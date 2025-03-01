@@ -1,15 +1,17 @@
 import { CommandInteraction } from "discord.js";
-import { BotCommand, BotModule } from "../base";
+import { BotCommand, BotModule } from "./base";
 import humanizeDuration from "humanize-duration";
 
 export default class Ping extends BotModule {
     name: string = "Ping";
     description: string = "Pong!";
-    color = 0x00ffff;
-    ready = true;
+    commandName: string = "ping";
+    color: number = 0x00ffff;
+    ready: boolean = true;
+    dmPermission: boolean = true;
     
-    @BotCommand({ name: 'ping', description: 'Pong!' })
-    async run(interaction: CommandInteraction) {
+    @BotCommand({ description: "Pong!", dmPermission: true })
+    async ping(interaction: CommandInteraction) {
         await interaction.reply({
             embeds: [{
                 description: "🏓 Pong! (**" + (Date.now() - interaction.createdTimestamp)

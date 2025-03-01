@@ -1,10 +1,21 @@
-import { ChatInputApplicationCommandData, CommandInteraction } from "discord.js";
+import { ApplicationCommandOptionData, ApplicationCommandSubCommandData, ApplicationCommandSubGroupData, ChatInputApplicationCommandData, CommandInteraction } from "discord.js";
+import { BotModule } from "./modules/base";
 
-export interface BotCommandMetadata extends ChatInputApplicationCommandData {
-    method: symbol | string
+export interface ChatInputAplicationSubcommandData extends Omit<ChatInputApplicationCommandData, "name" | "options" | "type"> {
+    subcommand?: string;
+    subcommandGroup?: string;
+    options?: readonly Exclude<
+        ApplicationCommandOptionData,
+        ApplicationCommandSubGroupData | ApplicationCommandSubCommandData
+    >[];
 }
 
-export interface BotCommand extends ChatInputApplicationCommandData {
+export interface BotSubcommandMetadata extends ChatInputAplicationSubcommandData {
+    method: symbol | string;
+}
+
+export interface BotCommand extends ChatInputAplicationSubcommandData {
+    module: BotModule;
     run: (interaction: CommandInteraction) => Promise<void>;
 }
 
