@@ -1,12 +1,17 @@
 {
+  "name": "br4nd-0n-v3",
+  "version": "0.1",
   "scripts": {
-    "start": "ts-node src/index.ts"
+    "dev": "ts-node src/index.ts",
+    "build": "tsc src/"
   },
   "dependencies": {
     "discord.js": "^14.18.0",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "humanize-duration": "^3.32.1"
   },
   "devDependencies": {
+    "@types/humanize-duration": "^3.27.4",
     "@types/dotenv": "^6.1.1",
     "@types/node": "^22.13.8",
     "ts-node": "^10.9.2",
