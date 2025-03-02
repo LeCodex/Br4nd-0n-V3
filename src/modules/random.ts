@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, CommandInteraction } from "discord.js";
+import { ApplicationCommandOptionType, CommandInteraction, MessageFlags } from "discord.js";
 import { BotCommand, BotModule } from "./base";
 
 export default class Random extends BotModule {
@@ -19,7 +19,7 @@ export default class Random extends BotModule {
     }
 
     @BotCommand({
-        subcommand: "die", description: "Roll a die", options: [
+        subcommand: "die", description: "Rolls a die", options: [
             { name: "sides", description: "Number of sides", type: ApplicationCommandOptionType.Integer, minValue: 1 }
         ]
     })
@@ -35,12 +35,12 @@ export default class Random extends BotModule {
     })
     async choice(interaction: CommandInteraction) {
         const choices = interaction.options.get("choices")?.value?.toString().split(",").map((e) => e.trim());
-        if (!choices) return await interaction.reply({ content: "Please supply choices", flags: "Ephemeral" });
+        if (!choices || choices.length < 1) return await interaction.reply({ content: "Please supply choices", flags: MessageFlags.Ephemeral });
         this.reply(interaction, `🔮 I choose **${choices[Math.floor(Math.random() * choices.length)]}**!`);
     }
 
     @BotCommand({ subcommand: "rps", description: "Plays Rock Paper Scissors" })
-    @BotCommand({ subcommand: "shifumi", description: "Plays Rock Paper Scissors" })
+    @BotCommand({ subcommand: "shifumi", description: "Plays Shifumi" })
     async rps(interaction: CommandInteraction) {
         const throws = [":rock: Rock", "📄 Paper", "✂️ Scissors"];
         this.reply(interaction, `✊ I throw **${throws[Math.floor(Math.random() * throws.length)]}**!`);
@@ -72,7 +72,7 @@ export default class Random extends BotModule {
         this.reply(interaction, `🃏 Card(s) drawn: ${result.join(", ")}`);
     }
 
-    @BotCommand({ subcommand: "8ball", description: "Shake the 8-ball" })
+    @BotCommand({ subcommand: "8ball", description: "Shakes the 8-ball" })
     async eightBall(interaction: CommandInteraction) {
         const answers = [
             "It is certain.",

@@ -1,11 +1,13 @@
-import { ApplicationCommandOptionData, ApplicationCommandOptionType, ApplicationCommandType, ChatInputApplicationCommandData, Client, InteractionType } from "discord.js";
+import { ApplicationCommandOptionData, ApplicationCommandOptionType, ApplicationCommandType, ChatInputApplicationCommandData, Client } from "discord.js";
 import { configDotenv } from "dotenv";
 import { modules } from "./modules";
 import { BotCommand } from "./interfaces";
 import Logger from "./logger";
 import ErrorHandler from "./errors";
+import AdminPanel from "./admin";
+import View from "./view";
 
-configDotenv()
+configDotenv();
 
 Logger.log("Bot is starting...");
 
@@ -19,6 +21,9 @@ client.on("ready", async () => {
         Logger.error(`Bot failed to connect`);
         return;
     }
+
+    ErrorHandler.load(client);
+    AdminPanel.load(client);
 
     const groupedCommands: ChatInputApplicationCommandData[] = [];
     for (const module of modules) {
@@ -87,13 +92,24 @@ client.on("interactionCreate", async (interaction) => {
                     await command.run(interaction);
                 }
             }
-            return;
+        } else if (interaction.isMessageComponent()) {
+            for (const [messageId, view] of View.index) {
+                if (messageId === interaction.message.id) {
+                    await view.handle(interaction);
+                }
+            }
         }
-
-        if (interaction.isRepliable()) await interaction.deferReply();
     } catch (e) {
         await ErrorHandler.handle(client, interaction, e);
     }
+});
+
+process.on('uncaughtException', async (err) => {
+    await ErrorHandler.handle(client, undefined, err);
+});
+  
+process.on('unhandledRejection', async (err) => {
+    await ErrorHandler.handle(client, undefined, err);
 });
 
 client.login(process.env.BOT_TOKEN);

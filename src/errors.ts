@@ -1,6 +1,21 @@
-import { Client, EmbedBuilder, Interaction } from "discord.js";
+import { Client, EmbedBuilder, Interaction, Message, TextChannel } from "discord.js";
+import DB from "./db";
 
 export default class ErrorHandler {
+    static tempMessages = new Map<Message, number>();
+
+    static async load(client: Client) {
+        const messages = await DB.load("errors", "messages", [] as [string, string, number][]);
+        for (const [channelId, messageId, timestamp] of messages) {
+            const channel = await client.channels.fetch(channelId);
+            if (!(channel instanceof TextChannel)) continue;
+            const message = await channel.messages.fetch(messageId);
+            if (!message) continue;
+            await this.addTempMessage(message, timestamp);
+        }
+        await this.save();
+    }
+
     static async handle(client: Client, interaction: Interaction | undefined, error: any) {
         const embed = new EmbedBuilder()
             .setTitle("Something went wrong!")
@@ -12,10 +27,24 @@ export default class ErrorHandler {
 
         if (interaction?.isRepliable() && !interaction.replied) {
             embed.setFooter({ text: "This message will be deleted in one minute" });
-            const message = await interaction.reply({
+            const response = await interaction.reply({
                 embeds: [embed]
             });
-            setTimeout(async () => await message.delete(), 60000);
+            await this.addTempMessage(await response.fetch());
+            await this.save();
         }
+    }
+
+    static async addTempMessage(message: Message, timestamp: number = Date.now() + 60000) {
+        this.tempMessages.set(message, timestamp);
+        setTimeout(async () => {
+            this.tempMessages.delete(message);
+            await message.delete();
+            await this.save();
+        }, timestamp - Date.now());
+    }
+
+    static async save() {
+        await DB.save("errors", "messages", [...this.tempMessages.entries()].map(([message, timestamp]) => [message.channelId, message.id, timestamp]));
     }
 }

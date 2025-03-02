@@ -1,5 +1,6 @@
-import { ApplicationCommandOptionData, ApplicationCommandSubCommandData, ApplicationCommandSubGroupData, ChatInputApplicationCommandData, CommandInteraction } from "discord.js";
+import { AnyComponentBuilder, ApplicationCommandOptionData, ApplicationCommandSubCommandData, ApplicationCommandSubGroupData, ButtonBuilder, ButtonComponentData, ChannelSelectMenuBuilder, ChannelSelectMenuComponentData, ChatInputApplicationCommandData, CommandInteraction, ComponentData, Interaction, InteractionButtonComponentData, MentionableSelectMenuBuilder, MentionableSelectMenuComponentData, MessageActionRowComponentData, MessageComponentInteraction, RoleSelectMenuBuilder, RoleSelectMenuComponentData, StringSelectMenuBuilder, StringSelectMenuComponentData, UserSelectMenuBuilder, UserSelectMenuComponentData } from "discord.js";
 import { BotModule } from "./modules/base";
+import View from "./view";
 
 export interface ChatInputAplicationSubcommandData extends Omit<ChatInputApplicationCommandData, "name" | "options" | "type"> {
     subcommand?: string;
@@ -19,4 +20,40 @@ export interface BotCommand extends ChatInputAplicationSubcommandData {
     run: (interaction: CommandInteraction) => Promise<void>;
 }
 
+export type Constructor<T, P extends any[] = any> = new (...args: P) => T;
 export type Concrete<T extends abstract new (...args: any[]) => any> = T extends abstract new (...args: infer U) => infer V ? new (...args: U) => V : never;
+
+export type ComponentHandlerMetadata<T extends NonLinkButtonMessageActionRowComponentData = NonLinkButtonMessageActionRowComponentData> = T & {
+    builder: Constructor<NonTextInputComponentBuilder>;
+    method: symbol | string;
+    row?: Range<4>;
+    index?: Range<4>;
+}
+
+export type ComponentHandlerParameter<T extends NonLinkButtonMessageActionRowComponentData> = Omit<ComponentHandlerMetadata<T>, "type" | "customId" | "custom_id" | "method" | "builder">;
+
+export type ComponentHandler<T extends NonLinkButtonMessageActionRowComponentData = NonLinkButtonMessageActionRowComponentData> = ComponentHandlerMetadata<T> & {
+    view: View;
+    run: (interaction: MessageComponentInteraction) => Promise<void>;
+}
+
+export type NonLinkButtonMessageActionRowComponentData =
+    | InteractionButtonComponentData
+    | StringSelectMenuComponentData
+    | UserSelectMenuComponentData
+    | RoleSelectMenuComponentData
+    | MentionableSelectMenuComponentData
+    | ChannelSelectMenuComponentData;
+
+export type NonTextInputComponentBuilder = 
+    | ButtonBuilder
+    | StringSelectMenuBuilder
+    | UserSelectMenuBuilder
+    | StringSelectMenuBuilder
+    | ChannelSelectMenuBuilder
+    | MentionableSelectMenuBuilder
+    | RoleSelectMenuBuilder
+
+export type Fill<Amount extends number, Result extends number[] = []> = Result['length'] extends Amount ? Result : Fill<Amount, [...Result, 0]>; 
+export type Range<Min extends number, Max extends number = -1, Current extends number[] = Fill<Max extends -1 ? 0 : Min>> =
+    Current['length'] extends (Max extends -1 ? Min : Max) ? Current['length'] : Current['length'] | Range<Min, Max, [...Current, 0]>;

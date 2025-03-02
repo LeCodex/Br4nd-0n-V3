@@ -1,7 +1,7 @@
 import { Client, CommandInteraction } from "discord.js";
-import { BotCommand, BotSubcommandMetadata, ChatInputAplicationSubcommandData, Concrete } from "../interfaces";
+import { BotCommand, BotSubcommandMetadata, ChatInputAplicationSubcommandData } from "../interfaces";
 
-const BotCommands = Symbol("BotCommands");
+export const BotCommands = Symbol("BotCommands");
 
 export abstract class BotModule {
     abstract name: string;
@@ -11,23 +11,20 @@ export abstract class BotModule {
 
     dmPermission: boolean = false;
 
-    private _commands: BotCommand[] = [];
-    get commands() { return this._commands; }
+    commands: BotCommand[] = [];
     ready = false;
 
     constructor(public client: Client) {
         const commandsMetadata = this.constructor.prototype[BotCommands] as BotSubcommandMetadata[];
-        if (commandsMetadata && commandsMetadata.length) {
-            for (const metadata of commandsMetadata) {
-                this.commands.push({
-                    ...metadata,
-                    module: this,
-                    dmPermission: metadata.dmPermission ?? this.dmPermission,
-                    run: async (...args: any) => {
-                        if (this.ready) await (this as any)[metadata.method](...args);
-                    }
-                });
-            }
+        for (const metadata of commandsMetadata ?? []) {
+            this.commands.push({
+                ...metadata,
+                module: this,
+                dmPermission: metadata.dmPermission ?? this.dmPermission,
+                run: async (...args: any) => {
+                    if (this.ready) await (this as any)[metadata.method](...args);
+                }
+            });
         }
     }
 
