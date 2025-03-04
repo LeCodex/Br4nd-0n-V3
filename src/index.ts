@@ -89,7 +89,7 @@ client.on("interactionCreate", async (interaction) => {
                 ) {
                     const concatenatedCommand = interaction.commandName + (subcommandGroup ? ` ${subcommandGroup}` : "") + (subcommand ? ` ${subcommand}` : "");
                     Logger.log(`Running command "${concatenatedCommand}" with options ${JSON.stringify(Object.fromEntries(interaction.options.data.map(e => [e.name, e.value])))}`);
-                    await command.run(interaction);
+                    await command.callback(interaction);
                 }
             }
         } else if (interaction.isMessageComponent()) {

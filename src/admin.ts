@@ -1,4 +1,4 @@
-import { ButtonInteraction, ButtonStyle, Client, InteractionCollector, Message, MessageFlags, TextChannel } from "discord.js";
+import { ButtonInteraction, ButtonStyle, Client, InteractionCollector, Message, MessageFlags, Presence, TextChannel } from "discord.js";
 import DB from "./db";
 import View, { Button } from "./view";
 
@@ -6,7 +6,7 @@ class AdminView extends View {
     @Button({ style: ButtonStyle.Primary, label: "Restart", emoji: "🔄" })
     async restart(interaction: ButtonInteraction) {
         await interaction.reply({ content: "The bot will restart", flags: MessageFlags.Ephemeral });
-        process.exit(0);
+        process.exit();
     }
 
     @Button({ style: ButtonStyle.Danger, label: "Panic", emoji: "💥" })
@@ -18,7 +18,6 @@ class AdminView extends View {
 export default class AdminPanel {
     channel?: TextChannel;
     view?: AdminView;
-    collector?: InteractionCollector<ButtonInteraction>;
 
     static _instance: AdminPanel;
 

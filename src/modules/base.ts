@@ -21,7 +21,7 @@ export abstract class BotModule {
                 ...metadata,
                 module: this,
                 dmPermission: metadata.dmPermission ?? this.dmPermission,
-                run: async (...args: any) => {
+                callback: async (...args: any) => {
                     if (this.ready) await (this as any)[metadata.method](...args);
                 }
             });

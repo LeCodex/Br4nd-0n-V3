@@ -130,4 +130,4 @@ dist
 .pnp.*
 
 # save data
-.data/*
+.data/

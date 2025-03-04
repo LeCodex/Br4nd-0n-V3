@@ -17,7 +17,7 @@ export interface BotSubcommandMetadata extends ChatInputAplicationSubcommandData
 
 export interface BotCommand extends ChatInputAplicationSubcommandData {
     module: BotModule;
-    run: (interaction: CommandInteraction) => Promise<void>;
+    callback: (interaction: CommandInteraction) => Promise<void>;
 }
 
 export type Constructor<T, P extends any[] = any> = new (...args: P) => T;
@@ -33,8 +33,7 @@ export type ComponentHandlerMetadata<T extends NonLinkButtonMessageActionRowComp
 export type ComponentHandlerParameter<T extends NonLinkButtonMessageActionRowComponentData> = Omit<ComponentHandlerMetadata<T>, "type" | "customId" | "custom_id" | "method" | "builder">;
 
 export type ComponentHandler<T extends NonLinkButtonMessageActionRowComponentData = NonLinkButtonMessageActionRowComponentData> = ComponentHandlerMetadata<T> & {
-    view: View;
-    run: (interaction: MessageComponentInteraction) => Promise<void>;
+    callback: (interaction: MessageComponentInteraction) => Promise<void>;
 }
 
 export type NonLinkButtonMessageActionRowComponentData =

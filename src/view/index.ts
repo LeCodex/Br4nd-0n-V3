@@ -14,20 +14,10 @@ export default class View {
     constructor(public message?: Message) {
         const componentsMetadata = this.constructor.prototype[ComponentHandlers] as ComponentHandlerMetadata<NonLinkButtonMessageActionRowComponentData>[];
         for (const metadata of componentsMetadata ?? []) {
-            this.components.push({
+            this.setComponent({
                 ...metadata,
-                view: this,
-                run: async (...args: any) => await (this as any)[metadata.method](...args)
+                callback: async (...args: any) => await (this as any)[metadata.method](...args)
             });
-
-            let row = metadata.row ?? this.actionRows.findIndex((e) => e.components.length < 5);
-            row = row === -1 ? this.actionRows.length : row;
-            this.actionRows[row] ??= new ActionRowBuilder();
-            const index = metadata.index ?? this.actionRows[row]?.components.length;
-            if (this.actionRows[row]?.components[index]) {
-                throw RangeError(`Component for method ${metadata.method.toString()} is trying to fill an occupied slot`);
-            }
-            this.actionRows[row].components[index] = new metadata.builder(metadata);
         }
 
         if (this.message) {
@@ -36,9 +26,24 @@ export default class View {
         }
     }
 
+    setComponent(component: ComponentHandler<NonLinkButtonMessageActionRowComponentData>, canReplace: boolean = true) {
+        this.components.push(component);
+
+        let row = component.row ?? this.actionRows.findIndex((e) => e.components.length < 5);
+        if (row === -1) row = this.actionRows.length;
+        this.actionRows[row] ??= new ActionRowBuilder();
+        
+        let index = component.index ?? this.actionRows[row].components.findIndex((e) => typeof e === "undefined");
+        if (index === -1) index = this.actionRows[row].components.length;
+        if (this.actionRows[row].components[index] && !canReplace) {
+            throw RangeError(`Component for method ${component.method.toString()} is trying to fill an occupied slot`);
+        }
+        this.actionRows[row].components[index] = new component.builder(component);
+    }
+
     async send(channel: TextChannel, options: string | MessageCreateOptions) {
         if (this.message) {
-            throw TypeError("View was already sent");
+            throw Error("View was already sent");
         }
 
         this.message = await channel.send({ ...(typeof options === "string" ? { content: options } : options), components: this.actionRows });
@@ -56,8 +61,8 @@ export default class View {
     async handle(interaction: MessageComponentInteraction) {
         for (const component of this.components) {
             if (component.customId === interaction.customId) {
-                Logger.log(`Running component handler for "${component.method.toString()}" of ${component.view.constructor.name}`);
-                await component.run(interaction);
+                Logger.log(`Running component handler for "${component.method.toString()}" of ${this.constructor.name}`);
+                await component.callback(interaction);
             }
         }
     }
