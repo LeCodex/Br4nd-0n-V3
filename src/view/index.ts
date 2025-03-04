@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto";
-import { ActionRowBuilder, AnyComponentBuilder, ButtonBuilder, ChannelSelectMenuBuilder, ChannelSelectMenuComponentData, ComponentData, ComponentType, InteractionButtonComponentData, MentionableSelectMenuBuilder, MentionableSelectMenuComponentData, Message, MessageComponentInteraction, MessageCreateOptions, MessageEditOptions, RoleSelectMenuBuilder, RoleSelectMenuComponentData, Snowflake, StringSelectMenuBuilder, StringSelectMenuComponentData, TextChannel, TextInputBuilder, UserSelectMenuBuilder, UserSelectMenuComponentData } from "discord.js";
+import { ActionRowBuilder, AnyComponentBuilder, ButtonBuilder, ChannelSelectMenuBuilder, ChannelSelectMenuComponentData, ComponentData, ComponentType, InteractionButtonComponentData, MentionableSelectMenuBuilder, MentionableSelectMenuComponentData, Message, MessageComponentInteraction, MessageCreateOptions, MessageEditOptions, RoleSelectMenuBuilder, RoleSelectMenuComponentData, Snowflake, StringSelectMenuBuilder, StringSelectMenuComponentData, TextChannel, UserSelectMenuBuilder, UserSelectMenuComponentData } from "discord.js";
 import { ComponentHandler, ComponentHandlerMetadata, ComponentHandlerParameter, Constructor, NonLinkButtonMessageActionRowComponentData, NonTextInputComponentBuilder } from "../interfaces";
 import Logger from "../logger";
 
@@ -36,14 +36,14 @@ export default class View {
         let index = component.index ?? this.actionRows[row].components.findIndex((e) => typeof e === "undefined");
         if (index === -1) index = this.actionRows[row].components.length;
         if (this.actionRows[row].components[index] && !canReplace) {
-            throw RangeError(`Component for method ${component.method.toString()} is trying to fill an occupied slot`);
+            throw RangeError(`Component is trying to fill an occupied slot`);
         }
         this.actionRows[row].components[index] = new component.builder(component);
     }
 
     async send(channel: TextChannel, options: string | MessageCreateOptions) {
         if (this.message) {
-            throw Error("View was already sent");
+            throw Error("View was already sent. Did you mean to use edit?");
         }
 
         this.message = await channel.send({ ...(typeof options === "string" ? { content: options } : options), components: this.actionRows });
