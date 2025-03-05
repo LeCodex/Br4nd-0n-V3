@@ -27,6 +27,12 @@ export default class DB {
         return JSON.parse(json) as T;
     }
 
+    public static async delete(collection: string, name: string) {
+        if (!fs.existsSync(this.getCollectionPath(collection))) fs.mkdirSync(this.getCollectionPath(collection), { recursive: true });
+        fs.rm(this.getSavePath(collection, name), err => { if (err != null) Logger.error(err) });
+        Logger.log(collection + " JSON data deleted");
+    }
+
     public static async saveExists(collection: string, name: string) {
         return fs.existsSync(this.getSavePath(collection, name));
     }

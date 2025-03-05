@@ -25,8 +25,8 @@ export type Concrete<T extends abstract new (...args: any[]) => any> = T extends
 export type ComponentHandlerMetadata<T extends NonLinkButtonMessageActionRowComponentData = NonLinkButtonMessageActionRowComponentData> = T & {
     builder: Constructor<NonTextInputComponentBuilder>;
     method: symbol | string;
-    row?: Range<4>;
-    index?: Range<4>;
+    row?: NumberRange<4>;
+    index?: NumberRange<4>;
 }
 
 export type ComponentHandlerParameter<T extends NonLinkButtonMessageActionRowComponentData> = Omit<ComponentHandlerMetadata<T>, "type" | "customId" | "custom_id" | "method" | "builder">;
@@ -53,5 +53,6 @@ export type NonTextInputComponentBuilder =
     | RoleSelectMenuBuilder
 
 export type Fill<Amount extends number, Result extends number[] = []> = Result['length'] extends Amount ? Result : Fill<Amount, [...Result, 0]>; 
-export type Range<Min extends number, Max extends number = -1, Current extends number[] = Fill<Max extends -1 ? 0 : Min>> =
-    Current['length'] extends (Max extends -1 ? Min : Max) ? Current['length'] : Current['length'] | Range<Min, Max, [...Current, 0]>;
+export type NumberRange<Min extends number, Max extends number = -1, Current extends number[] = Fill<Max extends -1 ? 0 : Min>> =
+    Current['length'] extends (Max extends -1 ? Min : Max) ? Current['length'] : Current['length'] | NumberRange<Min, Max, [...Current, 0]>;
+export type CharOf<T extends string> = T extends `${infer Char}${infer Tail}` ? Char | CharOf<Tail> : never

@@ -1,4 +1,4 @@
-import { Client, CommandInteraction } from "discord.js";
+import { Client, CommandInteraction, MessageFlags } from "discord.js";
 import { BotCommand, BotSubcommandMetadata, ChatInputAplicationSubcommandData } from "../interfaces";
 
 export const BotCommands = Symbol("BotCommands");
@@ -21,15 +21,15 @@ export abstract class BotModule {
                 ...metadata,
                 module: this,
                 dmPermission: metadata.dmPermission ?? this.dmPermission,
-                callback: async (...args: any) => {
-                    if (this.ready) await (this as any)[metadata.method](...args);
+                callback: async (interaction: CommandInteraction) => {
+                    if (this.ready) {
+                        await (this as any)[metadata.method](interaction);
+                    } else {
+                        await interaction.reply({ content: "The module is not ready yet", flags: MessageFlags.Ephemeral });
+                    }
                 }
             });
         }
-    }
-
-    async command(interaction: CommandInteraction) {
-        throw TypeError("Not implemented");
     }
 }
 
