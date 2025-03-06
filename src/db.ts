@@ -17,7 +17,9 @@ export default class DB {
         Logger.log(collection + " JSON data saved");
     }
 
-    public static async load<T>(collection: string, name: string, fallback: T) {
+    public static async get<T>(collection: string, name: string): Promise<T | undefined>
+    public static async get<T>(collection: string, name: string, fallback: T): Promise<T>
+    public static async get<T>(collection: string, name: string, fallback?: T): Promise<T | undefined> {
         if (!await this.saveExists(collection, name)) {
             this.save(collection, name, fallback);
             return fallback;
@@ -35,5 +37,9 @@ export default class DB {
 
     public static async saveExists(collection: string, name: string) {
         return fs.existsSync(this.getSavePath(collection, name));
+    }
+
+    public static async getRecords(collection: string) {
+        return fs.readdirSync(this.getCollectionPath(collection)).map(e => e.slice(0, e.lastIndexOf(".")));
     }
 }

@@ -31,6 +31,8 @@ export abstract class BotModule {
             });
         }
     }
+
+    public onLoaded() {}
 }
 
 export function BotCommand(metadata: ChatInputAplicationSubcommandData): MethodDecorator {

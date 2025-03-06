@@ -33,7 +33,7 @@ export default class AdminPanel {
     }
 
     private async loadMessage() {
-        const save = await DB.load("admin", "message", { channel: process.env.ADMIN_PANEL_CHANNEL!, message: null });
+        const save = await DB.get("admin", "message", { channel: process.env.ADMIN_PANEL_CHANNEL!, message: null });
         const channel = await this.client.channels.fetch(save.channel);
         if (channel instanceof TextChannel) {
             this.channel = channel;

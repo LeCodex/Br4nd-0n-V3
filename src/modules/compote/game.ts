@@ -1,8 +1,11 @@
 import { APIEmbed, CommandInteraction, MessageFlags } from "discord.js";
+import { DateTime } from "luxon";
 import { Game } from "../game";
 import CompoteDePommesPlayer from "./player";
 import { CharOf, NumberRange } from "src/interfaces";
 import { getRankEmoji } from "../utils";
+import CompoteDePommes from ".";
+import Logger from "../../logger";
 
 export default class CompoteDePommesGame extends Game {
     static effectsDescription = [
@@ -33,12 +36,41 @@ export default class CompoteDePommesGame extends Game {
     summary: string[] = [];
     history: CompoteDePommesPlayer[] = [];
     maxHands: number = 10;
+    nextRefill: number;
+    refillTimeout?: NodeJS.Timeout;
+
+    constructor(module: CompoteDePommes, channelId: string, nextRefill?: number) {
+        super(module, channelId);
+        this.nextRefill = nextRefill ?? DateTime.now().setZone("Europe/Paris").toMillis();
+        this.setupNextRefill(!nextRefill);
+    }
+
+    setupNextRefill(increment: boolean = true) {
+        if (increment) {
+            let next = DateTime.now().setZone("Europe/Paris");
+            next = next.set({ hour: Math.floor(next.hour / 12) * 12, minute: 0, second: 0, millisecond: 0 }).plus({ hour: 12 });
+            Logger.log(next);
+            this.nextRefill = next.toMillis();
+        }
+
+        if (this.refillTimeout) clearTimeout(this.refillTimeout);
+        this.refillTimeout = setTimeout(() => {
+            for (const player of Object.values(this.players)) {
+                player.gainHands(Math.ceil(this.maxHands / 2), false);
+            }
+            this.setupNextRefill();
+        }, this.nextRefill - DateTime.now().setZone("Europe/Paris").toMillis());
+    }
 
     async roll(interaction: CommandInteraction) {
         const player = this.players[interaction.user.id] ??= new CompoteDePommesPlayer(this, interaction.user);
         if (player.hands === 0) {
             return await interaction.reply({ content: "Vous n'avez plus de cueillettes!", flags: MessageFlags.Ephemeral });
         }
+        if (player === this.history[0]) {
+            return await interaction.reply({ content: "Vous avez déjà joué, veuillez attendre un autre joueur.", flags: MessageFlags.Ephemeral });
+        }
+
         player.hands--;
         this.summary.length = 0;
 
@@ -52,6 +84,7 @@ export default class CompoteDePommesGame extends Game {
         player.rolls++;
 
         if (!this.summary.length) this.summary.push(`Pas de chance pour ${player.user.toString()} ! Rien cette fois !`)
+        await this.save();
         return await interaction.reply({ embeds: [this.rollEmbed(player, roll, letter)] });
     }
 
@@ -97,7 +130,7 @@ export default class CompoteDePommesGame extends Game {
         return {
             title: `Cueillette #${player.rolls} de ${player.user.displayName}`,
             description: `${player.user.toString()} obtient **${roll}** et hurle **${letter}** !\n*${CompoteDePommesGame.effectsDescription[roll - 1]}*`
-                + `\n\n${this.summary.join('\n')} \n\n${player.summary}\nRang: 🏅 ** ${this.order.indexOf(player) + 1}**`,
+                + `\n\n${this.summary.join('\n')} \n\n${player.summary}`,
             color: CompoteDePommesGame.color
         };
     }
@@ -233,11 +266,18 @@ export default class CompoteDePommesGame extends Game {
     protected serialize() {
         return {
             ...super.serialize(),
-            players: Object.fromEntries(Object.entries(this.players).map(([k, v]) => [k, v.serialize()]))
+            players: Object.fromEntries(Object.entries(this.players).map(([k, v]) => [k, v.serialize()])),
+            maxHands: this.maxHands,
+            history: this.history.map(e => e.user.id),
+            nextRefill: this.nextRefill,
         };
     }
 
-    protected parse(obj: ReturnType<typeof this.serialize>): void {
-        
+    static async load(module: CompoteDePommes, channelId: string, obj: Record<string, any>): Promise<CompoteDePommesGame> {
+        const instance = new this(module, channelId, obj.nextRefill);
+        instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]: [string, any]) => [k, await CompoteDePommesPlayer.load(module.client, instance, v)])));
+        instance.maxHands = obj.maxHands;
+        instance.history = obj.history.map((e: string) => instance.players[e]);
+        return instance;
     }
 }

@@ -5,7 +5,7 @@ export default class ErrorHandler {
     static tempMessages = new Map<Message, number>();
 
     static async load(client: Client) {
-        const messages = await DB.load("errors", "messages", [] as [string, string, number][]);
+        const messages = await DB.get("errors", "messages", [] as [string, string, number][]);
         for (const [channelId, messageId, timestamp] of messages) {
             const channel = await client.channels.fetch(channelId);
             if (!(channel instanceof TextChannel)) continue;
