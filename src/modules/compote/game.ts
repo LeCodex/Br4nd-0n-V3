@@ -42,24 +42,25 @@ export default class CompoteDePommesGame extends Game {
     constructor(module: CompoteDePommes, channelId: string, nextRefill?: number) {
         super(module, channelId);
         this.nextRefill = nextRefill ?? DateTime.now().setZone("Europe/Paris").toMillis();
-        this.setupNextRefill(!nextRefill);
+        this.setupNextRefill();
     }
 
-    setupNextRefill(increment: boolean = true) {
-        if (increment) {
-            let next = DateTime.now().setZone("Europe/Paris");
-            next = next.set({ hour: Math.floor(next.hour / 12) * 12, minute: 0, second: 0, millisecond: 0 }).plus({ hour: 12 });
-            Logger.log(next);
-            this.nextRefill = next.toMillis();
-        }
+    setupNextRefill() {
+        let next = DateTime.now().setZone("Europe/Paris");
+        next = next.set({ hour: Math.floor(next.hour / 12) * 12, minute: 0, second: 0, millisecond: 0 }).plus({ hour: 12 });
+        Logger.log(next);
+        this.nextRefill = next.toMillis();
 
         if (this.refillTimeout) clearTimeout(this.refillTimeout);
-        this.refillTimeout = setTimeout(() => {
-            for (const player of Object.values(this.players)) {
-                player.gainHands(Math.ceil(this.maxHands / 2), false);
-            }
-            this.setupNextRefill();
-        }, this.nextRefill - DateTime.now().setZone("Europe/Paris").toMillis());
+        this.refillTimeout = setTimeout(() => this.refill(), this.nextRefill - DateTime.now().setZone("Europe/Paris").toMillis());
+    }
+
+    async refill() {
+        for (const player of Object.values(this.players)) {
+            player.gainHands(Math.ceil(this.maxHands / 2), false);
+        }
+        this.setupNextRefill();
+        await this.save();
     }
 
     async roll(interaction: CommandInteraction) {
