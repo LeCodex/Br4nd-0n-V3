@@ -7,7 +7,7 @@ import ErrorHandler from "src/errors";
 import AdminPanel from "src/admin";
 import View from "src/view";
 import { client } from "src/client";
-import { BotModule } from "./modules/base";
+import { BotModule } from "src/modules/base";
 
 configDotenv();
 

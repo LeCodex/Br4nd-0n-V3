@@ -7,13 +7,13 @@ import { BotModule } from "../base";
 import Logger from "src/logger";
 
 export class Tartilettres extends GameModule(BotModule) {
-    static words = new Set(fs.readFileSync(module.path + '/fr.txt').toString().split("\n"));
+    static words = new Set(fs.readFileSync(module.path + '/fr.txt').toString().split("\n").map((e) => e.trim()));
     protected cls = TartilettresGame;
     name = "Tartilettres";
     description = "Joue au Scrabble avec des peignes";
     commandName = "tarti";
     color = 0x008000;
-    
+
     protected instantiate(interaction: ChatInputCommandInteraction): TartilettresGame {
         return new TartilettresGame(this, interaction.channelId);
     }
