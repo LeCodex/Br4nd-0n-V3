@@ -1,10 +1,11 @@
 import { Client, EmbedBuilder, Interaction, Message, TextChannel } from "discord.js";
 import DB from "./db";
+import Logger from "./logger";
 
 export default class ErrorHandler {
-    static tempMessages = new Map<Message, number>();
+    private static tempMessages = new Map<Message, number>();
 
-    static async load(client: Client) {
+    public static async load(client: Client) {
         const messages = await DB.get("errors", "messages", [] as [string, string, number][]);
         for (const [channelId, messageId, timestamp] of messages) {
             const channel = await client.channels.fetch(channelId);
@@ -16,7 +17,9 @@ export default class ErrorHandler {
         await this.save();
     }
 
-    static async handle(client: Client, interaction: Interaction | undefined, error: any) {
+    public static async handle(client: Client, interaction: Interaction | undefined, error: any) {
+        Logger.error("\x1b[31m", error, "\x1b[0m");
+
         const embed = new EmbedBuilder()
             .setTitle("Something went wrong!")
             .setColor(0xff0000)
@@ -35,7 +38,7 @@ export default class ErrorHandler {
         }
     }
 
-    static async addTempMessage(message: Message, timestamp: number = Date.now() + 60000) {
+    public static async addTempMessage(message: Message, timestamp: number = Date.now() + 60000) {
         this.tempMessages.set(message, timestamp);
         setTimeout(async () => {
             this.tempMessages.delete(message);
@@ -44,7 +47,7 @@ export default class ErrorHandler {
         }, timestamp - Date.now());
     }
 
-    static async save() {
+    public static async save() {
         await DB.save("errors", "messages", [...this.tempMessages.entries()].map(([message, timestamp]) => [message.channelId, message.id, timestamp]));
     }
 }

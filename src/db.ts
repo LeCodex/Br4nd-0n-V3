@@ -40,6 +40,8 @@ export default class DB {
     }
 
     public static async getRecords(collection: string) {
-        return fs.readdirSync(this.getCollectionPath(collection)).map(e => e.slice(0, e.lastIndexOf(".")));
+        const path = this.getCollectionPath(collection);
+        if (!fs.existsSync(path)) fs.mkdirSync(path);
+        return fs.readdirSync(path).map(e => e.slice(0, e.lastIndexOf(".")));
     }
 }

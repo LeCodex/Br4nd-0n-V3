@@ -12,10 +12,10 @@ export default class Logger {
     }
 
     static warn(...data: any[]) {
-        console.warn(this.now(), ...data);
+        console.warn(this.now(), "\x1b[33m",  ...data, "\x1b[0m");
     }
 
     static error(...data: any[]) {
-        console.error(this.now(), ...data);
+        console.error(this.now(), "\x1b[31m", ...data, "\x1b[0m");
     }
 }

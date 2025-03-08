@@ -1,6 +1,8 @@
-import { Client, User } from "discord.js";
+import { User } from "discord.js";
 import CompoteDePommesGame from "./game";
 import { getRankEmoji } from "../utils";
+import CompoteDePommes from ".";
+import { client } from "../../client";
 
 export default class CompoteDePommesPlayer {
     rolls: number = 0;
@@ -100,7 +102,7 @@ export default class CompoteDePommesPlayer {
         };
     }
 
-    static async load(client: Client, game: CompoteDePommesGame, obj: ReturnType<CompoteDePommesPlayer["serialize"]>) {
+    static async load(module: CompoteDePommes, game: CompoteDePommesGame, obj: ReturnType<CompoteDePommesPlayer["serialize"]>) {
         const instance = new this(game, await client.users.fetch(obj.user));
         instance.rolls = obj.rolls;
         instance.basket = obj.basket;

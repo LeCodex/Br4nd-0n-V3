@@ -1,4 +1,4 @@
-import { APIEmbed, CommandInteraction, MessageFlags } from "discord.js";
+import { APIEmbed, ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { DateTime } from "luxon";
 import { Game } from "../game";
 import CompoteDePommesPlayer from "./player";
@@ -63,13 +63,13 @@ export default class CompoteDePommesGame extends Game {
         await this.save();
     }
 
-    async roll(interaction: CommandInteraction) {
+    async roll(interaction: ChatInputCommandInteraction) {
         const player = this.players[interaction.user.id] ??= new CompoteDePommesPlayer(this, interaction.user);
         if (player.hands === 0) {
-            return await interaction.reply({ content: "Vous n'avez plus de cueillettes!", flags: MessageFlags.Ephemeral });
+            return interaction.reply({ content: "Vous n'avez plus de cueillettes!", flags: MessageFlags.Ephemeral });
         }
         if (player === this.history[0]) {
-            return await interaction.reply({ content: "Vous avez déjà joué, veuillez attendre un autre joueur.", flags: MessageFlags.Ephemeral });
+            return interaction.reply({ content: "Vous avez déjà joué, veuillez attendre un autre joueur.", flags: MessageFlags.Ephemeral });
         }
 
         player.hands--;
@@ -86,7 +86,7 @@ export default class CompoteDePommesGame extends Game {
 
         if (!this.summary.length) this.summary.push(`Pas de chance pour ${player.user.toString()} ! Rien cette fois !`)
         await this.save();
-        return await interaction.reply({ embeds: [this.rollEmbed(player, roll, letter)] });
+        return interaction.reply({ embeds: [this.rollEmbed(player, roll, letter)] });
     }
 
     get order() {
@@ -276,7 +276,8 @@ export default class CompoteDePommesGame extends Game {
 
     static async load(module: CompoteDePommes, channelId: string, obj: Record<string, any>): Promise<CompoteDePommesGame> {
         const instance = new this(module, channelId, obj.nextRefill);
-        instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]: [string, any]) => [k, await CompoteDePommesPlayer.load(module.client, instance, v)])));
+        instance.paused = obj.paused;
+        instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]: [string, any]) => [k, await CompoteDePommesPlayer.load(module, instance, v)])));
         instance.maxHands = obj.maxHands;
         instance.history = obj.history.map((e: string) => instance.players[e]);
         return instance;

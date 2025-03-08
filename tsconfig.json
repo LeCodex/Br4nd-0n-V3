@@ -1,11 +1,11 @@
 {
     "compilerOptions": {
         "target": "ESNext",
-        "module": "commonjs",
-        "rootDir": "./src/",
-        "outDir": "./dist/",
+        "module": "NodeNext",
+        "rootDir": "src",
+        "outDir": "dist",
         "strict": true,
-        "moduleResolution": "node",
+        "moduleResolution": "nodenext",
         "importHelpers": true,
         "experimentalDecorators": true,
         "esModuleInterop": true,
@@ -18,13 +18,18 @@
             "node_modules/@types"
         ],
         "sourceMap": false,
-        "baseUrl": "./"
+        "baseUrl": ".",
     },
     "include": [
-        "./**/*.ts"
+        "src",
+        "src/**/*.ts"
     ],
     "exclude": [
         "node_modules",
-        "dist"
+        "dist",
+        ".vscode"
     ],
+    "ts-node": {
+        "require": ["tsconfig-paths/register"]
+    }
 }

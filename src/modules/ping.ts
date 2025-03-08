@@ -1,6 +1,7 @@
-import { CommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 import { BotCommand, BotModule } from "./base";
 import humanizeDuration from "humanize-duration";
+import { client } from "../client";
 
 export default class Ping extends BotModule {
     name: string = "Ping";
@@ -11,12 +12,12 @@ export default class Ping extends BotModule {
     dmPermission: boolean = true;
     
     @BotCommand({ description: "Pong!", dmPermission: true })
-    async ping(interaction: CommandInteraction) {
+    public async ping(interaction: ChatInputCommandInteraction) {
         await interaction.reply({
             embeds: [{
                 description: "🏓 Pong! (**" + (Date.now() - interaction.createdTimestamp)
-                    + " ms**).\n🤖 __" + this.client.user?.username + "__ has been up for **" + humanizeDuration(this.client.uptime ?? 0, { largest: 2, round: true, conjunction: " and ", serialComma: false })
-                    + "**.\n🔄 Average websocket ping: **" + this.client.ws.ping + " ms**.",
+                    + " ms**).\n🤖 __" + client.user?.username + "__ has been up for **" + humanizeDuration(client.uptime ?? 0, { largest: 2, round: true, conjunction: " and ", serialComma: false })
+                    + "**.\n🔄 Average websocket ping: **" + client.ws.ping + " ms**.",
                 color: this.color
             }]
         })

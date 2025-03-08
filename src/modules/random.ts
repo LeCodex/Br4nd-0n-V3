@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, CommandInteraction, MessageFlags } from "discord.js";
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { BotCommand, BotModule } from "./base";
 
 export default class Random extends BotModule {
@@ -9,7 +9,7 @@ export default class Random extends BotModule {
     ready: boolean = true;
     dmPermission: boolean = true;
 
-    async reply(interaction: CommandInteraction, content: string) {
+    public async reply(interaction: ChatInputCommandInteraction, content: string) {
         await interaction.reply({
             embeds: [{
                 description: content,
@@ -23,7 +23,7 @@ export default class Random extends BotModule {
             { name: "sides", description: "Number of sides", type: ApplicationCommandOptionType.Integer, minValue: 1 }
         ]
     })
-    async die(interaction: CommandInteraction) {
+    public async die(interaction: ChatInputCommandInteraction) {
         const sides = Number(interaction.options.get("sides")?.value ?? 6);
         await this.reply(interaction, `🎲 The D${sides} landed on **${Math.floor(Math.random() * sides + 1)}**`);
     }
@@ -33,15 +33,15 @@ export default class Random extends BotModule {
             { name: "choices", description: "Choices, separated by commas", type: ApplicationCommandOptionType.String, required: true }
         ]
     })
-    async choice(interaction: CommandInteraction) {
+    public async choice(interaction: ChatInputCommandInteraction) {
         const choices = interaction.options.get("choices")?.value?.toString().split(",").map((e) => e.trim());
-        if (!choices || choices.length < 1) return await interaction.reply({ content: "Please supply choices", flags: MessageFlags.Ephemeral });
+        if (!choices || choices.length < 1) return interaction.reply({ content: "Please supply choices", flags: MessageFlags.Ephemeral });
         this.reply(interaction, `🔮 I choose **${choices[Math.floor(Math.random() * choices.length)]}**!`);
     }
 
     @BotCommand({ subcommand: "rps", description: "Plays Rock Paper Scissors" })
     @BotCommand({ subcommand: "shifumi", description: "Plays Shifumi" })
-    async rps(interaction: CommandInteraction) {
+    public async rps(interaction: ChatInputCommandInteraction) {
         const throws = [":rock: Rock", "📄 Paper", "✂️ Scissors"];
         this.reply(interaction, `✊ I throw **${throws[Math.floor(Math.random() * throws.length)]}**!`);
     }
@@ -52,7 +52,7 @@ export default class Random extends BotModule {
             { name: "unique", description: "Are the cards draw unique or not?", type: ApplicationCommandOptionType.Boolean },
         ]
     })
-    async card(interaction: CommandInteraction) {
+    public async card(interaction: ChatInputCommandInteraction) {
         const amount = Number(interaction.options.get("number")?.value ?? 1);
         const unique = interaction.options.get("unique")?.value ?? false;
 
@@ -73,7 +73,7 @@ export default class Random extends BotModule {
     }
 
     @BotCommand({ subcommand: "8ball", description: "Shakes the 8-ball" })
-    async eightBall(interaction: CommandInteraction) {
+    public async eightBall(interaction: ChatInputCommandInteraction) {
         const answers = [
             "It is certain.",
             "It is decidedly so.",

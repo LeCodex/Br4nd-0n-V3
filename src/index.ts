@@ -1,20 +1,20 @@
-import { ApplicationCommandOptionData, ApplicationCommandOptionType, ApplicationCommandType, ChatInputApplicationCommandData, Client } from "discord.js";
+import { ApplicationCommandOptionData, ApplicationCommandOptionType, ApplicationCommandType, ChatInputApplicationCommandData } from "discord.js";
 import { configDotenv } from "dotenv";
-import { modules } from "./modules";
-import { BotCommand } from "./interfaces";
-import Logger from "./logger";
-import ErrorHandler from "./errors";
-import AdminPanel from "./admin";
-import View from "./view";
+import { modules } from "src/modules";
+import { BotCommand } from "src/interfaces";
+import Logger from "src/logger";
+import ErrorHandler from "src/errors";
+import AdminPanel from "src/admin";
+import View from "src/view";
+import { client } from "src/client";
+import { BotModule } from "./modules/base";
 
 configDotenv();
 
 Logger.log("Bot is starting...");
 
-const client = new Client({
-    intents: []
-});
 const allCommands: BotCommand[] = [];
+const moduleInstances: BotModule[] = [];
 
 client.on("ready", async () => {
     if (!client.user || !client.application) {
@@ -69,7 +69,7 @@ client.on("ready", async () => {
             });
         }
 
-        Logger.log(`Loaded module ${instance.name} (${instance.description}) with ${instance.commands.length} commands`);
+        Logger.log(`Loaded module ${module.name} (${instance.description}) with ${instance.commands.length} commands`);
         instance.onLoaded();
     }
 
@@ -102,6 +102,12 @@ client.on("interactionCreate", async (interaction) => {
         }
     } catch (e) {
         await ErrorHandler.handle(client, interaction, e);
+    }
+});
+
+client.on("messageCreate", async (message) => {
+    for (const module of moduleInstances) {
+        module.onMessage(message);
     }
 });
 
