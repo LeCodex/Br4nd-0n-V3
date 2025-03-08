@@ -1,7 +1,7 @@
 import { randomBytes } from "crypto";
 import { ActionRowBuilder, AnyComponentBuilder, ButtonBuilder, ChannelSelectMenuBuilder, ChannelSelectMenuComponentData, ComponentData, ComponentType, InteractionButtonComponentData, MentionableSelectMenuBuilder, MentionableSelectMenuComponentData, Message, MessageComponentInteraction, MessageCreateOptions, MessageEditOptions, RoleSelectMenuBuilder, RoleSelectMenuComponentData, Snowflake, StringSelectMenuBuilder, StringSelectMenuComponentData, TextChannel, UserSelectMenuBuilder, UserSelectMenuComponentData } from "discord.js";
-import { ComponentHandler, ComponentHandlerMetadata, ComponentHandlerParameter, Constructor, NonLinkButtonMessageActionRowComponentData, NonTextInputComponentBuilder } from "../interfaces";
-import Logger from "../logger";
+import { ComponentHandler, ComponentHandlerMetadata, ComponentHandlerParameter, Constructor, NonLinkButtonMessageActionRowComponentData, NonTextInputComponentBuilder } from "src/interfaces";
+import Logger from "src/logger";
 
 const ComponentHandlers = Symbol("ComponentHandlers");
 

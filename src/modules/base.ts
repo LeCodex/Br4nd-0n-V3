@@ -1,6 +1,5 @@
 import { ChatInputCommandInteraction, Client, Message, MessageFlags, OmitPartialGroupDMChannel } from "discord.js";
 import { BotCommand, BotSubcommandMetadata, ChatInputAplicationSubcommandData } from "src/interfaces";
-import Logger from "src/logger";
 
 export const BotCommands = Symbol("BotCommands");
 

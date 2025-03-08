@@ -1,11 +1,11 @@
 import { APIEmbed, ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { DateTime } from "luxon";
-import { Game } from "../game";
+import { Game } from "src/modules/game";
 import CompoteDePommesPlayer from "./player";
 import { CharOf, NumberRange } from "src/interfaces";
-import { getRankEmoji } from "../utils";
+import { getRankEmoji } from "src/modules/utils";
 import CompoteDePommes from ".";
-import Logger from "../../logger";
+import Logger from "src/logger";
 
 export default class CompoteDePommesGame extends Game {
     static effectsDescription = [

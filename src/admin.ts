@@ -1,4 +1,4 @@
-import { ButtonInteraction, ButtonStyle, Client, InteractionCollector, Message, MessageFlags, Presence, TextChannel } from "discord.js";
+import { ButtonInteraction, ButtonStyle, Client, MessageFlags, TextChannel } from "discord.js";
 import DB from "./db";
 import View, { Button } from "./view";
 

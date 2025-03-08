@@ -1,8 +1,8 @@
 import { User } from "discord.js";
 import CompoteDePommesGame from "./game";
-import { getRankEmoji } from "../utils";
+import { getRankEmoji } from "src/modules/utils";
 import CompoteDePommes from ".";
-import { client } from "../../client";
+import { client } from "src/client";
 
 export default class CompoteDePommesPlayer {
     rolls: number = 0;

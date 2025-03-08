@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { BotCommand, BotModule } from "./base";
-import DB from "../db";
-import { ChatInputAplicationSubcommandData, Constructor } from "src/interfaces";
-import Logger from "../logger";
+import DB from "src/db";
+import { ChatInputAplicationSubcommandData } from "src/interfaces";
+import Logger from "src/logger";
 
 export abstract class Game {
     paused: boolean = false;

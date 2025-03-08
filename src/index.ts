@@ -69,7 +69,7 @@ client.on("ready", async () => {
             });
         }
 
-        Logger.log(`Loaded module ${module.name} (${instance.description}) with ${instance.commands.length} commands`);
+        Logger.log(`Loaded module ${instance.name} (${instance.description}) with ${instance.commands.length} commands`);
         instance.onLoaded();
     }
 

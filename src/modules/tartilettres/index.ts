@@ -4,7 +4,6 @@ import { TartilettresGame } from "./game";
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
 import { replyMultiple } from "src/modules/utils";
 import { BotModule } from "../base";
-import Logger from "src/logger";
 
 export class Tartilettres extends GameModule(BotModule) {
     static words = new Set(fs.readFileSync(module.path + '/fr.txt').toString().split("\n").map((e) => e.trim()));
