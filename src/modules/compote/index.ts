@@ -1,9 +1,9 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from "discord.js";
-import { GameCommand, GameModule } from "src/modules/game"
+import { GameCommand } from "src/modules/game"
+import GameModule from "src/modules/game/base";
 import CompoteDePommesGame from "./game";
-import { BotModule } from "src/modules/base";
 
-export default class CompoteDePommes extends GameModule(BotModule) {
+export default class CompoteDePommes extends GameModule() {
     protected cls = CompoteDePommesGame;
     name: string = "Compote de Pommes";
     description: string = "Lancer un dé, c'est fort en pomme";

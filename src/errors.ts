@@ -18,8 +18,7 @@ export default class ErrorHandler {
     }
 
     public static async handle(client: Client, interaction: Interaction | undefined, error: any) {
-        Logger.error("\x1b[31m", error, "\x1b[0m");
-
+        Logger.error(error);
         const embed = new EmbedBuilder()
             .setTitle("Something went wrong!")
             .setColor(0xff0000)

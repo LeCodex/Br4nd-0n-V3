@@ -4,10 +4,13 @@
         "module": "NodeNext",
         "rootDir": "src",
         "outDir": "dist",
+        "newLine": "LF",
         "strict": true,
         "moduleResolution": "nodenext",
         "importHelpers": true,
         "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "pretty": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "allowSyntheticDefaultImports": true,
@@ -18,11 +21,11 @@
             "node_modules/@types"
         ],
         "sourceMap": false,
-        "baseUrl": ".",
+        "baseUrl": "."
     },
     "include": [
         "src",
-        "src/**/*.ts"
+        "src/**/*.ts",
     ],
     "exclude": [
         "node_modules",

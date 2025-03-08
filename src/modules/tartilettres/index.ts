@@ -1,12 +1,12 @@
 import * as fs from "fs";
-import { GameCommand, GameModule } from "src/modules/game";
-import { TartilettresGame } from "./game";
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
 import { replyMultiple } from "src/modules/utils";
-import { BotModule } from "../base";
+import { GameCommand } from "src/modules/game";
+import GameModule from "src/modules/game/base";
+import TartilettresGame from "./game";
 
-export class Tartilettres extends GameModule(BotModule) {
-    static words = new Set(fs.readFileSync(module.path + '/fr.txt').toString().split("\n").map((e) => e.trim()));
+export default class Tartilettres extends GameModule() {
+    static words = new Set(fs.readFileSync('config/tartilettres/fr.txt').toString().split("\n").map((e) => e.trim()));
     protected cls = TartilettresGame;
     name = "Tartilettres";
     description = "Joue au Scrabble avec des peignes";

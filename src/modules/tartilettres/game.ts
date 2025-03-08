@@ -1,9 +1,9 @@
 import { Game } from "src/modules/game";
 import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
-import { TartilettresPlayer } from "./player";
-import { Tartilettres } from ".";
+import TartilettresPlayer from "./player";
+import Tartilettres from ".";
 
-export class TartilettresGame extends Game {
+export default class TartilettresGame extends Game {
     readonly letters: string[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
     players: Record<string, TartilettresPlayer> = {};
     lastPlayed: string = "";

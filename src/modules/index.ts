@@ -1,9 +1,9 @@
-import { BotModule } from "./base";
-import Ping from "./ping";
-import Random from "./random";
-import CompoteDePommes from "./compote";
-import { Tartilettres } from "./tartilettres";
+import { BotModule } from "src/modules/base";
 import { Concrete } from "src/interfaces";
+import Ping from "src/modules/ping";
+import Random from "src/modules/random";
+import CompoteDePommes from "src/modules/compote";
+import Tartilettres from "src/modules/tartilettres";
 
 export const modules: Concrete<typeof BotModule>[] = [
     Ping,

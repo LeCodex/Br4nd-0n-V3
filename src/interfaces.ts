@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionData, ApplicationCommandSubCommandData, ApplicationCommandSubGroupData, ButtonBuilder, ChannelSelectMenuBuilder, ChannelSelectMenuComponentData, ChatInputApplicationCommandData, ChatInputCommandInteraction, InteractionButtonComponentData, MentionableSelectMenuBuilder, MentionableSelectMenuComponentData, MessageComponentInteraction, RoleSelectMenuBuilder, RoleSelectMenuComponentData, StringSelectMenuBuilder, StringSelectMenuComponentData, UserSelectMenuBuilder, UserSelectMenuComponentData } from "discord.js";
-import { BotModule } from "./modules/base";
+import { BotModule } from "src/modules/base";
+import GameModule from "src/modules/game/base";
 
 export interface ChatInputAplicationSubcommandData extends Omit<ChatInputApplicationCommandData, "name" | "options" | "type"> {
     subcommand?: string;
@@ -56,3 +57,5 @@ export type Fill<Amount extends number, Result extends number[] = []> = Result['
 export type NumberRange<Min extends number, Max extends number = -1, Current extends number[] = Fill<Max extends -1 ? 0 : Min>> =
     Current['length'] extends (Max extends -1 ? Min : Max) ? Current['length'] : Current['length'] | NumberRange<Min, Max, [...Current, 0]>;
 export type CharOf<T extends string> = T extends `${infer Char}${infer Tail}` ? Char | CharOf<Tail> : never;
+
+export type GameModule = InstanceType<ReturnType<typeof GameModule>>;

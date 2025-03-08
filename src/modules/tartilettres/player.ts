@@ -1,9 +1,9 @@
 import { ChatInputCommandInteraction, MessageFlags, User } from "discord.js";
-import { TartilettresGame } from "./game";
-import { Tartilettres } from ".";
+import TartilettresGame from "./game";
+import Tartilettres from ".";
 import { client } from "src/client";
 
-export class TartilettresPlayer {
+export default class TartilettresPlayer {
     score: number = 0;
     letters: Record<string, boolean> = {};
     taboo: string[] = [];
