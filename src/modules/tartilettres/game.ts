@@ -1,4 +1,4 @@
-import { Game } from "src/modules/game";
+import { Game } from "modules/game";
 import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import TartilettresPlayer from "./player";
 import Tartilettres from ".";
@@ -9,10 +9,10 @@ export default class TartilettresGame extends Game {
     lastPlayed: string = "";
     saidWords: string[] = [];
     wordLength: number = 7;
+    declare module: Tartilettres;
 
     constructor(module: Tartilettres, channelId: string) {
         super(module, channelId);
-        this.nextTurn();
     }
 
     public async sendWord(interaction: ChatInputCommandInteraction) {

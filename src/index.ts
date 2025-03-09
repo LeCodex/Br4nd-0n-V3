@@ -1,13 +1,13 @@
 import { ApplicationCommandOptionData, ApplicationCommandOptionType, ApplicationCommandType, ChatInputApplicationCommandData } from "discord.js";
 import { configDotenv } from "dotenv";
-import { modules } from "src/modules";
-import { BotCommand } from "src/interfaces";
-import Logger from "src/logger";
-import ErrorHandler from "src/errors";
-import AdminPanel from "src/admin";
-import View from "src/view";
-import { client } from "src/client";
-import { BotModule } from "src/modules/base";
+import { modules } from "modules";
+import { BotCommand } from "interfaces";
+import Logger from "logger";
+import ErrorHandler from "errors";
+import AdminPanel from "admin";
+import View from "view";
+import { client } from "client";
+import { BotModule } from "modules/base";
 
 configDotenv();
 
@@ -22,12 +22,12 @@ client.on("ready", async () => {
         return;
     }
 
-    ErrorHandler.load(client);
-    AdminPanel.load(client);
+    ErrorHandler.load();
+    AdminPanel.load();
 
     const groupedCommands: ChatInputApplicationCommandData[] = [];
     for (const module of modules) {
-        const instance = new module(client);
+        const instance = new module();
         allCommands.push(...instance.commands);
 
         const subcommandsCount = instance.commands.filter((e) => e.subcommand).length;
@@ -101,7 +101,7 @@ client.on("interactionCreate", async (interaction) => {
             }
         }
     } catch (e) {
-        await ErrorHandler.handle(client, interaction, e);
+        await ErrorHandler.handle(interaction, e);
     }
 });
 
@@ -112,11 +112,11 @@ client.on("messageCreate", async (message) => {
 });
 
 process.on('uncaughtException', async (err) => {
-    await ErrorHandler.handle(client, undefined, err);
+    await ErrorHandler.handle(undefined, err);
 });
   
 process.on('unhandledRejection', async (err) => {
-    await ErrorHandler.handle(client, undefined, err);
+    await ErrorHandler.handle(undefined, err);
 });
 
 client.login(process.env.BOT_TOKEN);

@@ -1,10 +1,10 @@
-import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
-import DB from "src/db";
-import Logger from "src/logger";
+import { ChatInputCommandInteraction, MessageFlags, TextChannel } from "discord.js";
+import DB from "db";
+import Logger from "logger";
 import { BotModule, BotCommand } from "../base";
 import { Game } from ".";
 
-export default function() {
+export default function GameModule() {
     abstract class GameModule extends BotModule {
         protected abstract cls: typeof Game;
         protected games: Record<string, Game> = {};
@@ -26,14 +26,13 @@ export default function() {
                 return interaction.reply({ content: "A game is already going in this channel", flags: MessageFlags.Ephemeral });
             }
 
-            const game = this.games[interaction.channelId] = this.instantiate(interaction);
-            await game.save();
+            const game = this.games[interaction.channelId] = await this.instantiate(interaction);
+            while (!game.channel) { };
+            await game.start();
             await interaction.reply("Started");
         }
 
-        protected instantiate(interaction: ChatInputCommandInteraction): Game {
-            throw TypeError("Not implemented");
-        }
+        protected abstract instantiate(interaction: ChatInputCommandInteraction): Promise<Game>;
 
         @BotCommand({ subcommand: "toggle", description: "Pause/Unpause a currently ongoing game", defaultMemberPermissions: ["ManageChannels"] })
         public async toggle(interaction: ChatInputCommandInteraction) {
@@ -56,6 +55,7 @@ export default function() {
 
             await game.delete();
             delete this.games[interaction.channelId];
+            await interaction.reply("Deleted");
         }
 
         public game(channelId: string) {

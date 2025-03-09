@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionData, ApplicationCommandSubCommandData, ApplicationCommandSubGroupData, ButtonBuilder, ChannelSelectMenuBuilder, ChannelSelectMenuComponentData, ChatInputApplicationCommandData, ChatInputCommandInteraction, InteractionButtonComponentData, MentionableSelectMenuBuilder, MentionableSelectMenuComponentData, MessageComponentInteraction, RoleSelectMenuBuilder, RoleSelectMenuComponentData, StringSelectMenuBuilder, StringSelectMenuComponentData, UserSelectMenuBuilder, UserSelectMenuComponentData } from "discord.js";
-import { BotModule } from "src/modules/base";
-import GameModule from "src/modules/game/base";
+import { BotModule } from "modules/base";
+import GameModule from "modules/game/base";
 
 export interface ChatInputAplicationSubcommandData extends Omit<ChatInputApplicationCommandData, "name" | "options" | "type"> {
     subcommand?: string;
@@ -29,12 +29,12 @@ export type ComponentHandlerMetadata<T extends NonLinkButtonMessageActionRowComp
     row?: NumberRange<4>;
     index?: NumberRange<4>;
 }
+export type ComponentHandlerMetadataParameter<T extends NonLinkButtonMessageActionRowComponentData> = Omit<ComponentHandlerMetadata<T>, "type" | "customId" | "custom_id" | "method" | "builder">;
 
-export type ComponentHandlerParameter<T extends NonLinkButtonMessageActionRowComponentData> = Omit<ComponentHandlerMetadata<T>, "type" | "customId" | "custom_id" | "method" | "builder">;
-
-export type ComponentHandler<T extends NonLinkButtonMessageActionRowComponentData = NonLinkButtonMessageActionRowComponentData> = ComponentHandlerMetadata<T> & {
+export type ComponentHandler<T extends NonLinkButtonMessageActionRowComponentData = NonLinkButtonMessageActionRowComponentData> = Omit<ComponentHandlerMetadata<T>, "method"> & {
     callback: (interaction: MessageComponentInteraction) => Promise<void>;
 }
+export type ComponentHandlerParameter<T extends NonLinkButtonMessageActionRowComponentData> = Omit<ComponentHandler<T>, "type" | "customId" | "custom_id" | "builder">;
 
 export type NonLinkButtonMessageActionRowComponentData =
     | InteractionButtonComponentData
@@ -59,3 +59,8 @@ export type NumberRange<Min extends number, Max extends number = -1, Current ext
 export type CharOf<T extends string> = T extends `${infer Char}${infer Tail}` ? Char | CharOf<Tail> : never;
 
 export type GameModule = InstanceType<ReturnType<typeof GameModule>>;
+
+export interface Vector2 {
+    x: number,
+    y: number
+};

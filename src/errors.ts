@@ -1,11 +1,12 @@
 import { Client, EmbedBuilder, Interaction, Message, TextChannel } from "discord.js";
 import DB from "./db";
 import Logger from "./logger";
+import { client } from "client";
 
 export default class ErrorHandler {
     private static tempMessages = new Map<Message, number>();
 
-    public static async load(client: Client) {
+    public static async load() {
         const messages = await DB.get("errors", "messages", [] as [string, string, number][]);
         for (const [channelId, messageId, timestamp] of messages) {
             const channel = await client.channels.fetch(channelId);
@@ -17,7 +18,7 @@ export default class ErrorHandler {
         await this.save();
     }
 
-    public static async handle(client: Client, interaction: Interaction | undefined, error: any) {
+    public static async handle(interaction: Interaction | undefined, error: any) {
         Logger.error(error);
         const embed = new EmbedBuilder()
             .setTitle("Something went wrong!")

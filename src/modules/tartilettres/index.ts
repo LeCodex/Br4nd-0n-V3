@@ -1,19 +1,19 @@
 import * as fs from "fs";
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
-import { replyMultiple } from "src/modules/utils";
-import { GameCommand } from "src/modules/game";
-import GameModule from "src/modules/game/base";
+import { replyMultiple } from "utils";
+import { GameCommand } from "modules/game";
+import GameModule from "modules/game/base";
 import TartilettresGame from "./game";
 
 export default class Tartilettres extends GameModule() {
-    static words = new Set(fs.readFileSync('config/tartilettres/fr.txt').toString().split("\n").map((e) => e.trim()));
     protected cls = TartilettresGame;
     name = "Tartilettres";
     description = "Joue au Scrabble avec des peignes";
     commandName = "tarti";
     color = 0x008000;
+    words = new Set(fs.readFileSync('config/tartilettres/fr.txt').toString().split("\n").map((e) => e.trim()));
 
-    protected instantiate(interaction: ChatInputCommandInteraction): TartilettresGame {
+    protected async instantiate(interaction: ChatInputCommandInteraction) {
         return new TartilettresGame(this, interaction.channelId);
     }
 

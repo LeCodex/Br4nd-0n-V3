@@ -21,7 +21,7 @@
             "node_modules/@types"
         ],
         "sourceMap": false,
-        "baseUrl": "."
+        "baseUrl": "src"
     },
     "include": [
         "src",
@@ -34,5 +34,8 @@
     ],
     "ts-node": {
         "require": ["tsconfig-paths/register"]
+    },
+    "tsc-alias": {
+        "verbose": true
     }
 }

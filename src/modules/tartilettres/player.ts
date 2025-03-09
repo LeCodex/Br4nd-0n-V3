@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, MessageFlags, User } from "discord.js";
 import TartilettresGame from "./game";
 import Tartilettres from ".";
-import { client } from "src/client";
+import { client } from "client";
 
 export default class TartilettresPlayer {
     score: number = 0;
@@ -23,14 +23,14 @@ export default class TartilettresPlayer {
             return interaction.reply({ content: "Le mot a déjà été proposé", flags: MessageFlags.Ephemeral });
         } else if (list.every(e => this.letters[e])) {
             return interaction.reply({ content: "Ce mot ne retirerait aucune lettre de votre peigne", flags: MessageFlags.Ephemeral });
-        } else if (!Tartilettres.words.has(word)) {
+        } else if (!this.game.module.words.has(word)) {
             return interaction.reply({ content: "Veuillez renseigner un mot valide", flags: MessageFlags.Ephemeral });
         }
 
         for (const char of list) {
             if (!this.letters[char]) {
                 this.letters[char] = true;
-                if (this.game.letters.includes(char)) this.score ++;
+                if (this.game.letters.includes(char)) this.score++;
             }
         }
 

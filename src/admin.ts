@@ -1,6 +1,7 @@
-import { ButtonInteraction, ButtonStyle, Client, MessageFlags, TextChannel } from "discord.js";
+import { ButtonInteraction, ButtonStyle, MessageFlags, TextChannel } from "discord.js";
 import DB from "./db";
 import View, { Button } from "./view";
+import { client } from "client";
 
 class AdminView extends View {
     @Button({ style: ButtonStyle.Primary, label: "Restart", emoji: "🔄" })
@@ -21,11 +22,11 @@ export default class AdminPanel {
 
     static _instance: AdminPanel;
 
-    private constructor(public client: Client) { }
+    private constructor() { }
 
-    static async load(client: Client) {
+    static async load() {
         if (!this._instance) {
-            this._instance = new this(client);
+            this._instance = new this();
             await this._instance.loadMessage();
             await this._instance.setupPanel();
         }
@@ -34,13 +35,7 @@ export default class AdminPanel {
 
     private async loadMessage() {
         const save = await DB.get("admin", "message", { channel: process.env.ADMIN_PANEL_CHANNEL!, message: null });
-        const channel = await this.client.channels.fetch(save.channel);
-        if (channel instanceof TextChannel) {
-            this.channel = channel;
-            if (save.message) {
-                this.view = new AdminView(await this.channel?.messages.fetch(save.message));
-            }
-        }
+        this.view = new AdminView(await View.load(save));
     }
 
     private async setupPanel() {
@@ -49,7 +44,7 @@ export default class AdminPanel {
         const message = {
             embeds: [{
                 title: "Admin Panel",
-                description: `Admin: ${(await this.client.users.fetch(process.env.ADMIN!)).toString()}`,
+                description: `Admin: ${(await client.users.fetch(process.env.ADMIN!)).toString()}`,
                 color: 0x990099
             }]
         };

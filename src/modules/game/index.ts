@@ -1,12 +1,24 @@
-import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
+import { ChatInputCommandInteraction, MessageFlags, SendableChannels } from "discord.js";
 import { BotCommand } from "../base";
-import DB from "src/db";
-import { ChatInputAplicationSubcommandData, type GameModule } from "src/interfaces";
+import DB from "db";
+import { ChatInputAplicationSubcommandData, type GameModule } from "interfaces";
+import { client } from "client";
 
 export abstract class Game {
     paused: boolean = false;
+    channel?: SendableChannels;
 
-    constructor(public module: GameModule, public channelId: string) { }
+    constructor(public module: GameModule, public channelId: string) {
+        client.channels.fetch(channelId).then(async (channel) => {
+            if (channel?.isSendable()) {
+                this.channel = channel;
+            }
+        });
+    }
+
+    public async start() {
+        await this.save();
+    }
 
     public async save() {
         await DB.save(this.module.commandName, this.channelId, this.serialize());

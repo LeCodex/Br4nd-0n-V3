@@ -1,18 +1,19 @@
+import { client } from "client";
 import { randomBytes } from "crypto";
-import { ActionRowBuilder, AnyComponentBuilder, ButtonBuilder, ChannelSelectMenuBuilder, ChannelSelectMenuComponentData, ComponentData, ComponentType, InteractionButtonComponentData, MentionableSelectMenuBuilder, MentionableSelectMenuComponentData, Message, MessageComponentInteraction, MessageCreateOptions, MessageEditOptions, RoleSelectMenuBuilder, RoleSelectMenuComponentData, Snowflake, StringSelectMenuBuilder, StringSelectMenuComponentData, TextChannel, UserSelectMenuBuilder, UserSelectMenuComponentData } from "discord.js";
-import { ComponentHandler, ComponentHandlerMetadata, ComponentHandlerParameter, Constructor, NonLinkButtonMessageActionRowComponentData, NonTextInputComponentBuilder } from "src/interfaces";
-import Logger from "src/logger";
+import { ActionRowBuilder, AnyComponentBuilder, ButtonBuilder, ChannelSelectMenuBuilder, ChannelSelectMenuComponentData, ComponentData, ComponentType, InteractionButtonComponentData, InteractionReplyOptions, MentionableSelectMenuBuilder, MentionableSelectMenuComponentData, Message, MessageComponentInteraction, MessageCreateOptions, MessageEditOptions, RepliableInteraction, RoleSelectMenuBuilder, RoleSelectMenuComponentData, SendableChannels, Snowflake, StringSelectMenuBuilder, StringSelectMenuComponentData, TextBasedChannel, TextChannel, UserSelectMenuBuilder, UserSelectMenuComponentData } from "discord.js";
+import { ComponentHandler, ComponentHandlerMetadata, ComponentHandlerParameter, ComponentHandlerMetadataParameter, Constructor, NonLinkButtonMessageActionRowComponentData, NonTextInputComponentBuilder } from "interfaces";
+import Logger from "logger";
 
 const ComponentHandlers = Symbol("ComponentHandlers");
 
 export default class View {
     static index = new Map<Snowflake, View>();
 
-    private actionRows: ActionRowBuilder<NonTextInputComponentBuilder>[] = [];
-    private components: ComponentHandler<NonLinkButtonMessageActionRowComponentData>[] = [];
+    protected actionRows: ActionRowBuilder<NonTextInputComponentBuilder>[] = [];
+    private components: ComponentHandler[] = [];
 
     constructor(public message?: Message) {
-        const componentsMetadata = this.constructor.prototype[ComponentHandlers] as ComponentHandlerMetadata<NonLinkButtonMessageActionRowComponentData>[];
+        const componentsMetadata = this.constructor.prototype[ComponentHandlers] as ComponentHandlerMetadata[];
         for (const metadata of componentsMetadata ?? []) {
             this.setComponent({
                 ...metadata,
@@ -21,15 +22,12 @@ export default class View {
         }
 
         if (this.message) {
-            this.message.edit({ components: this.actionRows });
             View.index.set(this.message.id, this);
         }
     }
 
-    setComponent(component: ComponentHandler<NonLinkButtonMessageActionRowComponentData>, canReplace: boolean = true) {
-        this.components.push(component);
-
-        let row = component.row ?? this.actionRows.findIndex((e) => e.components.length < 5);
+    private setComponent<T extends NonLinkButtonMessageActionRowComponentData>(component: ComponentHandler<T>, canReplace: boolean = true) {
+        let row = component.row ?? this.actionRows.findIndex((e) => !e || e.components.length < 5);
         if (row === -1) row = this.actionRows.length;
         this.actionRows[row] ??= new ActionRowBuilder();
         
@@ -38,10 +36,65 @@ export default class View {
         if (this.actionRows[row].components[index] && !canReplace) {
             throw RangeError(`Component is trying to fill an occupied slot`);
         }
+        this.components.push(component);
         this.actionRows[row].components[index] = new component.builder(component);
     }
 
-    async send(channel: TextChannel, options: string | MessageCreateOptions) {
+    public setButton(component: ComponentHandlerParameter<InteractionButtonComponentData>) {
+        this.setComponent({
+            ...component,
+            customId: randomBytes(20).toString('hex'),
+            builder: ButtonBuilder,
+            type: ComponentType.Button
+        });
+    }
+
+    public setStringSelect(component: ComponentHandlerParameter<StringSelectMenuComponentData>) {
+        this.setComponent({
+            ...component,
+            customId: randomBytes(20).toString('hex'),
+            builder: StringSelectMenuBuilder,
+            type: ComponentType.StringSelect
+        });
+    }
+
+    public setUserSelect(component: ComponentHandlerParameter<UserSelectMenuComponentData>) {
+        this.setComponent({
+            ...component,
+            customId: randomBytes(20).toString('hex'),
+            builder: UserSelectMenuBuilder,
+            type: ComponentType.UserSelect
+        });
+    }
+
+    public setChannelSelect(component: ComponentHandlerParameter<ChannelSelectMenuComponentData>) {
+        this.setComponent({
+            ...component,
+            customId: randomBytes(20).toString('hex'),
+            builder: ChannelSelectMenuBuilder,
+            type: ComponentType.ChannelSelect
+        });
+    }
+
+    public setRoleSelect(component: ComponentHandlerParameter<RoleSelectMenuComponentData>) {
+        this.setComponent({
+            ...component,
+            customId: randomBytes(20).toString('hex'),
+            builder: RoleSelectMenuBuilder,
+            type: ComponentType.RoleSelect
+        });
+    }
+
+    public setMentionableSelect(component: ComponentHandlerParameter<MentionableSelectMenuComponentData>) {
+        this.setComponent({
+            ...component,
+            customId: randomBytes(20).toString('hex'),
+            builder: MentionableSelectMenuBuilder,
+            type: ComponentType.MentionableSelect
+        });
+    }
+
+    public async send(channel: SendableChannels, options: string | MessageCreateOptions) {
         if (this.message) {
             throw Error("View was already sent. Did you mean to use edit?");
         }
@@ -53,63 +106,96 @@ export default class View {
         return this;
     }
 
-    async edit(options: string | MessageEditOptions) {
+    public async reply(interaction: RepliableInteraction, options: InteractionReplyOptions) {
+        if (this.message) {
+            throw Error("View was already sent. Did you mean to use edit?");
+        }
+
+        const res = await interaction.reply({ ...options, components: this.actionRows, withResponse: true });
+        this.message = res.resource?.message ?? undefined;
+        if (this.message) {
+            View.index.set(this.message.id, this);
+        }
+        return this;
+    }
+
+    public async edit(options: string | MessageEditOptions) {
         await this.message?.edit({ ...(typeof options === "string" ? { content: options } : options), components: this.actionRows });
         return this;
     }
 
-    async handle(interaction: MessageComponentInteraction) {
+    protected filter(interaction: MessageComponentInteraction) {
+        return true;
+    }
+
+    public async handle(interaction: MessageComponentInteraction) {
+        if (!this.filter(interaction)) {
+            return interaction.deferUpdate();
+        }
+
         for (const component of this.components) {
             if (component.customId === interaction.customId) {
-                Logger.log(`Running component handler for "${component.method.toString()}" of ${this.constructor.name}`);
+                Logger.log(`Running component handler for ${this.constructor.name}`);
                 await component.callback(interaction);
             }
         }
     }
 
-    async delete() {
+    public async delete() {
         if (this.message) {
             await this.message.delete();
             if (View.index.get(this.message.id) === this) View.index.delete(this.message.id);
         }
     }
 
-    async end() {
+    public async end() {
         if (this.message && View.index.get(this.message.id) === this) {
             View.index.delete(this.message.id);
             await this.message.edit({ ...this.message, attachments: [...this.message.attachments.values()], flags: undefined, components: undefined });
             delete this.message;
         }
     }
+
+    serialize() {
+        return {
+            channel: this.message?.channelId,
+            message: this.message?.id
+        }
+    }
+
+    static async load(obj: Record<string, any>) {
+        const channel = await client.channels.fetch(obj.channel);
+        return channel?.isSendable() ? await channel.messages.fetch(obj.message) : undefined;
+    }
 }
 
 function ComponentHandlerDecorator(metadata: ComponentData & { builder: Constructor<AnyComponentBuilder> }): MethodDecorator {
     return function (target: any, propertyKey: symbol | string, descriptor: PropertyDescriptor) {
-        target[ComponentHandlers] ??= [] as ComponentHandlerMetadata<NonLinkButtonMessageActionRowComponentData>[];
+        target[ComponentHandlers] ??= [] as ComponentHandlerMetadata[];
         target[ComponentHandlers].push({ ...metadata, method: propertyKey });
     };
 }
 
-export function Button(metadata: ComponentHandlerParameter<InteractionButtonComponentData>): MethodDecorator {
+export function Button(metadata: ComponentHandlerMetadataParameter<InteractionButtonComponentData>): MethodDecorator {
     return ComponentHandlerDecorator({ ...metadata, type: ComponentType.Button, customId: randomBytes(20).toString('hex'), builder: ButtonBuilder });
 }
 
-export function StringSelect(metadata: ComponentHandlerParameter<StringSelectMenuComponentData>): MethodDecorator {
+export function StringSelect(metadata: ComponentHandlerMetadataParameter<StringSelectMenuComponentData>): MethodDecorator {
     return ComponentHandlerDecorator({ ...metadata, type: ComponentType.StringSelect, customId: randomBytes(20).toString('hex'), builder: StringSelectMenuBuilder });
 }
 
-export function UserSelect(metadata: ComponentHandlerParameter<UserSelectMenuComponentData>): MethodDecorator {
+export function UserSelect(metadata: ComponentHandlerMetadataParameter<UserSelectMenuComponentData>): MethodDecorator {
     return ComponentHandlerDecorator({ ...metadata, type: ComponentType.UserSelect, customId: randomBytes(20).toString('hex'), builder: UserSelectMenuBuilder });
 }
 
-export function ChannelSelect(metadata: ComponentHandlerParameter<ChannelSelectMenuComponentData>): MethodDecorator {
+export function ChannelSelect(metadata: ComponentHandlerMetadataParameter<ChannelSelectMenuComponentData>): MethodDecorator {
     return ComponentHandlerDecorator({ ...metadata, type: ComponentType.ChannelSelect, customId: randomBytes(20).toString('hex'), builder: ChannelSelectMenuBuilder });
 }
 
-export function RoleSelect(metadata: ComponentHandlerParameter<RoleSelectMenuComponentData>): MethodDecorator {
+export function RoleSelect(metadata: ComponentHandlerMetadataParameter<RoleSelectMenuComponentData>): MethodDecorator {
     return ComponentHandlerDecorator({ ...metadata, type: ComponentType.RoleSelect, customId: randomBytes(20).toString('hex'), builder: RoleSelectMenuBuilder });
 }
 
-export function MentionableSelect(metadata: ComponentHandlerParameter<MentionableSelectMenuComponentData>): MethodDecorator {
+export function MentionableSelect(metadata: ComponentHandlerMetadataParameter<MentionableSelectMenuComponentData>): MethodDecorator {
     return ComponentHandlerDecorator({ ...metadata, type: ComponentType.MentionableSelect, customId: randomBytes(20).toString('hex'), builder: MentionableSelectMenuBuilder });
 }

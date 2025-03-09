@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from "discord.js";
-import { GameCommand } from "src/modules/game"
-import GameModule from "src/modules/game/base";
+import { GameCommand } from "modules/game"
+import GameModule from "../game/base";
 import CompoteDePommesGame from "./game";
 
 export default class CompoteDePommes extends GameModule() {
@@ -10,7 +10,7 @@ export default class CompoteDePommes extends GameModule() {
     color: number = 0xdd2e44;
     commandName: string = "compote";
 
-    protected instantiate(interaction: ChatInputCommandInteraction) {
+    protected async instantiate(interaction: ChatInputCommandInteraction) {
         return new CompoteDePommesGame(this, interaction.channelId);
     }
 

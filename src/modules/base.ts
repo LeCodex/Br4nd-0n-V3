@@ -1,5 +1,5 @@
-import { ChatInputCommandInteraction, Client, Message, MessageFlags, OmitPartialGroupDMChannel } from "discord.js";
-import { BotCommand, BotSubcommandMetadata, ChatInputAplicationSubcommandData } from "src/interfaces";
+import { ChatInputCommandInteraction, Message, MessageFlags, OmitPartialGroupDMChannel } from "discord.js";
+import { BotCommand, BotSubcommandMetadata, ChatInputAplicationSubcommandData } from "interfaces";
 
 export const BotCommands = Symbol("BotCommands");
 
@@ -13,7 +13,7 @@ export abstract class BotModule {
     protected ready = false;
     protected dmPermission: boolean = false;
 
-    constructor(public client: Client) {
+    constructor() {
         for (const metadata of this.constructor.prototype[BotCommands] as BotSubcommandMetadata[] ?? []) {
             this.commands!.push({
                 ...metadata,

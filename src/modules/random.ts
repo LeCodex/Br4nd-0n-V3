@@ -59,7 +59,7 @@ export default class Random extends BotModule {
         const suits = ["❤️", "☘️", "♠️", "🔷"];
         let result: string[] = [];
 
-        for (var i = 0; i < Math.min(unique ? 52 : 100, amount); i ++) {
+        for (var i = 0; i < Math.min(unique ? 52 : 100, amount); i++) {
             let card;
             do {
                 const value = Math.floor(Math.random() * 13) + 1;
