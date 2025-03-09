@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, MessageFlags, TextChannel } from "discord.js";
 import DB from "db";
 import Logger from "logger";
-import { BotModule, BotCommand } from "../base";
+import { BotModule, AdminCommand } from "../base";
 import { Game } from ".";
 
 export default function GameModule() {
@@ -20,21 +20,20 @@ export default function GameModule() {
             this.ready = true;
         }
 
-        @BotCommand({ subcommand: "start", description: "Start a game", defaultMemberPermissions: ["ManageChannels"] })
+        @AdminCommand({ subcommand: "start", description: "Start a game" })
         public async start(interaction: ChatInputCommandInteraction) {
             if (this.game(interaction.channelId)) {
                 return interaction.reply({ content: "A game is already going in this channel", flags: MessageFlags.Ephemeral });
             }
 
             const game = this.games[interaction.channelId] = await this.instantiate(interaction);
-            while (!game.channel) { };
             await game.start();
             await interaction.reply("Started");
         }
 
         protected abstract instantiate(interaction: ChatInputCommandInteraction): Promise<Game>;
 
-        @BotCommand({ subcommand: "toggle", description: "Pause/Unpause a currently ongoing game", defaultMemberPermissions: ["ManageChannels"] })
+        @AdminCommand({ subcommand: "toggle", description: "Pause/Unpause a currently ongoing game" })
         public async toggle(interaction: ChatInputCommandInteraction) {
             const game = this.game(interaction.channelId);
             if (!game) {
@@ -46,7 +45,7 @@ export default function GameModule() {
             await interaction.reply("Paused");
         }
 
-        @BotCommand({ subcommand: "delete", description: "Stops and deletes a currently ongoing game", defaultMemberPermissions: ["ManageChannels"] })
+        @AdminCommand({ subcommand: "delete", description: "Stops and deletes a currently ongoing game" })
         public async stop(interaction: ChatInputCommandInteraction) {
             const game = this.game(interaction.channelId);
             if (!game) {

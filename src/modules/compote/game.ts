@@ -1,11 +1,10 @@
-import { APIEmbed, ChatInputCommandInteraction, MessageFlags, TextChannel } from "discord.js";
+import { APIEmbed, ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { DateTime } from "luxon";
 import { Game } from "modules/game";
 import CompoteDePommesPlayer from "./player";
 import { CharOf, NumberRange } from "interfaces";
-import { getRankEmoji } from "utils";
+import { createRankEmbed, getRankEmoji } from "utils";
 import CompoteDePommes from ".";
-import Logger from "logger";
 
 export default class CompoteDePommesGame extends Game {
     static effectsDescription = [
@@ -92,29 +91,15 @@ export default class CompoteDePommesGame extends Game {
     }
 
     get rankEmbed(): APIEmbed {
-        return {
-            title: "🏆 Classement",
-            fields: [
-                {
-                    name: "Participants",
-                    value: this.order.reduce((buffer, e, i) => {
-                        if (e.apples < buffer.lastScore) {
-                            buffer.lastScore = e.apples;
-                            buffer.rank++;
-                        }
-                        buffer.message += `${getRankEmoji(buffer.rank)} **${buffer.rank + 1}.** ${e.user ? e.user.toString() : "Joueur non trouvé"}\n`;
-                        return buffer;
-                    }, { message: "", rank: -1, lastScore: Infinity }).message,
-                    inline: true
-                },
-                {
-                    name: "Pommes",
-                    value: this.order.map((e) => `**${e.apples}** 🍎 *(${e.locked} 🔐 - ${e.basket} 🧺)*`).join("\n"),
-                    inline: true
-                }
-            ],
-            color: this.module.color
-        };
+        return createRankEmbed(
+            {
+                title: "🏆 Classement",
+                color: this.module.color
+            },
+            "Participants",
+            this.order.map((e) => ({ user: e.user, score: e.apples, scoreStr: `**${e.apples}** 🍎 *(${e.locked} 🔐 - ${e.basket} 🧺)*` })),
+            "Pommes"
+        );
     }
 
     get rulesEmbed(): APIEmbed {

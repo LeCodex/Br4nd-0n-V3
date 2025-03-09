@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionData, ApplicationCommandOptionType, ApplicationCommandType, ChatInputApplicationCommandData } from "discord.js";
+import { ApplicationCommandOptionData, ApplicationCommandOptionType, ApplicationCommandSubGroupData, ApplicationCommandType, ChatInputApplicationCommandData, PermissionFlagsBits } from "discord.js";
 import { configDotenv } from "dotenv";
 import { modules } from "modules";
 import { BotCommand } from "interfaces";
@@ -26,71 +26,97 @@ client.on("ready", async () => {
     AdminPanel.load();
 
     const groupedCommands: ChatInputApplicationCommandData[] = [];
+    const adminSubcommands: ApplicationCommandSubGroupData[] = [];
     for (const module of modules) {
         const instance = new module();
-        allCommands.push(...instance.commands);
+        allCommands.push(...instance.commands, ...instance.adminCommands.map((e) => ({ ...e, subcommandGroup: instance.commandName })));
 
-        const subcommandsCount = instance.commands.filter((e) => e.subcommand).length;
-        if (subcommandsCount < instance.commands.length && subcommandsCount > 0) {
-            throw TypeError(`Module ${instance.name} has both subcommands and a command, which isn't supported`);
-        }
-
-        if (subcommandsCount === 0) {
-            groupedCommands.push({
-                name: instance.commandName,
-                ...instance.commands[0],
-                type: ApplicationCommandType.ChatInput
-            });
-        } else {
-            const groupsWithSubcommands = new Map<string | undefined, BotCommand[]>();
-            for (const command of instance.commands) {
-                if (!groupsWithSubcommands.get(command.subcommandGroup)) groupsWithSubcommands.set(command.subcommandGroup, []);
-                groupsWithSubcommands.get(command.subcommandGroup)!.push(command);
+        if (instance.commands.length > 0) {
+            const subcommandsCount = instance.commands.filter((e) => e.subcommand).length;
+            if (subcommandsCount < instance.commands.length && subcommandsCount > 0) {
+                throw TypeError(`Module ${instance.name} has both subcommands and a command, which isn't supported`);
             }
     
-            groupedCommands.push({
-                name: instance.commandName,
-                description: instance.description,
-                type: ApplicationCommandType.ChatInput,
-                options: [...groupsWithSubcommands.entries()].flatMap<ApplicationCommandOptionData>(([subcommandGroup, subcommands]) => subcommandGroup ? {
-                    name: subcommandGroup,
-                    description: "",
-                    type: ApplicationCommandOptionType.SubcommandGroup,
-                    options: subcommands.map((e) => ({
+            if (subcommandsCount === 0) {
+                groupedCommands.push({
+                    name: instance.commandName,
+                    ...instance.commands[0],
+                    type: ApplicationCommandType.ChatInput
+                });
+            } else {
+                const groupsWithSubcommands = new Map<string | undefined, BotCommand[]>();
+                for (const command of instance.commands) {
+                    if (!groupsWithSubcommands.get(command.subcommandGroup)) groupsWithSubcommands.set(command.subcommandGroup, []);
+                    groupsWithSubcommands.get(command.subcommandGroup)!.push(command);
+                }
+        
+                groupedCommands.push({
+                    name: instance.commandName,
+                    description: instance.description,
+                    type: ApplicationCommandType.ChatInput,
+                    options: [...groupsWithSubcommands.entries()].flatMap<ApplicationCommandOptionData>(([subcommandGroup, subcommands]) => subcommandGroup ? {
+                        name: subcommandGroup,
+                        description: "",
+                        type: ApplicationCommandOptionType.SubcommandGroup,
+                        options: subcommands.map((e) => ({
+                            name: e.subcommand!,
+                            ...e,
+                            type: ApplicationCommandOptionType.Subcommand,
+                        })),
+                    } : subcommands.map((e) => ({
                         name: e.subcommand!,
                         ...e,
                         type: ApplicationCommandOptionType.Subcommand,
-                    })),
-                } : subcommands.map((e) => ({
+                    })))
+                });
+            }
+        }
+
+        if (instance.adminCommands.length > 0) {
+            adminSubcommands.push({
+                name: instance.commandName,
+                description: instance.description,
+                type: ApplicationCommandOptionType.SubcommandGroup as const,
+                options: instance.adminCommands.map((e) => ({
                     name: e.subcommand!,
-                    ...e,
-                    type: ApplicationCommandOptionType.Subcommand,
-                })))
+                    description: e.description,
+                    type: ApplicationCommandOptionType.Subcommand
+                }))
             });
         }
 
-        Logger.log(`Loaded module ${instance.name} (${instance.description}) with ${instance.commands.length} commands`);
-        instance.onLoaded();
+        Logger.log(`Loaded module ${instance.name} (${instance.description}) with ${instance.commands.length} + ${instance.adminCommands.length} commands`);
+        await instance.onLoaded();
     }
 
-    client.application.commands.set(groupedCommands);
+    groupedCommands.push({
+        name: "admin",
+        description: "Admin commands",
+        defaultMemberPermissions: [PermissionFlagsBits.Administrator],
+        type: ApplicationCommandType.ChatInput,
+        options: adminSubcommands
+    })
+
+    await client.application.commands.set(groupedCommands);
     Logger.log(`${client.user.username} is online`);
 });
 
 client.on("interactionCreate", async (interaction) => {
     try {
         if (interaction.isChatInputCommand()) {
+            const subcommandGroup = interaction.options.getSubcommandGroup(false);
+            const subcommand = interaction.options.getSubcommand(false);
             for (const command of allCommands) {
-                const subcommandGroup = interaction.options.getSubcommandGroup(false);
-                const subcommand = interaction.options.getSubcommand(false);
+                const name = command.module?.commandName ?? "admin";
                 if (
-                    command.module.commandName === interaction.commandName &&
+                    name === interaction.commandName &&
                     subcommandGroup === (command.subcommandGroup ?? null) &&
                     subcommand === (command.subcommand ?? null)
                 ) {
                     const concatenatedCommand = interaction.commandName + (subcommandGroup ? ` ${subcommandGroup}` : "") + (subcommand ? ` ${subcommand}` : "");
                     Logger.log(`Running command "${concatenatedCommand}" with options ${JSON.stringify(Object.fromEntries(interaction.options.data.map(e => [e.name, e.value])))}`);
                     await command.callback(interaction);
+                    break;
                 }
             }
         } else if (interaction.isMessageComponent()) {

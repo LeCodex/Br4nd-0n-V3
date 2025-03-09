@@ -2,9 +2,9 @@ import { ApplicationCommandOptionData, ApplicationCommandSubCommandData, Applica
 import { BotModule } from "modules/base";
 import GameModule from "modules/game/base";
 
-export interface ChatInputAplicationSubcommandData extends Omit<ChatInputApplicationCommandData, "name" | "options" | "type"> {
+export interface ChatInputAplicationSubcommandData<AllowSubcommandGroup extends boolean = true> extends Omit<ChatInputApplicationCommandData, "name" | "options" | "type"> {
     subcommand?: string;
-    subcommandGroup?: string;
+    subcommandGroup?: AllowSubcommandGroup extends true ? string : never;
     options?: readonly Exclude<
         ApplicationCommandOptionData,
         ApplicationCommandSubGroupData | ApplicationCommandSubCommandData
@@ -16,7 +16,7 @@ export interface BotSubcommandMetadata extends ChatInputAplicationSubcommandData
 }
 
 export interface BotCommand extends ChatInputAplicationSubcommandData {
-    module: BotModule;
+    module?: BotModule;
     callback: (interaction: ChatInputCommandInteraction) => Promise<void>;
 }
 

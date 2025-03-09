@@ -1,4 +1,4 @@
-import { EmbedBuilder, GuildEmoji } from "discord.js";
+import { EmbedBuilder, Emoji } from "discord.js";
 import { DateTime } from "luxon";
 import { Vector2 } from "interfaces";
 import { Game } from "modules/game";
@@ -46,7 +46,7 @@ export default class DedalleuxGame extends Game {
     timeout?: NodeJS.Timeout;
 
     availableItems = ["🍅", "🥩", "🌶️", "🧅", "🥕", "🥑", "🥔", "🍯", "🌰", "🍍", "🌮", "🧀", "🍐", "🌭", "🥦", "🥓"];
-    colors: (string | GuildEmoji)[];
+    colors: (string | Emoji)[];
 
     constructor(public module: Dedalleux, channelId: string) {
         super(module, channelId);
@@ -67,7 +67,7 @@ export default class DedalleuxGame extends Game {
         this.path = aStar(this.pawn, this.goal, this.board.map((row) => row.map((e) => e !== -1)));
     }
 
-    setupTimeout(newTurn = true) {
+    setupTimeout(newTurn: boolean = true) {
         if (this.timeout) clearTimeout(this.timeout);
 
         const now = DateTime.local();
@@ -81,7 +81,7 @@ export default class DedalleuxGame extends Game {
         }
 
         const time = this.nextTimestamp.toMillis() - now.toMillis();
-        this.timeout = setTimeout(() => { this.nextTurn(); }, this.nextTimestamp.toMillis() - now.toMillis());
+        this.timeout = setTimeout(() => { this.nextTurn(time <= 0); }, time);
     }
 
     createWalls() {
@@ -193,7 +193,7 @@ export default class DedalleuxGame extends Game {
         }
     }
 
-    async nextTurn() {
+    async nextTurn(noSend: boolean = false) {
         Object.values(this.players).forEach((element) => { element.turnedOnce = false; element.gainedOnePoint = false; });
 
         let winners: DedalleuxPlayer[] = [];
@@ -216,10 +216,12 @@ export default class DedalleuxGame extends Game {
         this.generatePath();
         this.turn++;
         this.clockwiseRotation = !this.clockwiseRotation;
-        await this.sendBoard();
-
         this.setupTimeout(true);
-        this.save();
+
+        if (!noSend) {
+            await this.sendBoard();
+            this.save();
+        }
     }
 
     serialize() {

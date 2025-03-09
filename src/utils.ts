@@ -1,5 +1,14 @@
-import { InteractionReplyOptions, MessagePayload, RepliableInteraction } from "discord.js";
+import { APIEmbed, Emoji, InteractionReplyOptions, MessagePayload, RepliableInteraction, Snowflake, User } from "discord.js";
 import { Vector2 } from "./interfaces";
+import { client } from "client";
+
+export async function getEmoji(name: Snowflake, fallback: string) {
+    try {
+        return (await client.application!.emojis.fetch()).find((e) => e.name === name) ?? fallback
+    } catch (e) {
+        return fallback;
+    }
+}
 
 export function getRankEmoji(rank: number) {
     if (rank < 3) return ["🥇", "🥈", "🥉"][rank];
@@ -93,4 +102,31 @@ export function aStar(start: Vector2, goal: Vector2, board: boolean[][]): Vector
     }
 
     return [start];
+}
+
+export function createRankEmbed(options: APIEmbed, playersTitle: string, order: Array<{ user: User, score: number }>, scoreTitle: string, scoreEmoji: string | Emoji): APIEmbed
+export function createRankEmbed(options: APIEmbed, playersTitle: string, order: Array<{ user: User, score: number, scoreStr: string }>, scoreTitle: string): APIEmbed
+export function createRankEmbed(options: APIEmbed, playersTitle: string, order: Array<{ user: User, score: number, scoreStr?: string }>, scoreTitle: string, scoreEmoji?: string | Emoji): APIEmbed {
+    return {
+        ...options,
+        fields: [
+            {
+                name: playersTitle,
+                value: order.reduce((buffer, e) => {
+                    if (e.score < buffer.lastScore) {
+                        buffer.lastScore = e.score;
+                        buffer.rank++;
+                    }
+                    buffer.message += `${getRankEmoji(buffer.rank)} **${buffer.rank + 1}.** ${e.user ? e.user.toString() : "Joueur non trouvé"}\n`;
+                    return buffer;
+                }, { message: "", rank: -1, lastScore: Infinity }).message,
+                inline: true
+            },
+            {
+                name: scoreTitle,
+                value: order.map((e) => e.scoreStr ?? `**${e.score}** ${scoreEmoji}`).join("\n"),
+                inline: true
+            }
+        ]
+    }
 }

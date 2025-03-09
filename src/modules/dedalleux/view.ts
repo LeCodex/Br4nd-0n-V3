@@ -7,7 +7,7 @@ import DedalleuxPlayer from "./player";
 export default class DedalleuxView extends View {
     constructor(public game: DedalleuxGame, message?: Message) {
         super(message);
-        for (const [i, emoji] of this.game.colors.slice(0, 5).entries()) {
+        for (const [i, emoji] of this.game.colors.slice(5).entries()) {
             this.setButton({
                 emoji: emoji.toString(),
                 style: ButtonStyle.Secondary,
@@ -32,7 +32,7 @@ export default class DedalleuxView extends View {
     public async callback(interaction: MessageComponentInteraction, index: number) {
         const now = DateTime.local();
         if ((this.game.nextTimestamp ?? now).toSeconds() - now.toSeconds() <= 30) {
-            return interaction.deferReply();
+            return interaction.deferUpdate();
         };
 
         const player = this.game.players[interaction.user.id];

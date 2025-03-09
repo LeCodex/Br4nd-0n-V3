@@ -1,8 +1,9 @@
 import { client } from "client";
 import GameModule from "modules/game/base";
 import DedalleuxGame from "./game";
-import { ChatInputCommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction, Emoji } from "discord.js";
 import { Game, GameCommand } from "../game";
+import { getEmoji } from "utils";
 
 export default class Dedalleux extends GameModule() {
     protected cls = DedalleuxGame;
@@ -11,27 +12,25 @@ export default class Dedalleux extends GameModule() {
     commandName = "dedale";
     color = 0x144350;
 
-    colors = {
-        redSquare: client.emojis.cache.get("780049456263069706") || "🟥",
-        blueSquare: client.emojis.cache.get("780049455830270002") || "🟦",
-        greenSquare: client.emojis.cache.get("780049456048766976") || "🟩",
-        yellowSquare: client.emojis.cache.get("780049455562358825") || "🟨",
-        purpleSquare: client.emojis.cache.get("780049455608889345") || "🟪",
-        redCirle: client.emojis.cache.get("780049455511765003") || "🛑",
-        blueCircle: client.emojis.cache.get("780049455911141376") || "♾️",
-        greenCircle: client.emojis.cache.get("780049455897772032") || "💚",
-        yellowCircle: client.emojis.cache.get("780049456322183170") || "📀",
-        purpleCircle: client.emojis.cache.get("780049455935914014") || "🟣",
-    };
-    pawnEmoji = client.emojis.cache.get("1036956874446221403") || "📍";
+    colors: Record<string, string | Emoji> = {};
+    pawnEmoji: string | Emoji = "📍";
+
+    public async onLoaded(): Promise<void> {
+        this.colors.redSquare = await getEmoji("Mur1", "🟥");
+        this.colors.blueSquare = await getEmoji("Mur2", "🟦");
+        this.colors.greenSquare = await getEmoji("Mur3", "🟩");
+        this.colors.yellowSquare = await getEmoji("Mur4", "🟨");
+        this.colors.purpleSquare = await getEmoji("Mur5", "🟪");
+        this.colors.redCirle = await getEmoji("Pilier1", "🛑");
+        this.colors.blueCircle = await getEmoji("Pilier2", "♾️");
+        this.colors.greenCircle = await getEmoji("Pilier3", "💚");
+        this.colors.yellowCircle = await getEmoji("Pilier4", "📀");
+        this.colors.purpleCircle = await getEmoji("Pilier5", "🟣");
+        this.pawnEmoji = await getEmoji("brax", "📍");
+        await super.onLoaded();
+    }
 
     protected async instantiate(interaction: ChatInputCommandInteraction): Promise<Game> {
         return new DedalleuxGame(this, interaction.channelId);
-    }
-
-    @GameCommand({ subcommand: "turn", description: "Turn" })
-    public async turn(game: DedalleuxGame, interaction: ChatInputCommandInteraction) {
-        await game.nextTurn();
-        await interaction.reply("Turn");
     }
 }
