@@ -1,19 +1,21 @@
-import { client } from "client";
 import GameModule from "modules/game/base";
 import DedalleuxGame from "./game";
 import { ChatInputCommandInteraction, Emoji } from "discord.js";
-import { Game, GameCommand } from "../game";
+import { Game } from "../game";
 import { getEmoji } from "utils";
 
 export default class Dedalleux extends GameModule() {
     protected cls = DedalleuxGame;
     name = "Dédalleux";
     description = "Donne ta liste de course à Brax";
-    commandName = "dedale";
     color = 0x144350;
 
     colors: Record<string, string | Emoji> = {};
     pawnEmoji: string | Emoji = "📍";
+
+    constructor() {
+        super("dedale");
+    }
 
     public async onLoaded(): Promise<void> {
         this.colors.redSquare = await getEmoji("Mur1", "🟥");

@@ -9,9 +9,12 @@ export default class Tartilettres extends GameModule() {
     protected cls = TartilettresGame;
     name = "Tartilettres";
     description = "Joue au Scrabble avec des peignes";
-    commandName = "tarti";
     color = 0x008000;
-    words = new Set(fs.readFileSync('config/tartilettres/fr.txt').toString().split("\n").map((e) => e.trim()));
+    words = new Set(this.readConfigFile("fr.txt")?.split("\n").map((e) => e.trim()));
+
+    constructor() {
+        super("tarti");
+    }
 
     protected async instantiate(interaction: ChatInputCommandInteraction) {
         return new TartilettresGame(this, interaction.channelId);
@@ -19,7 +22,7 @@ export default class Tartilettres extends GameModule() {
 
     @GameCommand({
         subcommand: "submit", description: "Envoie un mot", options: [
-            { name: "mot", description: "Le mot", type: ApplicationCommandOptionType.String, maxLength: 10, minLength: 5, required: true }
+            { name: "mot", description: "Un mot de 5 à 10 lettres", type: ApplicationCommandOptionType.String, maxLength: 10, minLength: 5, required: true }
         ]
     })
     public async submit(game: TartilettresGame, interaction: ChatInputCommandInteraction) {

@@ -6,10 +6,13 @@ import { client } from "client";
 export default class Ping extends BotModule {
     name: string = "Ping";
     description: string = "Pong!";
-    commandName: string = "ping";
     color: number = 0x00ffff;
     ready: boolean = true;
     dmPermission: boolean = true;
+    
+    constructor() {
+        super("ping");
+    }
     
     @BotCommand({ description: "Pong!", dmPermission: true })
     public async ping(interaction: ChatInputCommandInteraction) {

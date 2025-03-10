@@ -25,10 +25,15 @@ export default class DedalleuxPlayer {
 
     async sendItem(interaction: RepliableInteraction) {
         var embed = new EmbedBuilder()
-            .setTitle("Ingrédient à récupérer: " + this.game.items[this.item].item)
+            .setTitle(`Ingrédient à récupérer: ${this.game.items[this.item].item}`)
+            .setDescription(`Joueurs avec le même ingrédient: ${Object.values(this.game.players).filter((e) => e.item === this.item).map((e) => e.toString()).join(", ")}`)
             .setColor(this.game.module.color);
 
         await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+    }
+
+    toString() {
+        return `${this.turnedOnce ? "" : "__"}${this.user?.toString() ?? "Joueur non trouvé"}${this.turnedOnce ? "" : "__"}`
     }
 
     serialize() {

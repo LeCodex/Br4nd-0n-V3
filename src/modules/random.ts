@@ -4,10 +4,13 @@ import { BotCommand, BotModule } from "./base";
 export default class Random extends BotModule {
     name: string = "Random";
     description: string = "Multiple random generators";
-    commandName: string = "random";
     color: number = 0xff6600;
     ready: boolean = true;
     dmPermission: boolean = true;
+
+    constructor() {
+        super("random");
+    }
 
     public async reply(interaction: ChatInputCommandInteraction, content: string) {
         await interaction.reply({

@@ -9,11 +9,14 @@ import { client } from "client";
 export default class Sakatasses extends BotModule {
     public name: string = "Sakatasses";
     public description: string = "Compte des tasses comme un businessman compte les étoiles";
-    public commandName: string = "sak";
     public color: number = 0xffff66;
 
     private sak: Record<string, Record<string, number>> = {};
     private cupEmoji: string | Emoji = "☕";
+
+    constructor() {
+        super("sak");
+    }
 
     public async onLoaded() {
         const records = await DB.getRecords(this.commandName);
@@ -33,7 +36,7 @@ export default class Sakatasses extends BotModule {
         }
     }
 
-    @BotCommand({ subcommand: "info", description: "Voir son sakatasse" })
+    @BotCommand({ description: "Voir son sakatasse" })
     public async info(interaction: ChatInputCommandInteraction) {
         if (!interaction.guildId) {
             return interaction.reply({ content: "Not in a guild", flags: MessageFlags.Ephemeral });

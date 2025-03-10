@@ -49,6 +49,30 @@ export function getDist(start: Vector2, end: Vector2) {
     return Math.sqrt((start.x - end.x) ** 2 + (start.y - end.y) ** 2);
 }
 
+export class ObjectKeyMap<K extends object, V> extends Map<K, V> {
+    private equals(key1: K, key2: K) {
+        return (Object.entries(key1) as Array<[keyof K, K[keyof K]]>).every(([k, v]) => key2[k] === v);
+    }
+    
+    public set(keyPredicate: K, value: V) {
+        for (const key of this.keys()) {
+            if (this.equals(keyPredicate, key)) {
+                return super.set(key, value);
+            }
+        }
+        return super.set(keyPredicate, value);
+    }
+    
+    public get(keyPredicate: K) {
+        for (const key of this.keys()) {
+            if (this.equals(keyPredicate, key)) {
+                return super.get(key);
+            }
+        }
+        return undefined;
+    }
+}
+
 export function aStar(start: Vector2, goal: Vector2, board: boolean[][]): Vector2[] {
     function reconstructPath(cameFrom: WeakMap<Vector2, Vector2>, current: Vector2) {
         const totalPath = [current];
@@ -61,9 +85,9 @@ export function aStar(start: Vector2, goal: Vector2, board: boolean[][]): Vector
 
     const openSet = [start];
     const closedSet = [];
-    const cameFrom = new WeakMap<Vector2, Vector2>();
-    const gScore = new WeakMap<Vector2, number>();
-    const fScore = new WeakMap<Vector2, number>();
+    const cameFrom = new ObjectKeyMap<Vector2, Vector2>();
+    const gScore = new ObjectKeyMap<Vector2, number>();
+    const fScore = new ObjectKeyMap<Vector2, number>();
 
     const h = (n: Vector2) => getDist(n, goal);
     gScore.set(start, 0);
@@ -87,7 +111,7 @@ export function aStar(start: Vector2, goal: Vector2, board: boolean[][]): Vector
                     y: current.y + dy
                 };
 
-                const tentative_gScore = gScore.get(current) ?? 0 + 1;
+                const tentative_gScore = (gScore.get(current) ?? 0) + 1;
                 if (tentative_gScore < (gScore.get(neighbor) ?? Infinity)) {
                     cameFrom.set(neighbor, current);
                     gScore.set(neighbor, tentative_gScore);

@@ -6,8 +6,6 @@ import { aStar, getDist, getRankEmoji, shuffle } from "utils";
 import Dedalleux from ".";
 import DedalleuxView from "./view";
 import DedalleuxPlayer from "./player";
-import Logger from "logger";
-import { client } from "client";
 import View from "view";
 
 export interface Wall {
@@ -165,7 +163,7 @@ export default class DedalleuxGame extends Game {
                         acc.lastScore = e.score;
                         acc.rank++;
                     }
-                    acc.message += `${getRankEmoji(acc.rank)} **${acc.rank + 1}.** ${e.user ? e.user.toString() : "Joueur non trouvé"}: **${e.score}**${e.gainedOnePoint ? " (+" + roundValue + ")" : ""}\n`;
+                    acc.message += `${getRankEmoji(acc.rank)} **${acc.rank + 1}.** ${e.toString()}: **${e.score}**${e.gainedOnePoint ? " (+" + roundValue + ")" : ""}\n`;
                     return acc;
                 }, { message: "", rank: -1, lastScore: Infinity, lastIndex: Infinity }).message
             });

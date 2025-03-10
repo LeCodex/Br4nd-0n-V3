@@ -8,7 +8,10 @@ export default class CompoteDePommes extends GameModule() {
     name: string = "Compote de Pommes";
     description: string = "Lancer un dé, c'est fort en pomme";
     color: number = 0xdd2e44;
-    commandName: string = "compote";
+
+    constructor() {
+        super("compote");
+    }
 
     protected async instantiate(interaction: ChatInputCommandInteraction) {
         return new CompoteDePommesGame(this, interaction.channelId);

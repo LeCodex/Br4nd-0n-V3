@@ -1,4 +1,5 @@
-import { ChatInputCommandInteraction, Message, MessageFlags, OmitPartialGroupDMChannel, PermissionFlagsBits } from "discord.js";
+import { ChatInputCommandInteraction, Message, MessageFlags, OmitPartialGroupDMChannel, Snowflake } from "discord.js";
+import * as fs from "fs";
 import { BotCommand, BotSubcommandMetadata, ChatInputAplicationSubcommandData } from "interfaces";
 
 export const BotCommands = Symbol("BotCommands");
@@ -7,15 +8,15 @@ export const AdminCommands = Symbol("AdminCommands");
 export abstract class BotModule {
     public abstract name: string;
     public abstract description: string;
-    public abstract commandName: string;
     public abstract color: number;
+    public guilds: Snowflake[] = [];
 
     public commands: BotCommand[] = [];
     public adminCommands: BotCommand[] = [];
     protected ready = false;
     protected dmPermission: boolean = false;
 
-    constructor() {
+    constructor(public commandName: string) {
         for (const [symbol, list, module] of [[BotCommands, this.commands, this], [AdminCommands, this.adminCommands, undefined]] as const) {
             for (const metadata of this.constructor.prototype[symbol] as BotSubcommandMetadata[] ?? []) {
                 list.push({
@@ -31,6 +32,17 @@ export abstract class BotModule {
                     }
                 });
             }
+        }
+
+        const guilds = this.readConfigFile("guilds.json");
+        this.guilds = guilds ? JSON.parse(guilds) : [""];
+    }
+
+    protected readConfigFile(path: string) {
+        if (fs.existsSync(`config/${this.commandName}/${path}`)) {
+            return fs.readFileSync(`config/${this.commandName}/${path}`).toString();
+        } else {
+            return undefined;
         }
     }
 

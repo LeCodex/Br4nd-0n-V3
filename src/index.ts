@@ -22,11 +22,11 @@ client.on("ready", async () => {
         return;
     }
 
-    ErrorHandler.load();
-    AdminPanel.load();
+    await ErrorHandler.load();
+    await AdminPanel.load();
 
-    const groupedCommands: ChatInputApplicationCommandData[] = [];
-    const adminSubcommands: ApplicationCommandSubGroupData[] = [];
+    const groupedCommands: Record<string, ChatInputApplicationCommandData[]> = {};
+    const adminSubcommands: Record<string, ApplicationCommandSubGroupData[]> = {};
     for (const module of modules) {
         const instance = new module();
         allCommands.push(...instance.commands, ...instance.adminCommands.map((e) => ({ ...e, subcommandGroup: instance.commandName })));
@@ -36,21 +36,22 @@ client.on("ready", async () => {
             if (subcommandsCount < instance.commands.length && subcommandsCount > 0) {
                 throw TypeError(`Module ${instance.name} has both subcommands and a command, which isn't supported`);
             }
-    
+
+            let commandData: ChatInputApplicationCommandData;
             if (subcommandsCount === 0) {
-                groupedCommands.push({
+                commandData = {
                     name: instance.commandName,
                     ...instance.commands[0],
                     type: ApplicationCommandType.ChatInput
-                });
+                };
             } else {
                 const groupsWithSubcommands = new Map<string | undefined, BotCommand[]>();
                 for (const command of instance.commands) {
                     if (!groupsWithSubcommands.get(command.subcommandGroup)) groupsWithSubcommands.set(command.subcommandGroup, []);
                     groupsWithSubcommands.get(command.subcommandGroup)!.push(command);
                 }
-        
-                groupedCommands.push({
+                
+                commandData = {
                     name: instance.commandName,
                     description: instance.description,
                     type: ApplicationCommandType.ChatInput,
@@ -68,12 +69,17 @@ client.on("ready", async () => {
                         ...e,
                         type: ApplicationCommandOptionType.Subcommand,
                     })))
-                });
+                };
+            }
+
+            for (const guildId of instance.guilds) {
+                groupedCommands[guildId] ??= [];
+                groupedCommands[guildId].push(commandData);
             }
         }
 
         if (instance.adminCommands.length > 0) {
-            adminSubcommands.push({
+            let subcommandData: ApplicationCommandSubGroupData = {
                 name: instance.commandName,
                 description: instance.description,
                 type: ApplicationCommandOptionType.SubcommandGroup as const,
@@ -82,23 +88,39 @@ client.on("ready", async () => {
                     description: e.description,
                     type: ApplicationCommandOptionType.Subcommand
                 }))
-            });
+            };
+
+            for (const guildId of instance.guilds) {
+                adminSubcommands[guildId] ??= [];
+                adminSubcommands[guildId].push(subcommandData);
+            }
         }
 
         Logger.log(`Loaded module ${instance.name} (${instance.description}) with ${instance.commands.length} + ${instance.adminCommands.length} commands`);
         await instance.onLoaded();
     }
 
-    groupedCommands.push({
-        name: "admin",
-        description: "Admin commands",
-        defaultMemberPermissions: [PermissionFlagsBits.Administrator],
-        type: ApplicationCommandType.ChatInput,
-        options: adminSubcommands
-    })
+    for (const [guildId, adminSubcommand] of Object.entries(adminSubcommands)) {
+        groupedCommands[guildId] ??= [];
+        groupedCommands[guildId].push({
+            name: "admin",
+            description: "Admin commands",
+            defaultMemberPermissions: [PermissionFlagsBits.Administrator],
+            type: ApplicationCommandType.ChatInput,
+            options: adminSubcommand
+        });
+    }
 
-    await client.application.commands.set(groupedCommands);
-    Logger.log(`${client.user.username} is online`);
+    for (const [guildId, commands] of Object.entries(groupedCommands)) {
+        if (guildId === "") {
+            await client.application.commands.set(commands);
+            Logger.log(`Registered ${commands.length} commands globally`);
+        } else {
+            await client.application.commands.set(commands, guildId);
+            Logger.log(`Registered ${commands.length} commands for guild ${guildId}`);
+        }
+    }
+    Logger.log(`${client.user.displayName} is online`);
 });
 
 client.on("interactionCreate", async (interaction) => {
