@@ -13,8 +13,8 @@ export abstract class BotModule {
 
     public commands: BotCommand[] = [];
     public adminCommands: BotCommand[] = [];
+    public dmPermission: boolean = false;
     protected ready = false;
-    protected dmPermission: boolean = false;
 
     constructor(public commandName: string) {
         for (const [symbol, list, module] of [[BotCommands, this.commands, this], [AdminCommands, this.adminCommands, undefined]] as const) {
@@ -22,7 +22,6 @@ export abstract class BotModule {
                 list.push({
                     ...metadata,
                     module,
-                    dmPermission: metadata.dmPermission ?? this.dmPermission,
                     callback: async (interaction: ChatInputCommandInteraction) => {
                         if (this.ready) {
                             await (this as any)[metadata.method](interaction);

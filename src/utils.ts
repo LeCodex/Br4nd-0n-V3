@@ -45,11 +45,10 @@ export async function replyMultiple(interaction: RepliableInteraction, sentences
 }
 
 export function getDist(start: Vector2, end: Vector2) {
-    //console.log(start.x - end.x, start.y - end.y);
     return Math.sqrt((start.x - end.x) ** 2 + (start.y - end.y) ** 2);
 }
 
-export class ObjectKeyMap<K extends object, V> extends Map<K, V> {
+export class ObjectKeyMap<K extends Object, V> extends Map<K, V> {
     private equals(key1: K, key2: K) {
         return (Object.entries(key1) as Array<[keyof K, K[keyof K]]>).every(([k, v]) => key2[k] === v);
     }
@@ -73,7 +72,7 @@ export class ObjectKeyMap<K extends object, V> extends Map<K, V> {
     }
 }
 
-export function aStar(start: Vector2, goal: Vector2, board: boolean[][]): Vector2[] {
+export function aStar(start: Vector2, goal: Vector2, isEmpty: (pos: Vector2) => boolean): Vector2[] {
     function reconstructPath(cameFrom: WeakMap<Vector2, Vector2>, current: Vector2) {
         const totalPath = [current];
         while (cameFrom.has(current)) {
@@ -104,13 +103,12 @@ export function aStar(start: Vector2, goal: Vector2, board: boolean[][]): Vector
         for (let r = 0; r < 4; r++) {
             const dx = [1, 0, -1, 0][r];
             const dy = [0, 1, 0, -1][r];
+            const neighbor: Vector2 = {
+                x: current.x + dx,
+                y: current.y + dy
+            };
 
-            if (current.x + dx >= 0 && current.x + dx < board.length && current.y + dy >= 0 && current.y + dy < board.length && !board[current.y + dy][current.x + dx]) {
-                const neighbor: Vector2 = {
-                    x: current.x + dx,
-                    y: current.y + dy
-                };
-
+            if (isEmpty(neighbor)) {
                 const tentative_gScore = (gScore.get(current) ?? 0) + 1;
                 if (tentative_gScore < (gScore.get(neighbor) ?? Infinity)) {
                     cameFrom.set(neighbor, current);

@@ -41,6 +41,7 @@ client.on("ready", async () => {
             if (subcommandsCount === 0) {
                 commandData = {
                     name: instance.commandName,
+                    dmPermission: instance.dmPermission,
                     ...instance.commands[0],
                     type: ApplicationCommandType.ChatInput
                 };
@@ -54,6 +55,7 @@ client.on("ready", async () => {
                 commandData = {
                     name: instance.commandName,
                     description: instance.description,
+                    dmPermission: instance.dmPermission,
                     type: ApplicationCommandType.ChatInput,
                     options: [...groupsWithSubcommands.entries()].flatMap<ApplicationCommandOptionData>(([subcommandGroup, subcommands]) => subcommandGroup ? {
                         name: subcommandGroup,

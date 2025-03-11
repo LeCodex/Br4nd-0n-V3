@@ -62,7 +62,7 @@ export default class DedalleuxGame extends Game {
     }
 
     generatePath() {
-        this.path = aStar(this.pawn, this.goal, this.board.map((row) => row.map((e) => e !== -1)));
+        this.path = aStar(this.pawn, this.goal, (pos) => this.board[pos.x]?.[pos.y] === -1);
     }
 
     setupTimeout(newTurn: boolean = true) {
@@ -84,12 +84,12 @@ export default class DedalleuxGame extends Game {
 
     createWalls() {
         this.walls = [];
-        for (let i = 0; i < Math.pow(this.colors.length / 2, 2); i++) {
-            const wall = {
-                color: i % Math.floor(this.colors.length / 2),
+        const colorCount = Math.floor(this.colors.length / 2);
+        for (let i = 0; i < colorCount ** 2; i++) {
+            this.walls.unshift({
+                color: i % colorCount,
                 direction: Math.floor(Math.random() * 4)
-            };
-            this.walls.unshift(wall);
+            });
         }
 
         this.walls = shuffle(this.walls);
