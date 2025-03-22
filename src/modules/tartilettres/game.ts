@@ -15,6 +15,10 @@ export default class TartilettresGame extends Game {
         super(module, channelId);
     }
 
+    public async start(interaction: ChatInputCommandInteraction) {
+        await this.sendTable(interaction);
+    }
+
     public async sendWord(interaction: ChatInputCommandInteraction) {
         const player = this.players[interaction.user.id] ??= new TartilettresPlayer(this, interaction.user);
         const word = interaction.options.get("mot")?.value

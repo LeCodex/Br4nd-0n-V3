@@ -5,6 +5,7 @@ import CompoteDePommes from "modules/compote";
 import Tartilettres from "modules/tartilettres";
 import Dedalleux from "./dedalleux";
 import Sakatasses from "./sak";
+import YamJam from "./yamjam";
 
 export const modules: (new () => BotModule)[] = [
     Ping,
@@ -13,4 +14,5 @@ export const modules: (new () => BotModule)[] = [
     Tartilettres,
     Dedalleux,
     Sakatasses,
+    YamJam
 ];

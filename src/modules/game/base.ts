@@ -27,8 +27,7 @@ export default function GameModule() {
             }
 
             const game = this.games[interaction.channelId] = await this.instantiate(interaction);
-            await game.start();
-            await interaction.reply("Started");
+            await game.start(interaction);
         }
 
         protected abstract instantiate(interaction: ChatInputCommandInteraction): Promise<Game>;
@@ -42,7 +41,7 @@ export default function GameModule() {
 
             game.paused = !game.paused;
             await game.save();
-            await interaction.reply("Paused");
+            await interaction.reply(game.paused ? "Paused" : "Resumed");
         }
 
         @AdminCommand({ subcommand: "delete", description: "Stops and deletes a currently ongoing game" })

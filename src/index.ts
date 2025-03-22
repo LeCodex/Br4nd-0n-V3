@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionData, ApplicationCommandOptionType, ApplicationCommandSubGroupData, ApplicationCommandType, ChatInputApplicationCommandData, PermissionFlagsBits } from "discord.js";
+import { ApplicationCommandOptionData, ApplicationCommandOptionType, ApplicationCommandSubGroupData, ApplicationCommandType, ChatInputApplicationCommandData, InteractionContextType, PermissionFlagsBits } from "discord.js";
 import { configDotenv } from "dotenv";
 import { modules } from "modules";
 import { BotCommand } from "interfaces";
@@ -106,8 +106,10 @@ client.on("ready", async () => {
         groupedCommands[guildId] ??= [];
         groupedCommands[guildId].push({
             name: "admin",
-            description: "Admin commands",
+            description: `Admin commands${guildId === "" ? "" : " for this guild"}`,
             defaultMemberPermissions: [PermissionFlagsBits.Administrator],
+            dmPermission: false,
+            contexts: [InteractionContextType.Guild],
             type: ApplicationCommandType.ChatInput,
             options: adminSubcommand
         });

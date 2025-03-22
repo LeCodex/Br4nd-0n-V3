@@ -1,6 +1,6 @@
 import { client } from "client";
 import { randomBytes } from "crypto";
-import { ActionRowBuilder, AnyComponentBuilder, ButtonBuilder, ChannelSelectMenuBuilder, ChannelSelectMenuComponentData, ComponentData, ComponentType, InteractionButtonComponentData, InteractionReplyOptions, MentionableSelectMenuBuilder, MentionableSelectMenuComponentData, Message, MessageComponentInteraction, MessageCreateOptions, MessageEditOptions, RepliableInteraction, RoleSelectMenuBuilder, RoleSelectMenuComponentData, SendableChannels, Snowflake, StringSelectMenuBuilder, StringSelectMenuComponentData, TextBasedChannel, TextChannel, UserSelectMenuBuilder, UserSelectMenuComponentData } from "discord.js";
+import { ActionRowBuilder, AnyComponentBuilder, ButtonBuilder, ChannelSelectMenuBuilder, ChannelSelectMenuComponentData, ComponentData, ComponentType, InteractionButtonComponentData, InteractionReplyOptions, MentionableSelectMenuBuilder, MentionableSelectMenuComponentData, Message, MessageComponentInteraction, MessageCreateOptions, MessageEditOptions, RepliableInteraction, RoleSelectMenuBuilder, RoleSelectMenuComponentData, SendableChannels, Snowflake, StringSelectMenuBuilder, StringSelectMenuComponentData, UserSelectMenuBuilder, UserSelectMenuComponentData } from "discord.js";
 import { ComponentHandler, ComponentHandlerMetadata, ComponentHandlerParameter, ComponentHandlerMetadataParameter, Constructor, NonLinkButtonMessageActionRowComponentData, NonTextInputComponentBuilder } from "interfaces";
 import Logger from "logger";
 
@@ -117,6 +117,27 @@ export default class View {
             View.index.set(this.message.id, this);
         }
         return this;
+    }
+
+    public async update(message: Message, options: string | MessageEditOptions) {
+        if (this.message) {
+            throw Error("View was already sent. Did you mean to use edit?");
+        }
+
+        this.message = await message.edit({ ...(typeof options === "string" ? { content: options } : options), components: this.actionRows });
+        if (this.message) {
+            View.index.set(this.message.id, this);
+        }
+        return this;
+    }
+
+    public async resend(options: string | MessageCreateOptions) {
+        if (this.message) {
+            View.index.delete(this.message.id);
+            const channel = this.message.channel as SendableChannels;
+            this.message = undefined;
+            await this.send(channel, options);
+        }
     }
 
     public async edit(options: string | MessageEditOptions) {

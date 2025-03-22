@@ -1,4 +1,4 @@
-import { EmbedBuilder, Emoji } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder, Emoji } from "discord.js";
 import { DateTime } from "luxon";
 import { Vector2 } from "interfaces";
 import { Game } from "modules/game";
@@ -51,7 +51,7 @@ export default class DedalleuxGame extends Game {
         this.colors = Object.values(this.module.colors);
     }
 
-    async start() {
+    async start(interaction: ChatInputCommandInteraction) {
         this.createWalls();
         this.generateBoard();
         this.generatePath();
@@ -59,6 +59,8 @@ export default class DedalleuxGame extends Game {
         this.setupTimeout();
         await this.sendBoard();
         await this.save();
+        await interaction.deferReply();
+        await super.start(interaction);
     }
 
     generatePath() {

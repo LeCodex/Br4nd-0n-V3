@@ -16,8 +16,9 @@ export abstract class Game {
         });
     }
 
-    public async start() {
+    public async start(interaction: ChatInputCommandInteraction) {
         await this.save();
+        await interaction.reply("Started");
     }
 
     public async save() {
