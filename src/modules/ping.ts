@@ -14,7 +14,7 @@ export default class Ping extends BotModule {
         super("ping");
     }
     
-    @BotCommand({ description: "Pong!", dmPermission: true })
+    @BotCommand({ description: "Pong!" })
     public async ping(interaction: ChatInputCommandInteraction) {
         await interaction.reply({
             embeds: [{

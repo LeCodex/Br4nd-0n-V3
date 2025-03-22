@@ -6,13 +6,15 @@ import Tartilettres from "modules/tartilettres";
 import Dedalleux from "./dedalleux";
 import Sakatasses from "./sak";
 import YamJam from "./yamjam";
+import Say from "./say";
 
 export const modules: (new () => BotModule)[] = [
     Ping,
+    Say,
     Random,
     CompoteDePommes,
     Tartilettres,
     Dedalleux,
+    YamJam,
     Sakatasses,
-    YamJam
 ];
