@@ -137,25 +137,27 @@ export function createRankEmbed(options: APIEmbed, playersTitle: string, order: 
         buffer.message += `${getRankEmoji(buffer.rank)} **${buffer.rank + 1}.** ${e.user ? e.user.toString() : "Joueur non trouvé"}\n`;
         return buffer;
     }, { message: "", rank: -1, lastScore: Infinity }).message);
+    const scoreLines = maxCharsLines(order.map((e) => e.scoreStr ?? `**${e.score}** ${scoreEmoji}`).join("\n"));
+    const maxLines = Math.min(playersLines.length, scoreLines.length);
 
     return {
         ...options,
         fields: [
             {
                 name: playersTitle,
-                value: playersLines.join("\n"),
+                value: playersLines.slice(0, maxLines).join("\n"),
                 inline: true
             },
             {
                 name: scoreTitle,
-                value: order.map((e) => e.scoreStr ?? `**${e.score}** ${scoreEmoji}`).slice(0, playersLines.length).join("\n"),
+                value: scoreLines.slice(0, maxLines).join("\n"),
                 inline: true
             }
         ]
     }
 }
 
-export function maxCharsLines(message: string, chars: number = 1020) {
+export function maxCharsLines(message: string, chars: number = 1024) {
     const lines = [];
     let length = 0;
     for (const line of message.split("\n")) {
