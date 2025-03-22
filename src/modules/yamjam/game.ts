@@ -39,8 +39,7 @@ export default class YamJamGame extends Game {
         this.scoreCategories.chance = {name: "Chance (Somme des dés)", count: (player) => player.tray.reduce((a, e) => a + e + 1, 0)}
 
         await this.sendMessage();
-        await this.save();
-        await interaction.deferReply();
+        await super.start(interaction);
     }
 
     resetTimeout() {
@@ -73,7 +72,7 @@ export default class YamJamGame extends Game {
                 }
                 acc.message.push(
                     `${getRankEmoji(acc.rank)} **${acc.rank + 1}.** ${this.lastPlayed === e.user.id ? "__" : ""}${e.user ? e.user.toString() : "Joueur non trouvé"}` +
-                    `${this.lastPlayed === e.user.id ? "__" : ""}: **${e.score}** ${e.pointsGained !== null ? " (+" + e.pointsGained + ")" : ""} | ` +
+                    `${this.lastPlayed === e.user.id ? "__" : ""}: **${e.score}** ${e.pointsGained > 0 ? " (+" + e.pointsGained + ")" : ""} | ` +
                     `${e.tray.map(e => this.module.faces[e]).join("")}`
                 );
                 return acc;
