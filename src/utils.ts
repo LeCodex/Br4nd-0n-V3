@@ -129,26 +129,41 @@ export function aStar(start: Vector2, goal: Vector2, isEmpty: (pos: Vector2) => 
 export function createRankEmbed(options: APIEmbed, playersTitle: string, order: Array<{ user: User, score: number }>, scoreTitle: string, scoreEmoji: string | Emoji): APIEmbed
 export function createRankEmbed(options: APIEmbed, playersTitle: string, order: Array<{ user: User, score: number, scoreStr: string }>, scoreTitle: string): APIEmbed
 export function createRankEmbed(options: APIEmbed, playersTitle: string, order: Array<{ user: User, score: number, scoreStr?: string }>, scoreTitle: string, scoreEmoji?: string | Emoji): APIEmbed {
+    const playersLines = maxCharsLines(order.reduce((buffer, e) => {
+        if (e.score < buffer.lastScore) {
+            buffer.lastScore = e.score;
+            buffer.rank++;
+        }
+        buffer.message += `${getRankEmoji(buffer.rank)} **${buffer.rank + 1}.** ${e.user ? e.user.toString() : "Joueur non trouvé"}\n`;
+        return buffer;
+    }, { message: "", rank: -1, lastScore: Infinity }).message);
+
     return {
         ...options,
         fields: [
             {
                 name: playersTitle,
-                value: order.reduce((buffer, e) => {
-                    if (e.score < buffer.lastScore) {
-                        buffer.lastScore = e.score;
-                        buffer.rank++;
-                    }
-                    buffer.message += `${getRankEmoji(buffer.rank)} **${buffer.rank + 1}.** ${e.user ? e.user.toString() : "Joueur non trouvé"}\n`;
-                    return buffer;
-                }, { message: "", rank: -1, lastScore: Infinity }).message,
+                value: playersLines.join("\n"),
                 inline: true
             },
             {
                 name: scoreTitle,
-                value: order.map((e) => e.scoreStr ?? `**${e.score}** ${scoreEmoji}`).join("\n"),
+                value: order.map((e) => e.scoreStr ?? `**${e.score}** ${scoreEmoji}`).slice(0, playersLines.length).join("\n"),
                 inline: true
             }
         ]
     }
+}
+
+export function maxCharsLines(message: string, chars: number = 1020) {
+    const lines = [];
+    let length = 0;
+    for (const line of message.split("\n")) {
+        if (length + line.length > chars) {
+            break;
+        }
+        lines.push(line);
+        length += line.length + 1;
+    }
+    return lines;
 }
