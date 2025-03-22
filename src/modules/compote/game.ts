@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { Game } from "modules/game";
 import CompoteDePommesPlayer from "./player";
 import { CharOf, NumberRange } from "interfaces";
-import { createRankEmbed, getRankEmoji } from "utils";
+import { createRankEmbed } from "utils";
 import CompoteDePommes from ".";
 
 export default class CompoteDePommesGame extends Game {
@@ -61,6 +61,10 @@ export default class CompoteDePommesGame extends Game {
     }
 
     async roll(interaction: ChatInputCommandInteraction) {
+        if (this.paused) {
+            return interaction.reply({ content: "Le jeu est en pause", flags: MessageFlags.Ephemeral });
+        }
+
         const player = this.players[interaction.user.id] ??= new CompoteDePommesPlayer(this, interaction.user);
         if (player.hands === 0) {
             return interaction.reply({ content: "Vous n'avez plus de cueillettes!", flags: MessageFlags.Ephemeral });
@@ -72,7 +76,7 @@ export default class CompoteDePommesGame extends Game {
         player.hands--;
         this.summary.length = 0;
 
-        const roll = Math.floor(Math.random() * 20) + 1 as NumberRange<1, 20>;
+        const roll = 14 // Math.floor(Math.random() * 20) + 1 as NumberRange<1, 20>;
         const letter = "AEIOUY"[Math.floor(Math.random() * 5)] as CharOf<"AEIOUY">;
         this[`roll${roll}`](player, letter);
 

@@ -23,7 +23,7 @@ export default class CompoteDePommesPlayer {
     }
 
     useEffect(index: number, uses: number) {
-        const amount = this.effects[index]
+        const amount = this.effects[index];
         uses = Math.min(amount, uses);
         if (amount) {
             this.game.summary.push(`${this.user.toString()} utilise **${uses}** effet${amount > 1 ? "s" : ""} **#${index}**! Il lui en reste **${amount - uses}**.`);
@@ -37,8 +37,9 @@ export default class CompoteDePommesPlayer {
         amount = -Math.min(-amount, this.basket);
         if (!amount) return;
 
-        if (amount < 0 && this.effects[5]) {
-            this.stash(this.useEffect(5, Infinity));
+        if (amount < 0) {
+            const stashed = this.useEffect(5, Infinity);
+            if (stashed) this.stash(stashed);
         }
 
         this.basket = Math.max(0, this.basket + amount);
@@ -58,8 +59,7 @@ export default class CompoteDePommesPlayer {
         this.basket += amount;
         this.game.summary.push(`${this.user.toString()} vole **${amount} 🍎** à ${other.user.toString()}!`);
 
-        if (other.effects[12]) {
-            this.useEffect(12, 1);
+        if (other.useEffect(12, 1)) {
             other.steal(this, amount * 2);
         }
     }

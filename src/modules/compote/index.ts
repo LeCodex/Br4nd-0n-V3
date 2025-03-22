@@ -29,7 +29,7 @@ export default class CompoteDePommes extends GameModule() {
 
     @GameCommand({ subcommand: "rules", description: "Affiche les effets" })
     public async rules(game: CompoteDePommesGame, interaction: ChatInputCommandInteraction) {
-        return interaction.reply({ embeds: [game.rulesEmbed] });
+        return interaction.reply({ embeds: [game.rulesEmbed], flags: MessageFlags.Ephemeral });
     }
 
     @GameCommand({
@@ -42,6 +42,6 @@ export default class CompoteDePommes extends GameModule() {
         if (!player) {
             return interaction.reply({ content: "Cet utilisateur n'est pas dans la partie", flags: MessageFlags.Ephemeral });
         }
-        return interaction.reply({ embeds: [{ title: `Info de ${player.user.displayName}`, description: player.summary, color: this.color }] });
+        return interaction.reply({ embeds: [{ title: `Info de ${player.user.displayName}`, description: player.summary, color: this.color }], flags: MessageFlags.Ephemeral });
     }
 }
