@@ -119,18 +119,6 @@ export default class View {
         return this;
     }
 
-    public async update(message: Message, options: string | MessageEditOptions) {
-        if (this.message) {
-            throw Error("View was already sent. Did you mean to use edit?");
-        }
-
-        this.message = await message.edit({ ...(typeof options === "string" ? { content: options } : options), components: this.actionRows });
-        if (this.message) {
-            View.index.set(this.message.id, this);
-        }
-        return this;
-    }
-
     public async resend(options: string | MessageCreateOptions) {
         if (this.message) {
             View.index.delete(this.message.id);

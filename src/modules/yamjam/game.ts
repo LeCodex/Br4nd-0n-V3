@@ -44,7 +44,7 @@ export default class YamJamGame extends Game {
 
     resetTimeout() {
         clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => { this.rerollEverything() }, this.lastTimestamp - Date.now() + 1440000);
+        this.timeout = setTimeout(() => this.rerollEverything(), this.lastTimestamp + 1440000 - Date.now());
     }
 
     async rerollEverything() {
@@ -55,6 +55,8 @@ export default class YamJamGame extends Game {
 
         this.lastTimestamp = Date.now();
         this.resetTimeout();
+        await this.sendMessage();
+        await this.save();
     }
 
     async sendMessage() {
@@ -96,11 +98,10 @@ export default class YamJamGame extends Game {
             if (field.value.trim().length) embed.addFields(field);
         }
 
-        const view = new YamJamView(this);
         if (this.view?.message) {
-            this.view = await view.update(this.view.message, { embeds: [embed] });
+            this.view = await new YamJamView(this, this.view.message).edit({ embeds: [embed] });
         } else if (this.channel) {
-            this.view = await view.send(this.channel, { embeds: [embed] });
+            this.view = await new YamJamView(this).send(this.channel, { embeds: [embed] });
         }
     }
 
