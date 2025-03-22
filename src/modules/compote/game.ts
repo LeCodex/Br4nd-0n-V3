@@ -76,7 +76,7 @@ export default class CompoteDePommesGame extends Game {
         player.hands--;
         this.summary.length = 0;
 
-        const roll = 14 // Math.floor(Math.random() * 20) + 1 as NumberRange<1, 20>;
+        const roll = Math.floor(Math.random() * 20) + 1 as NumberRange<1, 20>;
         const letter = "AEIOUY"[Math.floor(Math.random() * 5)] as CharOf<"AEIOUY">;
         this[`roll${roll}`](player, letter);
 
