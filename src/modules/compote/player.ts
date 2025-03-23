@@ -52,6 +52,11 @@ export default class CompoteDePommesPlayer {
     }
 
     steal(other: CompoteDePommesPlayer, amount: number) {
+        if (amount) {
+            const stashed = other.useEffect(5, Infinity);
+            if (stashed) other.stash(stashed);
+        }
+
         amount = Math.min(other.basket, amount);
         if (!amount) return;
 
