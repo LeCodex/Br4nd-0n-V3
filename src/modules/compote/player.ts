@@ -43,7 +43,7 @@ export default class CompoteDePommesPlayer {
         }
 
         this.basket = Math.max(0, this.basket + amount);
-        this.game.summary.push(`${this.user.toString()} ${amount >= 0 ? "ajoute" : "perd"} **${Math.abs(amount)} 🍎** ${Math.abs(amount) >= 0 ? "dans" : "de"} son 🧺!`);
+        this.game.summary.push(`${this.user.toString()} ${amount >= 0 ? "ajoute" : "perd"} **${Math.abs(amount)} 🍎** ${amount >= 0 ? "dans" : "de"} son 🧺!`);
     }
 
     gainHands(amount: number) {
