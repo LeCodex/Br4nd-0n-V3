@@ -12,6 +12,7 @@ export default class CompoteDePommesPlayer {
     get apples() { return this.basket + this.locked; }
     effects: Record<number, number> = {};
     lastLetter: string = "";
+    get rankScore() { return [this.apples, this.locked]; }
 
     constructor(public game: CompoteDePommesGame, public user: User) {
         this.hands = game.maxHands;

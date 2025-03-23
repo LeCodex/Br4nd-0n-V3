@@ -77,7 +77,7 @@ export default class CompoteDePommesGame extends Game {
         this.summary.length = 0;
 
         const roll = Math.floor(Math.random() * 20) + 1 as NumberRange<1, 20>;
-        const letter = "AEIOUY"[Math.floor(Math.random() * 5)] as CharOf<"AEIOUY">;
+        const letter = "AEIOUY"[Math.floor(Math.random() * 6)] as CharOf<"AEIOUY">;
         this[`roll${roll}`](player, letter);
 
         if (this.history.includes(player)) this.history.splice(this.history.indexOf(player), 1);
@@ -90,12 +90,12 @@ export default class CompoteDePommesGame extends Game {
         return interaction.reply({ embeds: [this.rollEmbed(player, roll, letter)] });
     }
 
-    get order() {
-        return toMultiSorted(Object.values(this.players), (a, b) => [b.apples - a.apples, a.locked - b.locked]);
+    get rank() {
+        return toRanked(Object.values(this.players).map((e) => ({ value: e, score: e.rankScore })));
     }
 
-    get rank() {
-        return toRanked(Object.values(this.players).map((e) => ({ value: e, score: [e.apples, -e.locked] })));
+    get order() {
+        return this.rank.map((e) => e.value);
     }
 
     get rankEmbed(): APIEmbed {
@@ -105,7 +105,7 @@ export default class CompoteDePommesGame extends Game {
                 color: this.module.color
             },
             "Participants",
-            Object.values(this.players).map((e) => ({ user: e.user, score: [e.apples, e.locked], scoreStr: `**${e.apples}** 🍎 *(${e.locked} 🔐 - ${e.basket} 🧺)*` })),
+            Object.values(this.players).map((e) => ({ user: e.user, score: e.rankScore, scoreStr: `**${e.apples}** 🍎 *(${e.locked} 🔐 - ${e.basket} 🧺)*` })),
             "Pommes"
         );
     }
