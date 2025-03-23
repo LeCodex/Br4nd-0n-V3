@@ -1,5 +1,5 @@
 import { APIEmbed, Emoji, InteractionReplyOptions, MessagePayload, RepliableInteraction, Snowflake, User } from "discord.js";
-import { Vector2 } from "./interfaces";
+import { CharOf, Vector2 } from "./interfaces";
 import { client } from "client";
 
 export async function getEmoji(name: Snowflake, fallback: string) {
@@ -181,4 +181,10 @@ export function maxCharsLines(message: string, chars: number = 1024) {
         length += line.length + 1;
     }
     return lines;
+}
+
+export function randomlyPick<T extends string>(input: T): CharOf<T>
+export function randomlyPick<T extends unknown[]>(input: T): T[number]
+export function randomlyPick<T extends string | unknown[]>(input: T) {
+    return input[Math.floor(Math.random() * input.length)];
 }

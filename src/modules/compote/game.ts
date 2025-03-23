@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { Game } from "modules/game";
 import CompoteDePommesPlayer from "./player";
 import { CharOf, NumberRange } from "interfaces";
-import { createRankEmbed, toMultiSorted, toRanked } from "utils";
+import { createRankEmbed, randomlyPick, toMultiSorted, toRanked } from "utils";
 import CompoteDePommes from ".";
 
 export default class CompoteDePommesGame extends Game {
@@ -77,7 +77,7 @@ export default class CompoteDePommesGame extends Game {
         this.summary.length = 0;
 
         const roll = Math.floor(Math.random() * 20) + 1 as NumberRange<1, 20>;
-        const letter = "AEIOUY"[Math.floor(Math.random() * 6)] as CharOf<"AEIOUY">;
+        const letter = randomlyPick("AAAAAAAAAEEEEEEEEEEEEEEEIIIIIIIIOOOOOOUUUUUUY");
         this[`roll${roll}`](player, letter);
 
         if (this.history.includes(player)) this.history.splice(this.history.indexOf(player), 1);
