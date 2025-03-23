@@ -55,11 +55,11 @@ export default class YamJamGame extends Game {
 
         this.lastTimestamp = Date.now();
         this.resetTimeout();
-        await this.sendMessage();
+        await this.sendMessage(true);
         await this.save();
     }
 
-    async sendMessage() {
+    async sendMessage(resend = false) {
         const embed = new EmbedBuilder()
             .setTitle("[YAMS] Dés disponibles" + (this.lastPlayed ? " | Dernier dé pris par " + this.players[this.lastPlayed].user.displayName : ""))
             .setDescription(this.dice.map(e => this.module.faces[e]).join(""))
@@ -88,7 +88,7 @@ export default class YamJamGame extends Game {
             value.forEach((element, i) => {
                 totalLength += (element + "\n").length;
                 if (totalLength >= 1024) {
-                    embed.addFields(field);
+                    embed.addFields({ ...field });
                     field.value = "";
                     field.name = "Suite des joueurs"
                     totalLength = (element + "\n").length;
@@ -99,7 +99,7 @@ export default class YamJamGame extends Game {
         }
 
         if (this.view?.message) {
-            this.view = await new YamJamView(this, this.view.message).edit({ embeds: [embed] });
+            this.view = await new YamJamView(this, this.view.message)[resend ? "resend" : "edit"]({ embeds: [embed] });
         } else if (this.channel) {
             this.view = await new YamJamView(this).send(this.channel, { embeds: [embed] });
         }

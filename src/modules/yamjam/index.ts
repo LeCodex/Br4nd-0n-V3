@@ -1,7 +1,8 @@
 import GameModule from "modules/game/base";
 import YamJamGame from "./game";
-import { ChatInputCommandInteraction, Emoji } from "discord.js";
+import { ChatInputCommandInteraction, Emoji, MessageFlags } from "discord.js";
 import { getEmoji } from "utils";
+import { GameCommand } from "modules/game";
 
 export default class YamJam extends GameModule() {
     readonly cls = YamJamGame;
@@ -28,5 +29,11 @@ export default class YamJam extends GameModule() {
 
     protected async instantiate(interaction: ChatInputCommandInteraction): Promise<YamJamGame> {
         return new YamJamGame(this, interaction.channelId);
+    }
+
+    @GameCommand({ subcommand: "show", description: "Renvoie le message du jeu" })
+    public async show(game: YamJamGame, interaction: ChatInputCommandInteraction) {
+        await game.sendMessage(true);
+        await interaction.reply({ content: "Resent", flags: MessageFlags.Ephemeral });
     }
 }
