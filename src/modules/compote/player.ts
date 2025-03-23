@@ -83,11 +83,22 @@ export default class CompoteDePommesPlayer {
 
     get summary() {
         const activeEffects = Object.entries(this.effects).filter(([_, v]) => v > 0);
-        const rank = this.game.order.indexOf(this);
+        let rank = -1, score = Infinity;
+        for (const player of this.game.order) {
+            if (player.apples < score) {
+                rank++;
+                score = player.apples;
+            }
+
+            if (player === this) {
+                break;
+            }
+        }
+        
         return `Tu possèdes **${this.apples}** 🍎 ! *(${this.locked} 🔐 - ${this.basket} 🧺)*`
             + `\nIl te reste **${this.hands}**/${this.game.maxHands} cueillette${this.hands > 1 ? "s" : ""}`
             + (activeEffects.length > 0 ? `\nEffets : ${activeEffects.map(([k, v]) => `**#${k} x${v}**`).join(', ')}` : '')
-            + `\nRang: ${getRankEmoji(rank)} ** ${rank + 1}**`;
+            + `\nRang: ${getRankEmoji(rank)} **${rank + 1}**`;
     }
 
     serialize() {
