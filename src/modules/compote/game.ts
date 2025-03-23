@@ -105,7 +105,7 @@ export default class CompoteDePommesGame extends Game {
                 color: this.module.color
             },
             "Participants",
-            Object.values(this.players).map((e) => ({ user: e.user, score: [e.apples, -e.locked], scoreStr: `**${e.apples}** 🍎 *(${e.locked} 🔐 - ${e.basket} 🧺)*` })),
+            Object.values(this.players).map((e) => ({ user: e.user, score: [e.apples, e.locked], scoreStr: `**${e.apples}** 🍎 *(${e.locked} 🔐 - ${e.basket} 🧺)*` })),
             "Pommes"
         );
     }
