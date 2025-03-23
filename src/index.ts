@@ -99,7 +99,7 @@ client.on("ready", async () => {
         }
 
         Logger.log(`Loaded module ${instance.name} (${instance.description}) with ${instance.commands.length} + ${instance.adminCommands.length} commands`);
-        await instance.onLoaded();
+        instance.onLoaded();
     }
 
     for (const [guildId, adminSubcommand] of Object.entries(adminSubcommands)) {
