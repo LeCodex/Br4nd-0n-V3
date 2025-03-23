@@ -34,6 +34,7 @@ export default class YamJam extends GameModule() {
     @GameCommand({ subcommand: "show", description: "Renvoie le message du jeu" })
     public async show(game: YamJamGame, interaction: ChatInputCommandInteraction) {
         await game.sendMessage(true);
+        await game.save();
         await interaction.reply({ content: "Resent", flags: MessageFlags.Ephemeral });
     }
 }

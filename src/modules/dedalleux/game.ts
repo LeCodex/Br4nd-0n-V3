@@ -147,7 +147,7 @@ export default class DedalleuxGame extends Game {
         });
     }
 
-    async sendBoard(resend: boolean = false) {
+    async sendBoard(resend: boolean = false, edit: boolean = false) {
         let embed = new EmbedBuilder()
             .setTitle(`Dédalleux • Sens de rotation des murs: ${this.clockwiseRotation ? "🔁" : "🔄"}`)
             .setFooter({ text: `Tour #${this.turn} • Nombre d'ingrédients ramassés: ${this.pickedUp}` })
@@ -185,7 +185,11 @@ export default class DedalleuxGame extends Game {
         ).join("\n"));
 
         if (this.view) {
-            await this.view.resend({ embeds: [embed] }, resend);
+            if (edit) {
+                await this.view.edit({ embeds: [embed] });
+            } else {
+                await this.view.resend({ embeds: [embed] }, resend);
+            }
         } else if (this.channel) {
             this.view = await new DedalleuxView(this).send(this.channel, { embeds: [embed] });
         }
@@ -238,7 +242,6 @@ export default class DedalleuxGame extends Game {
             pawn: this.pawn,
             goal: this.goal,
             items: this.items,
-            board: this.board,
             view: this.view?.serialize()
         };
     }
@@ -257,11 +260,14 @@ export default class DedalleuxGame extends Game {
         instance.pawn = obj.pawn;
         instance.goal = obj.goal;
         instance.items = obj.items;
-        instance.board = obj.board;
-        if (obj.view) instance.view = new DedalleuxView(instance, await View.load(obj.view));
+        if (obj.view) {
+            instance.view = new DedalleuxView(instance, await View.load(obj.view));
+        }
+        instance.generateBoard();
         instance.generatePath();
         instance.setupTimeout();
-        await instance.sendBoard();
+        await instance.sendBoard(false, true);
+        await instance.save();
         return instance;
     }
 }

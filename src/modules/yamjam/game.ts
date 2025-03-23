@@ -134,9 +134,8 @@ export default class YamJamGame extends Game {
 
         if (obj.view) {
             instance.view = new YamJamView(instance, await View.load(obj.view));
-        } else {
-            await instance.sendMessage();
         }
+        await instance.sendMessage();
         instance.resetTimeout();
         await instance.sendMessage();
         return instance;
