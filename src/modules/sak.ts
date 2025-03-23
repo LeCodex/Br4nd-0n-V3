@@ -53,7 +53,7 @@ export default class Sakatasses extends BotModule {
         });
     }
 
-    @AdminCommand({ subcommand: "rank", description: "Voir le classement", defaultMemberPermissions: [ PermissionFlagsBits.ModerateMembers ] })
+    @AdminCommand({ subcommand: "rank", description: "Voir le classement" })
     public async rank(interaction: ChatInputCommandInteraction) {
         if (!interaction.guildId) {
             return interaction.reply({ content: "Not in a guild", flags: MessageFlags.Ephemeral });

@@ -87,8 +87,8 @@ client.on("ready", async () => {
                 type: ApplicationCommandOptionType.SubcommandGroup as const,
                 options: instance.adminCommands.map((e) => ({
                     name: e.subcommand!,
-                    description: e.description,
-                    type: ApplicationCommandOptionType.Subcommand
+                    ...e,
+                    type: ApplicationCommandOptionType.Subcommand,
                 }))
             };
 
