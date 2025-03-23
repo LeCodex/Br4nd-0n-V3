@@ -37,6 +37,6 @@ export default class Tartilettres extends GameModule() {
 
     @GameCommand({ subcommand: "show", description: "Affiche la table"})
     public async show(game: TartilettresGame, interaction: ChatInputCommandInteraction) {
-        return game.sendTable(interaction);
+        await game.sendTable(interaction);
     }
 }

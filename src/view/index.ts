@@ -127,7 +127,11 @@ export default class View {
             if (deletePrevious) {
                 await this.message.delete();
             } else {
-                await this.message.edit({ ...this.message, attachments: [...this.message.attachments.values()], flags: undefined, components: undefined });
+                await this.message.edit({
+                    content: this.message.content,
+                    embeds: this.message.embeds,
+                    attachments: [...this.message.attachments.values()]
+                });
             }
 
             this.message = undefined;
@@ -168,7 +172,11 @@ export default class View {
     public async end() {
         if (this.message && View.index.get(this.message.id) === this) {
             View.index.delete(this.message.id);
-            await this.message.edit({ ...this.message, attachments: [...this.message.attachments.values()], flags: undefined, components: undefined });
+            await this.message.edit({
+                content: this.message.content,
+                embeds: this.message.embeds,
+                attachments: [...this.message.attachments.values()]
+            });
             delete this.message;
         }
     }
@@ -181,8 +189,12 @@ export default class View {
     }
 
     static async load(obj: Record<string, any>) {
-        const channel = await client.channels.fetch(obj.channel);
-        return channel?.isSendable() ? await channel.messages.fetch(obj.message) : undefined;
+        try {
+            const channel = await client.channels.fetch(obj.channel);
+            return channel?.isSendable() ? await channel.messages.fetch(obj.message) : undefined;
+        } catch {
+            return undefined;
+        }
     }
 }
 
