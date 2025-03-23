@@ -1,7 +1,7 @@
 import GameModule from "modules/game/base";
 import DedalleuxGame from "./game";
-import { ChatInputCommandInteraction, Emoji } from "discord.js";
-import { Game } from "../game";
+import { ChatInputCommandInteraction, Emoji, MessageFlags } from "discord.js";
+import { Game, GameCommand } from "../game";
 import { getEmoji } from "utils";
 
 export default class Dedalleux extends GameModule() {
@@ -34,5 +34,11 @@ export default class Dedalleux extends GameModule() {
 
     protected async instantiate(interaction: ChatInputCommandInteraction): Promise<Game> {
         return new DedalleuxGame(this, interaction.channelId);
+    }
+
+    @GameCommand({ subcommand: "show", description: "Renvoie le message du jeu" })
+    public async show(game: DedalleuxGame, interaction: ChatInputCommandInteraction) {
+        await game.sendBoard(true);
+        await interaction.reply({ content: "Resent", flags: MessageFlags.Ephemeral });
     }
 }

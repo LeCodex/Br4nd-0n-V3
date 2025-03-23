@@ -119,13 +119,21 @@ export default class View {
         return this;
     }
 
-    public async resend(options: string | MessageCreateOptions) {
+    public async resend(options: string | MessageCreateOptions, deletePrevious: boolean = true) {
         if (this.message) {
             View.index.delete(this.message.id);
             const channel = this.message.channel as SendableChannels;
+
+            if (deletePrevious) {
+                await this.message.delete();
+            } else {
+                await this.message.edit({ ...this.message, attachments: [...this.message.attachments.values()], flags: undefined, components: undefined });
+            }
+
             this.message = undefined;
             await this.send(channel, options);
         }
+        return this;
     }
 
     public async edit(options: string | MessageEditOptions) {
