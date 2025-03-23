@@ -69,8 +69,7 @@ export default class Sakatasses extends BotModule {
                     "Utilisateurs",
                     await Promise.all(
                         Object.entries(this.sak[interaction.guildId])
-                            .toSorted(([_1, a], [_2, b]) => b - a)
-                            .map(async ([userId, amount]) => ({ user: await client.users.fetch(userId), score: amount }))
+                            .map(async ([userId, amount]) => ({ user: await client.users.fetch(userId), score: [amount] }))
                     ),
                     "Tasses",
                     this.cupEmoji

@@ -88,11 +88,12 @@ export default class CompoteDePommesPlayer {
 
     get summary() {
         const activeEffects = Object.entries(this.effects).filter(([_, v]) => v > 0);
-        let rank = -1, score = Infinity;
+        let rank = -1, score = Infinity, locked = 0;
         for (const player of this.game.order) {
-            if (player.apples < score) {
+            if (player.apples < score || player.locked > locked) {
                 rank++;
                 score = player.apples;
+                locked = player.locked;
             }
 
             if (player === this) {

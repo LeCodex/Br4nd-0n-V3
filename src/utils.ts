@@ -126,18 +126,25 @@ export function aStar(start: Vector2, goal: Vector2, isEmpty: (pos: Vector2) => 
     return [start];
 }
 
-export function createRankEmbed(options: APIEmbed, playersTitle: string, order: Array<{ user: User, score: number }>, scoreTitle: string, scoreEmoji: string | Emoji): APIEmbed
-export function createRankEmbed(options: APIEmbed, playersTitle: string, order: Array<{ user: User, score: number, scoreStr: string }>, scoreTitle: string): APIEmbed
-export function createRankEmbed(options: APIEmbed, playersTitle: string, order: Array<{ user: User, score: number, scoreStr?: string }>, scoreTitle: string, scoreEmoji?: string | Emoji): APIEmbed {
-    const playersLines = maxCharsLines(order.reduce((buffer, e) => {
-        if (e.score < buffer.lastScore) {
-            buffer.lastScore = e.score;
-            buffer.rank++;
+export function toMultiSorted<T>(array: Array<T>, compareFn: (a: T, b: T) => Array<number>) {
+    return array.toSorted((a, b) => compareFn(a, b).find((e) => e !== 0) ?? 0);
+}
+
+export function createRankEmbed(options: APIEmbed, playersTitle: string, players: Array<{ user: User, score: Array<number> }>, scoreTitle: string, scoreEmoji: string | Emoji): APIEmbed
+export function createRankEmbed(options: APIEmbed, playersTitle: string, players: Array<{ user: User, score: Array<number>, scoreStr: string }>, scoreTitle: string): APIEmbed
+export function createRankEmbed(options: APIEmbed, playersTitle: string, players: Array<{ user: User, score: Array<number>, scoreStr?: string }>, scoreTitle: string, scoreEmoji?: string | Emoji): APIEmbed {
+    const playersLines = maxCharsLines(toMultiSorted(players, (a, b) => a.score.map((e, i) => b.score[i] - e)).reduce((buffer, e) => {
+        for (const [i, score] of e.score.entries()) {
+            if (score < (buffer.lastScore[i] ?? Infinity)) {
+                buffer.lastScore = e.score;
+                buffer.rank++;
+                break;
+            }
         }
         buffer.message += `${getRankEmoji(buffer.rank)} **${buffer.rank + 1}.** ${e.user ? e.user.toString() : "Joueur non trouvé"}\n`;
         return buffer;
-    }, { message: "", rank: -1, lastScore: Infinity }).message);
-    const scoreLines = maxCharsLines(order.map((e) => e.scoreStr ?? `**${e.score}** ${scoreEmoji}`).join("\n"));
+    }, { message: "", rank: -1, lastScore: [] as Array<number> }).message);
+    const scoreLines = maxCharsLines(players.map((e) => e.scoreStr ?? `**${e.score}** ${scoreEmoji}`).join("\n"));
     const maxLines = Math.min(playersLines.length, scoreLines.length);
 
     return {

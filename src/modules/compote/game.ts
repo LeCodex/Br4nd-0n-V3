@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { Game } from "modules/game";
 import CompoteDePommesPlayer from "./player";
 import { CharOf, NumberRange } from "interfaces";
-import { createRankEmbed } from "utils";
+import { createRankEmbed, toMultiSorted } from "utils";
 import CompoteDePommes from ".";
 
 export default class CompoteDePommesGame extends Game {
@@ -91,7 +91,7 @@ export default class CompoteDePommesGame extends Game {
     }
 
     get order() {
-        return Object.values(this.players).sort((a, b) => b.apples - a.apples);
+        return toMultiSorted(Object.values(this.players), (a, b) => [b.apples - a.apples, a.locked - b.locked]);
     }
 
     get rankEmbed(): APIEmbed {
@@ -101,7 +101,7 @@ export default class CompoteDePommesGame extends Game {
                 color: this.module.color
             },
             "Participants",
-            this.order.map((e) => ({ user: e.user, score: e.apples, scoreStr: `**${e.apples}** 🍎 *(${e.locked} 🔐 - ${e.basket} 🧺)*` })),
+            Object.values(this.players).map((e) => ({ user: e.user, score: [e.apples, -e.locked], scoreStr: `**${e.apples}** 🍎 *(${e.locked} 🔐 - ${e.basket} 🧺)*` })),
             "Pommes"
         );
     }
