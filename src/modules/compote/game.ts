@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { Game } from "modules/game";
 import CompoteDePommesPlayer from "./player";
 import { CharOf, NumberRange } from "interfaces";
-import { createRankEmbed, toMultiSorted } from "utils";
+import { createRankEmbed, toMultiSorted, toRanked } from "utils";
 import CompoteDePommes from ".";
 
 export default class CompoteDePommesGame extends Game {
@@ -92,6 +92,10 @@ export default class CompoteDePommesGame extends Game {
 
     get order() {
         return toMultiSorted(Object.values(this.players), (a, b) => [b.apples - a.apples, a.locked - b.locked]);
+    }
+
+    get rank() {
+        return toRanked(Object.values(this.players).map((e) => ({ value: e, score: [e.apples, -e.locked] })));
     }
 
     get rankEmbed(): APIEmbed {
@@ -236,9 +240,8 @@ export default class CompoteDePommesGame extends Game {
     
     // 19) Le premier (ou les premiers si ex-aequo) du classement perd une pomme de son panier, deux si vous avez hurlé A.
     roll19(player: CompoteDePommesPlayer, letter: CharOf<"AEIOUY">) {
-        const max = this.order[0].apples;
-        for (const other of this.order) {
-            if (other.apples === max) other.gain(letter === "A" ? -2 : -1);
+        for (const other of this.rank.filter((e) => e.rank === 0).map((e) => e.value)) {
+            other.gain(letter === "A" ? -2 : -1);
         }
     }
     
