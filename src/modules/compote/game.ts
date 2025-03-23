@@ -54,7 +54,7 @@ export default class CompoteDePommesGame extends Game {
 
     async refill() {
         for (const player of Object.values(this.players)) {
-            player.gainHands(Math.ceil(this.maxHands / 2), false);
+            player.gainHands(Math.ceil(this.maxHands / 2));
         }
         this.setupTimeout();
         await this.save();

@@ -46,7 +46,7 @@ export default class CompoteDePommesPlayer {
         this.game.summary.push(`${this.user.toString()} ${amount >= 0 ? "ajoute" : "perd"} **${Math.abs(amount)} 🍎** ${Math.abs(amount) >= 0 ? "dans" : "de"} son 🧺!`);
     }
 
-    gainHands(amount: number, summary: boolean = true) {
+    gainHands(amount: number) {
         this.hands = Math.min(Math.max(0, this.hands + amount), this.game.maxHands);
         this.game.summary.push(`${this.user.toString()} ${amount >= 0 ? "gagne" : "perd"} **${Math.abs(amount)} lancer${Math.abs(amount) > 1 ? "s" : ""}**!`);
     }
