@@ -40,7 +40,11 @@ export default class CompoteDePommesPlayer {
 
         if (amount < 0) {
             const stashed = this.useEffect(5, Infinity);
-            if (stashed) this.stash(stashed);
+            if (stashed) {
+                this.stash(stashed);
+                amount = -Math.min(-amount, this.basket);
+                if (!amount) return;
+            }
         }
 
         this.basket = Math.max(0, this.basket + amount);
@@ -57,7 +61,11 @@ export default class CompoteDePommesPlayer {
         if (!amount) return;
 
         const stashed = other.useEffect(5, Infinity);
-        if (stashed) other.stash(stashed);
+        if (stashed) {
+            other.stash(stashed);
+            amount = Math.min(other.basket, amount);
+            if (!amount) return;
+        }
 
         other.basket -= amount;
         this.basket += amount;
