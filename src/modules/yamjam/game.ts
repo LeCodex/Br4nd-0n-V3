@@ -44,7 +44,7 @@ export default class YamJamGame extends Game {
 
     resetTimeout() {
         clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => this.rerollEverything(), this.lastTimestamp + 1440000 - Date.now());
+        this.timeout = setTimeout(() => this.rerollEverything(), this.lastTimestamp + 3600000 - Date.now());
     }
 
     async rerollEverything() {
