@@ -11,7 +11,7 @@ export default class CompoteDePommesGame extends Game {
         "Vous ajoutez à votre panier autant de pommes que le nombre de fois où vous avez fait 1.",
         "Planquez 5 pommes de votre panier s'il est plus gros que votre coffre, sinon ajoutez-les à votre panier.",
         "Planquez 3 pommes de votre panier s'il est plus gros que votre coffre, sinon ajoutez-les à votre panier.",
-        "Planquez 1 pomme de votre panier s'il est plus gros que votre coffre, sinon ajoutez-les à votre panier.",
+        "Planquez 1 pomme de votre panier s'il est plus gros que votre coffre, sinon ajoutez-la à votre panier.",
         "Avant votre prochaine perte de pommes, vous en planquerez une dans votre coffre, trois si vous hurlez O ou U.",
         "Ajoutez 4 pommes à votre panier.",
         "Ajoutez 2 pommes à votre panier.",
