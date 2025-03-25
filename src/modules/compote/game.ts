@@ -233,8 +233,9 @@ export default class CompoteDePommesGame extends Game {
     
     // 18) Vous volez une pomme à chaque personne au-dessus de vous au classement.
     roll18(player: CompoteDePommesPlayer, letter: CharOf<"AEIOUY">) {
-        for (const other of this.order) {
-            if (other === player) break;
+        const playerRank = this.rank.find((e) => e.value === player)?.rank ?? 0;
+        for (const { value: other, rank } of this.rank) {
+            if (rank === playerRank) break;
             player.steal(other, 1);
         }
     }
