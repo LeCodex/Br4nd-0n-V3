@@ -73,6 +73,8 @@ export default class CompoteDePommesGame extends Game {
             return interaction.reply({ content: "Vous avez déjà joué, veuillez attendre un autre joueur.", flags: MessageFlags.Ephemeral });
         }
 
+        await interaction.deferReply();
+
         player.hands--;
         this.summary.length = 0;
 
@@ -87,7 +89,7 @@ export default class CompoteDePommesGame extends Game {
 
         if (!this.summary.length) this.summary.push(`Pas de chance pour ${player.user.toString()} ! Rien cette fois !`)
         await this.save();
-        return interaction.reply({ embeds: [this.rollEmbed(player, roll, letter)] });
+        return interaction.editReply({ embeds: [this.rollEmbed(player, roll, letter)] });
     }
 
     get rank() {

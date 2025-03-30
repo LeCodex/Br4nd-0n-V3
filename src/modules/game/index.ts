@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, MessageFlags, SendableChannels } from "discord.js";
-import { BotCommand } from "../base";
+import { AdminCommand, BotCommand } from "../base";
 import DB from "db";
 import { ChatInputAplicationSubcommandData, type GameModule } from "interfaces";
 import { client } from "client";
@@ -41,8 +41,16 @@ export abstract class Game {
 }
 
 export function GameCommand(metadata: ChatInputAplicationSubcommandData): MethodDecorator {
+    return GenericGameCommand(metadata, BotCommand(metadata));
+}
+
+export function GameAdminCommand(metadata: ChatInputAplicationSubcommandData<false>): MethodDecorator {
+    return GenericGameCommand(metadata, AdminCommand(metadata));
+}
+
+function GenericGameCommand(metadata: ChatInputAplicationSubcommandData<boolean>, originalDecorator: MethodDecorator): MethodDecorator {
     return function (target: any, propertyKey: symbol | string, descriptor: PropertyDescriptor) {
-        BotCommand(metadata)(target, propertyKey, descriptor);
+        originalDecorator(target, propertyKey, descriptor);
         const originalMethod = descriptor.value as Function;
         descriptor.value = async function(this: GameModule, interaction: ChatInputCommandInteraction) {
             const game = this.game(interaction.channelId);

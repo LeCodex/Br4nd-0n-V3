@@ -184,7 +184,7 @@ export function maxCharsLines(message: string, chars: number = 1024) {
 }
 
 export function randomlyPick<T extends string>(input: T): CharOf<T>
-export function randomlyPick<T extends unknown[]>(input: T): T[number]
+export function randomlyPick<T extends unknown>(input: T[]): T
 export function randomlyPick<T extends string | unknown[]>(input: T) {
     return input[Math.floor(Math.random() * input.length)];
 }
