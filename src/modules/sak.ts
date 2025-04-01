@@ -89,7 +89,7 @@ export default class Sakatasses extends BotModule {
             return interaction.reply({ content: "Not in a guild", flags: MessageFlags.Ephemeral });
         }
         const amount = Number(interaction.options.get("amount")?.value);
-        if (!amount || isNaN(amount)) {
+        if (isNaN(amount)) {
             return interaction.reply({ content: "Invalid amount", flags: MessageFlags.Ephemeral });
         }
         
