@@ -1,5 +1,7 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { BotCommand, BotModule } from "./base";
+import { randomlyPick } from "utils";
+import { CharOf } from "interfaces";
 
 export default class Random extends BotModule {
     name: string = "Random";
@@ -59,15 +61,15 @@ export default class Random extends BotModule {
         const amount = Number(interaction.options.get("number")?.value ?? 1);
         const unique = interaction.options.get("unique")?.value ?? false;
 
-        const suits = ["❤️", "☘️", "♠️", "🔷"];
-        let result: string[] = [];
+        const suits = ["❤️", "☘️", "♠️", "🔷"] as const;
+        const result: string[] = [];
 
         for (var i = 0; i < Math.min(unique ? 52 : 100, amount); i++) {
-            let card;
+            let card: string;
             do {
                 const value = Math.floor(Math.random() * 13) + 1;
                 const display = value < 10 ? String(value + 1) : "AJKQ"[value - 10];
-                card = "**" + display + "** " + suits[Math.floor(Math.random() * 4)]
+                card = `**${display}** ${randomlyPick(suits)}`;
             } while (result.includes(card) && unique);
             result.push(card);
         }
@@ -103,5 +105,33 @@ export default class Random extends BotModule {
             "Very doubtful."
         ];
         this.reply(interaction, `🎱 ${answers[Math.floor(Math.random() * answers.length)]}`);
+    }
+
+    @BotCommand({
+        subcommand: "letter", description: "Gives one or more random letter", options: [
+            { name: "number", description: "Number of letters to roll", minValue: 1, type: ApplicationCommandOptionType.Integer },
+            { name: "uniform", description: "Are the letters uniformly drawn or using Scrabble distribution?", type: ApplicationCommandOptionType.Boolean },
+            { name: "unique", description: "Are the letters unique or not?", type: ApplicationCommandOptionType.Boolean },
+        ]
+    })
+    public async letter(interaction: ChatInputCommandInteraction) {
+        const amount = Number(interaction.options.get("number")?.value ?? 1);
+        const unique = interaction.options.get("unique")?.value ?? false;
+        const uniform = interaction.options.get("uniform")?.value ?? false;
+
+        const letters = uniform
+            ? "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            : "AAAAAAAAABBCCDDDEEEEEEEEEEEEEEEFFGGHHIIIIIIIIJKLLLLLMMMNNNNNNOOOOOOPPQRRRRRRSSSSSSTTTTTTUUUUUUVVWXYZ";
+        const result: string[] = [];
+
+        for (var i = 0; i < Math.min(unique ? 26 : 100, amount); i++) {
+            let letter: string;
+            do {
+                letter = `**${randomlyPick<string>(letters)}**`;
+            } while (result.includes(letter) && unique);
+            result.push(letter);
+        }
+
+        this.reply(interaction, `🔠 Letter(s) drawn: ${result.join(", ")}`);
     }
 }

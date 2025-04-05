@@ -56,7 +56,7 @@ export type NonTextInputComponentBuilder =
 export type Fill<Amount extends number, Result extends number[] = []> = Result['length'] extends Amount ? Result : Fill<Amount, [...Result, 0]>; 
 export type NumberRange<Min extends number, Max extends number = -1, Current extends number[] = Fill<Max extends -1 ? 0 : Min>> =
     Current['length'] extends (Max extends -1 ? Min : Max) ? Current['length'] : Current['length'] | NumberRange<Min, Max, [...Current, 0]>;
-export type CharOf<T extends string> = T extends `${infer Char}${infer Tail}` ? Char | CharOf<Tail> : never;
+export type CharOf<T extends string> = string extends T ? string : T extends `${infer Char}${infer Tail}` ? Char | CharOf<Tail> : never;
 
 export type GameModule = InstanceType<ReturnType<typeof GameModule>>;
 
