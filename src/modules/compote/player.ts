@@ -11,7 +11,6 @@ export default class CompoteDePommesPlayer {
     locked: number = 0;
     get apples() { return this.basket + this.locked; }
     effects: Record<number, number> = {};
-    lastLetter: string = "";
     get rankScore() { return [this.apples, this.locked]; }
 
     constructor(public game: CompoteDePommesGame, public user: User) {
@@ -110,7 +109,6 @@ export default class CompoteDePommesPlayer {
             locked: this.locked,
             effects: this.effects,
             hands: this.hands,
-            lastLetter: this.lastLetter,
         };
     }
 
@@ -121,7 +119,6 @@ export default class CompoteDePommesPlayer {
         instance.locked = obj.locked;
         instance.effects = obj.effects;
         instance.hands = obj.hands;
-        instance.lastLetter = obj.lastLetter;
         return instance;
     }
 }

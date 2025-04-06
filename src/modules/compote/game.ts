@@ -33,6 +33,7 @@ export default class CompoteDePommesGame extends Game {
     players: Record<string, CompoteDePommesPlayer> = {};
     summary: string[] = [];
     history: CompoteDePommesPlayer[] = [];
+    lastLetterPlayer: Partial<Record<CharOf<"AEIOUY">, CompoteDePommesPlayer>> = {};
     maxHands: number = 10;
     nextRefill: number;
     refillTimeout?: NodeJS.Timeout;
@@ -84,7 +85,7 @@ export default class CompoteDePommesGame extends Game {
 
         if (this.history.includes(player)) this.history.splice(this.history.indexOf(player), 1);
         this.history.unshift(player);
-        player.lastLetter = letter;
+        this.lastLetterPlayer[letter] = player;
         player.rolls++;
 
         if (!this.summary.length) this.summary.push(`Pas de chance pour ${player.user.toString()} ! Rien cette fois !`)
@@ -194,11 +195,9 @@ export default class CompoteDePommesGame extends Game {
     
     // 13) Vous volez une pomme au panier du précédent joueur ayant hurlé comme vous.
     roll13(player: CompoteDePommesPlayer, letter: CharOf<"AEIOUY">) {
-        for (const other of this.history) {
-            if (other.lastLetter === letter) {
-                player.steal(other, 1);
-                return;
-            }
+        const other = this.lastLetterPlayer[letter];
+        if (other) {
+            player.steal(other, 1);
         }
     }
     
@@ -265,15 +264,17 @@ export default class CompoteDePommesGame extends Game {
             maxHands: this.maxHands,
             history: this.history.map(e => e.user.id),
             nextRefill: this.nextRefill,
+            lastLetterPlayer: Object.fromEntries(Object.entries(this.lastLetterPlayer).map(([k, v]) => [k, v.user.id]))
         };
     }
 
-    static async load(module: CompoteDePommes, channelId: string, obj: Record<string, any>): Promise<CompoteDePommesGame> {
+    static async load(module: CompoteDePommes, channelId: string, obj: ReturnType<CompoteDePommesGame["serialize"]>): Promise<CompoteDePommesGame> {
         const instance = new this(module, channelId, obj.nextRefill);
         instance.paused = obj.paused;
         instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]: [string, any]) => [k, await CompoteDePommesPlayer.load(module, instance, v)])));
         instance.maxHands = obj.maxHands;
         instance.history = obj.history.map((e: string) => instance.players[e]);
+        instance.lastLetterPlayer = Object.fromEntries(Object.entries(obj.lastLetterPlayer).map(([k, v]) => [k, instance.players[v]]))
         instance.setupTimeout();
         return instance;
     }
