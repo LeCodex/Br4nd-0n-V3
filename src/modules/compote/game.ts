@@ -62,10 +62,6 @@ export default class CompoteDePommesGame extends Game {
     }
 
     async roll(interaction: ChatInputCommandInteraction) {
-        if (this.paused) {
-            return interaction.reply({ content: "Le jeu est en pause", flags: MessageFlags.Ephemeral });
-        }
-
         const player = this.players[interaction.user.id] ??= new CompoteDePommesPlayer(this, interaction.user);
         if (player.hands === 0) {
             return interaction.reply({ content: "Vous n'avez plus de cueillettes!", flags: MessageFlags.Ephemeral });

@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, MessageFlags, SendableChannels } from "discord.js";
 import { AdminCommand, BotCommand } from "../base";
 import DB from "db";
-import { ChatInputAplicationSubcommandData, type GameModule } from "interfaces";
+import { ChatInputAplicationSubcommandData, GameSubcommandData, type GameModule } from "interfaces";
 import { client } from "client";
 
 export abstract class Game {
@@ -40,15 +40,15 @@ export abstract class Game {
     }
 }
 
-export function GameCommand(metadata: ChatInputAplicationSubcommandData): MethodDecorator {
+export function GameCommand(metadata: GameSubcommandData): MethodDecorator {
     return GenericGameCommand(metadata, BotCommand(metadata));
 }
 
 export function GameAdminCommand(metadata: ChatInputAplicationSubcommandData<false>): MethodDecorator {
-    return GenericGameCommand(metadata, AdminCommand(metadata));
+    return GenericGameCommand({ ...metadata, pausable: false }, AdminCommand(metadata));
 }
 
-function GenericGameCommand(metadata: ChatInputAplicationSubcommandData<boolean>, originalDecorator: MethodDecorator): MethodDecorator {
+function GenericGameCommand(metadata: GameSubcommandData<boolean>, originalDecorator: MethodDecorator): MethodDecorator {
     return function (target: any, propertyKey: symbol | string, descriptor: PropertyDescriptor) {
         originalDecorator(target, propertyKey, descriptor);
         const originalMethod = descriptor.value as Function;
@@ -56,6 +56,9 @@ function GenericGameCommand(metadata: ChatInputAplicationSubcommandData<boolean>
             const game = this.game(interaction.channelId);
             if (!game) {
                 return interaction.reply({ content: "No game is currently ongoing in this channel", flags: MessageFlags.Ephemeral });
+            }
+            if (game.paused && (metadata.pausable ?? true)) {
+                return interaction.reply({ content: "The game is paused", flags: MessageFlags.Ephemeral });
             }
             return originalMethod.apply(this, [game, interaction]);
         }

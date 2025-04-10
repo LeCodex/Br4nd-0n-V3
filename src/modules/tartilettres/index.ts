@@ -29,13 +29,13 @@ export default class Tartilettres extends GameModule() {
         return game.sendWord(interaction);
     }
 
-    @GameCommand({ subcommand: "used", description: "Affiche les mots utilisés"})
+    @GameCommand({ subcommand: "used", description: "Affiche les mots utilisés", pausable: false })
     public async used(game: TartilettresGame, interaction: ChatInputCommandInteraction) {
         game.saidWords = game.saidWords.sort();
         return replyMultiple(interaction, game.saidWords);
     }
 
-    @GameCommand({ subcommand: "show", description: "Affiche la table"})
+    @GameCommand({ subcommand: "show", description: "Affiche la table", pausable: false })
     public async show(game: TartilettresGame, interaction: ChatInputCommandInteraction) {
         await game.sendTable(interaction);
     }

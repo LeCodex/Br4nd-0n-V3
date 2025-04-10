@@ -22,12 +22,12 @@ export default class CompoteDePommes extends GameModule() {
         return game.roll(interaction);
     }
 
-    @GameCommand({ subcommand: "rank", description: "Affiche le classement" })
+    @GameCommand({ subcommand: "rank", description: "Affiche le classement", pausable: false })
     public async rank(game: CompoteDePommesGame, interaction: ChatInputCommandInteraction) {
         return interaction.reply({ embeds: [game.rankEmbed] });
     }
 
-    @GameCommand({ subcommand: "rules", description: "Affiche les effets" })
+    @GameCommand({ subcommand: "rules", description: "Affiche les effets", pausable: false })
     public async rules(game: CompoteDePommesGame, interaction: ChatInputCommandInteraction) {
         return interaction.reply({ embeds: [game.rulesEmbed], flags: MessageFlags.Ephemeral });
     }
@@ -35,7 +35,7 @@ export default class CompoteDePommes extends GameModule() {
     @GameCommand({
         subcommand: "info", description: "Affiche les infos d'un joueur", options: [
             { name: "player", description: "Un joueur", type: ApplicationCommandOptionType.User }
-        ]
+        ], pausable: false
     })
     public async info(game: CompoteDePommesGame, interaction: ChatInputCommandInteraction) {
         const player = game.players[interaction.options.get("player")?.user?.id ?? interaction.user.id];

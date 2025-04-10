@@ -36,7 +36,7 @@ export default class Dedalleux extends GameModule() {
         return new DedalleuxGame(this, interaction.channelId);
     }
 
-    @GameCommand({ subcommand: "show", description: "Renvoie le message du jeu" })
+    @GameCommand({ subcommand: "show", description: "Renvoie le message du jeu", pausable: false })
     public async show(game: DedalleuxGame, interaction: ChatInputCommandInteraction) {
         await game.sendBoard(true);
         await game.save();

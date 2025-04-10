@@ -11,6 +11,10 @@ export interface ChatInputAplicationSubcommandData<AllowSubcommandGroup extends 
     >[];
 }
 
+export interface GameSubcommandData<AllowSubcommandGroup extends boolean = true> extends ChatInputAplicationSubcommandData<AllowSubcommandGroup> {
+    pausable?: boolean
+}
+
 export interface BotSubcommandMetadata extends ChatInputAplicationSubcommandData {
     method: symbol | string;
 }
