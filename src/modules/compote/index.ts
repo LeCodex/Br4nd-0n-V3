@@ -13,6 +13,19 @@ export default class CompoteDePommes extends GameModule() {
         super("compote");
     }
 
+    public async onToggled(game: CompoteDePommesGame): Promise<void> {
+        if (game.paused) {
+            clearTimeout(game.refillTimeout);
+            delete game.refillTimeout;
+        } else {
+            game.setupTimeout();
+        }
+    }
+
+    public async onDeleted(game: CompoteDePommesGame): Promise<void> {
+        clearTimeout(game.refillTimeout);
+    }
+
     protected async instantiate(interaction: ChatInputCommandInteraction) {
         return new CompoteDePommesGame(this, interaction.channelId);
     }

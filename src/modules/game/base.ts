@@ -4,7 +4,7 @@ import Logger from "logger";
 import { BotModule, AdminCommand } from "../base";
 import { Game } from ".";
 
-export default function GameModule() {
+export default function GameModule<T extends Game>() {
     abstract class GameModule extends BotModule {
         protected abstract cls: typeof Game;
         protected games: Record<string, Game> = {};
@@ -19,6 +19,9 @@ export default function GameModule() {
             }
             this.ready = true;
         }
+
+        public async onToggled(game: Game) {}
+        public async onDeleted(game: Game) {}
 
         @AdminCommand({ subcommand: "start", description: "Start a game" })
         public async start(interaction: ChatInputCommandInteraction) {
@@ -40,6 +43,7 @@ export default function GameModule() {
             }
 
             game.paused = !game.paused;
+            await this.onToggled(game);
             await game.save();
             await interaction.reply(game.paused ? "Paused" : "Resumed");
         }
@@ -52,6 +56,7 @@ export default function GameModule() {
             }
 
             await game.delete();
+            await this.onDeleted(game);
             delete this.games[interaction.channelId];
             await interaction.reply("Deleted");
         }

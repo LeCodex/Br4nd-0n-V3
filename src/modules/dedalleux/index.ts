@@ -32,6 +32,20 @@ export default class Dedalleux extends GameModule() {
         await super.onLoaded();
     }
 
+    public async onToggled(game: DedalleuxGame): Promise<void> {
+        if (game.paused) {
+            clearTimeout(game.timeout);
+            delete game.timeout;
+        } else {
+            game.setupTimeout();
+        }
+    }
+
+    public async onDeleted(game: DedalleuxGame): Promise<void> {
+        clearTimeout(game.timeout);
+        await game.view?.end();
+    }
+
     protected async instantiate(interaction: ChatInputCommandInteraction): Promise<Game> {
         return new DedalleuxGame(this, interaction.channelId);
     }

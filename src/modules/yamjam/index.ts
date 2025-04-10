@@ -27,6 +27,20 @@ export default class YamJam extends GameModule() {
         await super.onLoaded();
     }
 
+    public async onToggled(game: YamJamGame): Promise<void> {
+        if (game.paused) {
+            clearTimeout(game.timeout);
+            delete game.timeout;
+        } else {
+            game.resetTimeout();
+        }
+    }
+
+    public async onDeleted(game: YamJamGame): Promise<void> {
+        clearTimeout(game.timeout);
+        await game.view?.end();
+    }
+
     protected async instantiate(interaction: ChatInputCommandInteraction): Promise<YamJamGame> {
         return new YamJamGame(this, interaction.channelId);
     }
