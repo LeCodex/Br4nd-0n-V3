@@ -3,10 +3,12 @@ import View, { Button } from "view";
 import DedalleuxGame from "./game";
 import { DateTime } from "luxon";
 import DedalleuxPlayer from "./player";
+import GameView from "modules/game/view";
+import { ComponentHandler } from "interfaces";
 
-export default class DedalleuxView extends View {
-    constructor(public game: DedalleuxGame, message?: Message) {
-        super(message);
+export default class DedalleuxView extends GameView<DedalleuxGame> {
+    constructor(game: DedalleuxGame, message?: Message) {
+        super(game, message);
         for (const [i, emoji] of this.game.colors.slice(5).entries()) {
             this.setButton({
                 emoji: emoji.toString(),
@@ -18,12 +20,12 @@ export default class DedalleuxView extends View {
         }
     }
 
-    protected filter(interaction: MessageComponentInteraction): boolean {
+    protected filter(interaction: MessageComponentInteraction, handler: ComponentHandler): boolean {
         this.game.players[interaction.user.id] ??= new DedalleuxPlayer(this.game, interaction.user);
-        return true;
+        return super.filter(interaction, handler);
     }
 
-    @Button({ row: 1, label: "Voir son ingrédient", style: ButtonStyle.Primary })
+    @Button({ row: 1, label: "Voir son ingrédient", style: ButtonStyle.Primary, pausable: false })
     public async ingredient(interaction: ButtonInteraction) {
         const player = this.game.players[interaction.user.id];
         await player.sendItem(interaction);

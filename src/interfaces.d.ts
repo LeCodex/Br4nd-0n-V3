@@ -32,6 +32,7 @@ export type ComponentHandlerMetadata<T extends NonLinkButtonMessageActionRowComp
     method: symbol | string;
     row?: NumberRange<4>;
     index?: NumberRange<4>;
+    pausable?: boolean;
 }
 export type ComponentHandlerMetadataParameter<T extends NonLinkButtonMessageActionRowComponentData> = Omit<ComponentHandlerMetadata<T>, "type" | "customId" | "custom_id" | "method" | "builder">;
 

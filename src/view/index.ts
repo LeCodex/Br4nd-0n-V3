@@ -145,17 +145,16 @@ export default class View {
         return this;
     }
 
-    protected filter(interaction: MessageComponentInteraction) {
+    protected filter(interaction: MessageComponentInteraction, handler: ComponentHandler) {
         return true;
     }
 
     public async handle(interaction: MessageComponentInteraction) {
-        if (!this.filter(interaction)) {
-            return interaction.deferUpdate();
-        }
-
         for (const component of this.components) {
             if (component.customId === interaction.customId) {
+                if (!this.filter(interaction, component)) {
+                    return interaction.deferUpdate();
+                }
                 Logger.log(`Running component handler for ${this.constructor.name}`);
                 await component.callback(interaction);
             }

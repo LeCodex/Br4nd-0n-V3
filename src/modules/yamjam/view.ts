@@ -2,10 +2,12 @@ import { Message, ButtonStyle, MessageComponentInteraction, ButtonInteraction, M
 import View, { Button } from "view";
 import YamJamGame from "./game";
 import YamJamPlayer from "./player";
+import GameView from "modules/game/view";
+import { ComponentHandler } from "interfaces";
 
-export default class YamJamView extends View {
-    constructor(public game: YamJamGame, message?: Message) {
-        super(message);
+export default class YamJamView extends GameView<YamJamGame> {
+    constructor(game: YamJamGame, message?: Message) {
+        super(game, message);
         for (const [i, emoji] of this.game.dice.entries()) {
             this.setButton({
                 emoji: this.game.module.faces[emoji].toString(),
@@ -17,12 +19,12 @@ export default class YamJamView extends View {
         }
     }
 
-    protected filter(interaction: MessageComponentInteraction): boolean {
+    protected filter(interaction: MessageComponentInteraction, handler: ComponentHandler): boolean {
         this.game.players[interaction.user.id] ??= new YamJamPlayer(this.game, interaction.user);
-        return true;
+        return super.filter(interaction, handler);
     }
 
-    @Button({ row: 1, label: "Voir sa fiche", style: ButtonStyle.Primary })
+    @Button({ row: 1, label: "Voir sa fiche", style: ButtonStyle.Primary, pausable: false })
     public async ingredient(interaction: ButtonInteraction) {
         const player = this.game.players[interaction.user.id];
         await player.sendSheet(interaction);
