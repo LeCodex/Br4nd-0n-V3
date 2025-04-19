@@ -1,4 +1,3 @@
-import * as fs from "fs";
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
 import { replyMultiple } from "utils";
 import { GameCommand } from "modules/game";
@@ -10,10 +9,11 @@ export default class Tartilettres extends GameModule() {
     name = "Tartilettres";
     description = "Joue au Scrabble avec des peignes";
     color = 0x008000;
-    words = new Set(this.readConfigFile("fr.txt")?.split("\n").map((e) => e.trim()));
+    words: Set<string>;
 
     constructor() {
         super("tarti");
+        this.words = new Set(this.readConfigFile("fr.txt")?.split("\n").map((e) => e.trim()))
     }
 
     protected async instantiate(interaction: ChatInputCommandInteraction) {
