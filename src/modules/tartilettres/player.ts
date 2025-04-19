@@ -36,7 +36,7 @@ export default class TartilettresPlayer {
 
         if (this.game.letters.every(e => this.letters[e])) this.resetLetters(true);
         this.game.saidWords.push(word);
-        await this.game.nextTurn(interaction);
+        await this.game.nextTurn(interaction, word);
     }
 
     private resetLetters(withTaboo: boolean = false) {

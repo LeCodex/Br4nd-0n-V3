@@ -28,11 +28,11 @@ export default class TartilettresGame extends Game {
         return player.playWord(word, interaction);
     }
 
-    public async sendTable(interaction: ChatInputCommandInteraction) {
+    public async sendTable(interaction: ChatInputCommandInteraction, word?: string) {
         const maxLength = Object.values(this.players).reduce((acc, e) => Math.max(acc, e.user.displayName.length), 0);
         const sorted = Object.values(this.players).sort((a, b) => b.score - a.score);
         await interaction.reply(
-            `\`\`\`\nLongueur attendue: ${this.wordLength} lettres\n${sorted.map(e =>
+            `\`\`\`\n${word ? `Dernier mot: ${word}\n` : ""}Longueur attendue: ${this.wordLength} lettres\n${sorted.map(e =>
                 `${e.user.displayName}${" ".repeat(maxLength - e.user.displayName.length + 1)}: `
                 + `${this.letters.map(l => e.letters[l] ? "_" : l).join("")} (${e.score})`
                 + `${e.taboo.length ? "  ❌ " + e.taboo.join(",") : ""}`
@@ -40,11 +40,11 @@ export default class TartilettresGame extends Game {
         );
     }
 
-    async nextTurn(interaction?: ChatInputCommandInteraction) {
+    async nextTurn(interaction: ChatInputCommandInteraction, word: string) {
         this.wordLength = Math.floor(Math.random() * 6) + 5;
         if (interaction) {
             this.lastPlayed = interaction.user.id;
-            if (interaction) await this.sendTable(interaction);
+            if (interaction) await this.sendTable(interaction, word);
         }
         await this.save();
     }
