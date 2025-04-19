@@ -67,5 +67,6 @@ export default class TartilettresPlayer {
         instance.letters = obj.letters;
         instance.taboo = obj.taboo;
         instance.possibleTaboos = obj.possibleTaboos;
+        return instance;
     }
 }
