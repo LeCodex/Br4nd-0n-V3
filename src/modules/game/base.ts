@@ -3,6 +3,7 @@ import DB from "db";
 import Logger from "logger";
 import { BotModule, AdminCommand } from "../base";
 import { Game } from ".";
+import ErrorHandler from "errors";
 
 export default function GameModule<T extends Game>() {
     abstract class GameModule extends BotModule {
@@ -14,8 +15,12 @@ export default function GameModule<T extends Game>() {
             for (const channelId of records) {
                 const data = await DB.get<{ paused: boolean }>(this.commandName, channelId);
                 if (!data) continue;
-                Logger.log(`Loading game of ${this.commandName} in channel ${channelId}`);
-                this.games[channelId] = await this.cls.load(this, channelId, data);
+                try {
+                    Logger.log(`Loading game of ${this.commandName} in channel ${channelId}`);
+                    this.games[channelId] = await this.cls.load(this, channelId, data);
+                } catch (e) {
+                    await ErrorHandler.handle(undefined, e);
+                }
             }
             this.ready = true;
         }

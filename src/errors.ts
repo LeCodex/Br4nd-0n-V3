@@ -25,7 +25,7 @@ export default class ErrorHandler {
             .setColor(0xff0000)
             .setDescription("```js\n" + (error instanceof Error ? error.stack : error) + "```");
 
-        const errorChannel = await client.channels.fetch("474301772463341569"); //"<@240947137750237185>"
+        const errorChannel = await client.channels.fetch("474301772463341569");
         if (errorChannel?.isSendable()) await errorChannel.send({ embeds: [embed] });
 
         if (interaction?.isRepliable() && !interaction.replied) {
