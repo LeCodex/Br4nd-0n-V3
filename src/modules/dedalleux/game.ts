@@ -2,11 +2,12 @@ import { ChatInputCommandInteraction, EmbedBuilder, Emoji } from "discord.js";
 import { DateTime } from "luxon";
 import { Vector2 } from "interfaces";
 import { Game } from "modules/game";
-import { aStar, getDist, getRankEmoji, shuffle } from "utils";
+import { aStar, getDist, getRankEmoji } from "utils";
 import Dedalleux from ".";
 import DedalleuxView from "./view";
 import DedalleuxPlayer from "./player";
 import View from "view";
+import { shuffle } from "lodash";
 
 export interface Wall {
     color: number,

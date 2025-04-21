@@ -174,6 +174,7 @@ export default class View {
             await this.message.edit({
                 content: this.message.content,
                 embeds: this.message.embeds,
+                components: [],
                 attachments: [...this.message.attachments.values()]
             });
             delete this.message;

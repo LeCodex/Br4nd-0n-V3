@@ -7,6 +7,7 @@ import Dedalleux from "./dedalleux";
 import Sakatasses from "./sak";
 import YamJam from "./yamjam";
 import Say from "./say";
+import Steeple from "./steeple";
 
 export const modules: (new () => BotModule)[] = [
     Ping,
@@ -17,4 +18,5 @@ export const modules: (new () => BotModule)[] = [
     Dedalleux,
     YamJam,
     Sakatasses,
+    Steeple,
 ];
