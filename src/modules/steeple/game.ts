@@ -272,6 +272,7 @@ export default class SteepleGame extends Game {
         } else {
             await instance.sendBoard();
         }
+        instance.setupTimeout();
         return instance;
     }
 }
