@@ -6,6 +6,7 @@ import { ChatInputCommandInteraction, EmbedBuilder, Message, MessageFlags, React
 import { shuffle } from "lodash";
 import Steeple from ".";
 import { client } from "client";
+import { createRankEmbed } from "utils";
 
 type TileName = Exclude<keyof typeof Tiles, "default">;
 
@@ -33,6 +34,18 @@ export default class SteepleGame extends Game {
         this.setupTimeout();
         await this.sendBoard();
         await interaction.reply({ content: "Started", flags: MessageFlags.Ephemeral });
+    }
+
+    get rankEmbed() {
+        return createRankEmbed(
+            {
+                title: "🏆 Classement",
+                color: this.module.color
+            },
+            "Joueurs",
+            Object.values(this.players).map((e) => ({ user: e.user, score: e.rankScore, scoreStr: `**${e.score}** 🔄 | **${e.index}** 🪑` })),
+            "Score"
+        );
     }
 
     setupTimeout(newTurn = true) {

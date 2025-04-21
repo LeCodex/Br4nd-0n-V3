@@ -19,6 +19,8 @@ export default class SteeplePlayer {
         this.emoji = randomlyPick(defaultEmojis);
     }
 
+    get rankScore() { return [this.score, this.index]; }
+
     move(amount: number) {
         if (!amount) {
             this.game.summary.push(`⏺️ ${this.toString()} a fait du sur-place`);
