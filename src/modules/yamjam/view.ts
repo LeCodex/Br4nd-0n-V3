@@ -1,5 +1,5 @@
 import { Message, ButtonStyle, MessageComponentInteraction, ButtonInteraction, MessageFlags } from "discord.js";
-import View, { Button } from "view";
+import { Button } from "view";
 import YamJamGame from "./game";
 import YamJamPlayer from "./player";
 import GameView from "modules/game/view";

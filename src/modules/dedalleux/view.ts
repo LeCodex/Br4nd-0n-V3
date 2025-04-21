@@ -1,5 +1,5 @@
 import { ButtonInteraction, ButtonStyle, Message, MessageComponentInteraction, MessageFlags } from "discord.js";
-import View, { Button } from "view";
+import { Button } from "view";
 import DedalleuxGame from "./game";
 import { DateTime } from "luxon";
 import DedalleuxPlayer from "./player";
