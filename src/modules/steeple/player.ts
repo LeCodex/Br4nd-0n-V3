@@ -1,14 +1,17 @@
-import { Emoji, User } from "discord.js";
+import { User } from "discord.js";
 import SteepleGame from "./game";
-import { Effect } from "./effects";
+import Effect, * as Effects from "./effects";
 import { randomlyPick } from "utils";
+import { client } from "client";
+
+type EffectName = Exclude<keyof typeof Effects, "default">;
 
 export default class SteeplePlayer {
     index = 0;
     score = 0;
     effects: Effect<any>[] = [];
     movedThisTurn = false;
-    emoji: string | Emoji;
+    emoji: string;
 
     constructor(public game: SteepleGame, public user: User) {
         this.user = user;
@@ -88,6 +91,27 @@ export default class SteeplePlayer {
     }
 
     toString() {
-        return `${this.emoji.toString()} ${this.user.toString()}`;
+        return `${this.emoji} ${this.user.toString()}`;
+    }
+    
+    serialize() {
+        return {
+            user: this.user.id,
+            index: this.index,
+            score: this.score,
+            effects: this.effects.map((e) => e.serialize()),
+            movedThisTurn: this.movedThisTurn,
+            emoji: this.emoji,
+        }
+    }
+
+    static async load(game: SteepleGame, obj: ReturnType<SteeplePlayer["serialize"]>): Promise<SteeplePlayer> {
+        const instance = new this(game, await client.users.fetch(obj.user));
+        instance.index = obj.index;
+        instance.score = obj.score;
+        instance.effects = obj.effects.map((e) => new Effects[e.cls as EffectName](game, instance, e.data));
+        instance.movedThisTurn = obj.movedThisTurn;
+        instance.emoji = obj.emoji;
+        return instance;
     }
 }

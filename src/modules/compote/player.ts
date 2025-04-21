@@ -112,7 +112,7 @@ export default class CompoteDePommesPlayer {
         };
     }
 
-    static async load(module: CompoteDePommes, game: CompoteDePommesGame, obj: ReturnType<CompoteDePommesPlayer["serialize"]>) {
+    static async load(game: CompoteDePommesGame, obj: ReturnType<CompoteDePommesPlayer["serialize"]>) {
         const instance = new this(game, await client.users.fetch(obj.user));
         instance.rolls = obj.rolls;
         instance.basket = obj.basket;

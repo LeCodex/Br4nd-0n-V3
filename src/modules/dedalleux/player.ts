@@ -46,7 +46,7 @@ export default class DedalleuxPlayer {
         };
     }
 
-    static async load(module: Dedalleux, game: DedalleuxGame, obj: Record<string, any>) {
+    static async load(game: DedalleuxGame, obj: ReturnType<DedalleuxPlayer["serialize"]>) {
         const instance = new this(game, await client.users.fetch(obj.user));
         instance.score = obj.score;
         instance.turnedOnce = obj.turnedOnce;

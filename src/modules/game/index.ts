@@ -35,7 +35,7 @@ export abstract class Game {
         };
     }
 
-    static async load(module: GameModule, channelId: string, obj: Record<string, any>): Promise<Game> {
+    static async load(module: GameModule, channelId: string, obj: ReturnType<Game["serialize"]>): Promise<Game> {
         throw new TypeError("Not implemented");
     }
 }

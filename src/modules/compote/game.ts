@@ -267,7 +267,7 @@ export default class CompoteDePommesGame extends Game {
     static async load(module: CompoteDePommes, channelId: string, obj: ReturnType<CompoteDePommesGame["serialize"]>): Promise<CompoteDePommesGame> {
         const instance = new this(module, channelId, obj.nextRefill);
         instance.paused = obj.paused;
-        instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]: [string, any]) => [k, await CompoteDePommesPlayer.load(module, instance, v)])));
+        instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]: [string, any]) => [k, await CompoteDePommesPlayer.load(instance, v)])));
         instance.maxHands = obj.maxHands;
         instance.history = obj.history.map((e: string) => instance.players[e]);
         instance.lastLetterPlayer = Object.fromEntries(Object.entries(obj.lastLetterPlayer).map(([k, v]) => [k, instance.players[v]]))

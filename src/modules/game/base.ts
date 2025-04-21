@@ -12,7 +12,7 @@ export default function GameModule<T extends Game>() {
         public async onLoaded() {
             const records = await DB.getRecords(this.commandName);
             for (const channelId of records) {
-                const data = await DB.get<{}>(this.commandName, channelId);
+                const data = await DB.get<{ paused: boolean }>(this.commandName, channelId);
                 if (!data) continue;
                 Logger.log(`Loading game of ${this.commandName} in channel ${channelId}`);
                 this.games[channelId] = await this.cls.load(this, channelId, data);

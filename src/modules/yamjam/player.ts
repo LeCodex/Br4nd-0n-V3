@@ -61,7 +61,7 @@ export default class YamJamPlayer {
         };
     }
 
-    static async load(module: YamJam, game: YamJamGame, obj: Record<string, any>) {
+    static async load(game: YamJamGame, obj: ReturnType<YamJamPlayer["serialize"]>) {
         const instance = new this(game, await client.users.fetch(obj.user));
         instance.score = obj.score;
         instance.tray = obj.tray;

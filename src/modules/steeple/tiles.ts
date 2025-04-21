@@ -23,6 +23,12 @@ export default abstract class Tile {
     }
 
     effect?(player: SteeplePlayer, index: number, amount: number): void;
+
+    serialize() {
+        return {
+            cls: this.constructor.name
+        };
+    }
 }
 
 export class Chair extends Tile {

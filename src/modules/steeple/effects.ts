@@ -1,7 +1,7 @@
 import SteepleGame from "./game";
 import SteeplePlayer from "./player";
 
-export abstract class Effect<T extends Record<string, unknown> | void = void> {
+export default abstract class Effect<T extends Record<string, unknown> | void = void> {
     used = false;
     abstract name: string;
 
@@ -29,6 +29,13 @@ export abstract class Effect<T extends Record<string, unknown> | void = void> {
 
     throwEnd(player: SteeplePlayer) {
         return;
+    }
+
+    serialize() {
+        return {
+            cls: this.constructor.name,
+            data: this.data
+        };
     }
 }
 

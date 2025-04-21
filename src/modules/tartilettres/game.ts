@@ -67,7 +67,7 @@ export default class TartilettresGame extends Game {
         instance.lastPlayed = obj.lastPlayed;
         instance.wordLength = obj.wordLength ?? 7;
         instance.saidWords = obj.saidWords ?? [];
-        instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]: [string, any]) => [k, await TartilettresPlayer.load(module, instance, v)])));
+        instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]: [string, any]) => [k, await TartilettresPlayer.load(instance, v)])));
         return instance;
     }
 }

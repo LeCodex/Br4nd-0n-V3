@@ -2,10 +2,12 @@ import { DateTime, DurationLikeObject } from "luxon";
 import { Game } from "modules/game";
 import Tile, * as Tiles from "./tiles";
 import SteeplePlayer from "./player";
-import { ChatInputCommandInteraction, EmbedBuilder, MessageFlags, ReactionCollector, User } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder, Message, MessageFlags, ReactionCollector, SendableChannels, User } from "discord.js";
 import { shuffle } from "lodash";
 import Steeple from ".";
-import Logger from "logger";
+import { client } from "client";
+
+type TileName = Exclude<keyof typeof Tiles, "default">;
 
 export default class SteepleGame extends Game {
     board: Tile[] = [];
@@ -13,7 +15,7 @@ export default class SteepleGame extends Game {
     players: Record<string, SteeplePlayer> = {};
     summary: string[] = [];
     nextTimestamp = DateTime.local();
-    enabled = Object.keys(Tiles).filter((e) => e !== "default") as (Exclude<keyof typeof Tiles, "default">)[];
+    enabled = Object.keys(Tiles).filter((e) => e !== "default") as TileName[];
     turn = 1;
     timeout?: NodeJS.Timeout = undefined;
     gamerules = {};
@@ -39,7 +41,7 @@ export default class SteepleGame extends Game {
 
         const now = DateTime.local();
         if (newTurn) {
-            this.nextTimestamp = this.nextTimestamp.plus(this.waitDuration).set({ second: 0 });
+            this.nextTimestamp = this.nextTimestamp.plus(this.waitDuration).set({ second: 0, millisecond: 0 });
             if (!this.waitDuration.minutes) this.nextTimestamp = this.nextTimestamp.set({ minute: 0 });
         }
         const time = this.nextTimestamp.toMillis() - now.toMillis();
@@ -99,7 +101,7 @@ export default class SteepleGame extends Game {
                 if (lineSize * i + j >= this.board.length) break;
 
                 boardLine += this.board[lineSize * i + j].emoji.toString();
-                const column = Object.values(this.players).filter(e => e.index === lineSize * i + j).map(e => e.emoji.toString());
+                const column = Object.values(this.players).filter(e => e.index === lineSize * i + j).map(e => e.emoji);
                 playerColumns.push(column);
                 maxPlayers = Math.max(maxPlayers, column.length);
             }
@@ -178,28 +180,29 @@ export default class SteepleGame extends Game {
             }
             const message = await this.channel?.send({ embeds: [embed] });
             if (message) {
-                if (this.collector) {
-                    this.collector.stop();
-                    delete this.collector;
-                }
-                this.collector = message.createReactionCollector({ dispose: true });
-                this.collector.on('collect', async (reaction, user) => {
-                    await reaction.users.remove(user);
-                    if (this.paused) return;
-                    const banned_emojis = ["⬛", "◼", "◾", "▪", "🖤", "〰", "➗", "✖", "➖", "➕", "➰"];
-                    const player = this.getPlayerFromUser(user);
-                    if (!banned_emojis.includes(reaction.emoji.toString())) {
-                        player.emoji = reaction.emoji.toString();
-                        await this.sendBoard(true);
-                    }
-                });
-                this.collector.on('end', (_, reason) => {
-                    Logger.warn("Collector for steeple ended:", reason);
-                });
+                this.setupCollector(message);
             }
         }
 
         await this.save();
+    }
+
+    private setupCollector(message: Message) {
+        if (this.collector) {
+            this.collector.stop();
+            delete this.collector;
+        }
+        this.collector = message.createReactionCollector({ dispose: true });
+        this.collector.on('collect', async (reaction, user) => {
+            await reaction.users.remove(user);
+            if (this.paused) return;
+            const banned_emojis = ["⬛", "◼", "◾", "▪", "🖤", "〰", "➗", "✖", "➖", "➕", "➰"];
+            const player = this.getPlayerFromUser(user);
+            if (!banned_emojis.includes(reaction.emoji.toString())) {
+                player.emoji = reaction.emoji.toString();
+                await this.sendBoard(true);
+            }
+        });
     }
 
     async throwDice() {
@@ -226,12 +229,39 @@ export default class SteepleGame extends Game {
 
     protected serialize() {
         return {
-            ...super.serialize()
+            ...super.serialize(),
+            board: this.board.map((e) => e.serialize()),
+            order: this.order,
+            players: Object.fromEntries(Object.entries(this.players).map(([k, v]) => [k, v.serialize()])),
+            summary: this.summary,
+            nextTimestamp: this.nextTimestamp.toMillis(),
+            enabled: this.enabled,
+            turn: this.turn,
+            gamerules: this.gamerules,
+            waitDuration: this.waitDuration,
+            message: this.collector?.message.id,
         }
     }
 
-    static async load(module: Steeple, channelId: string, obj: Record<string, any>): Promise<SteepleGame> {
+    static async load(module: Steeple, channelId: string, obj: ReturnType<SteepleGame["serialize"]>): Promise<SteepleGame> {
         const instance = new this(module, channelId);
+        instance.paused = obj.paused;
+        instance.board = obj.board.map((e) => new Tiles[e.cls as TileName](instance));
+        instance.order = obj.order;
+        instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]) => [k, await SteeplePlayer.load(instance, v)])));
+        instance.summary = obj.summary;
+        instance.nextTimestamp = DateTime.fromMillis(obj.nextTimestamp) as DateTime<true>;
+        instance.enabled = obj.enabled;
+        instance.turn = obj.turn;
+        instance.gamerules = obj.gamerules;
+        instance.waitDuration = obj.waitDuration;
+
+        const message = obj.message && await (await client.channels.fetch(channelId) as SendableChannels).messages.fetch(obj.message)
+        if (message) {
+            instance.setupCollector(message);
+        } else {
+            await instance.sendBoard();
+        }
         return instance;
     }
 }

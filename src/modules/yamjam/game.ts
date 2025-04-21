@@ -118,9 +118,9 @@ export default class YamJamGame extends Game {
         };
     }
 
-    static async load(module: YamJam, channelId: string, obj: Record<string, any>): Promise<YamJamGame> {
+    static async load(module: YamJam, channelId: string, obj: ReturnType<YamJamGame["serialize"]>): Promise<YamJamGame> {
         const instance = new this(module, channelId);
-        instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]: [string, any]) => [k, await YamJamPlayer.load(module, instance, v)])));
+        instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]) => [k, await YamJamPlayer.load(instance, v)])));
         instance.dice = obj.dice;
         instance.paused = obj.paused;
         instance.lastPlayed = obj.lastPlayed;

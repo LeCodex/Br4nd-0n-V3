@@ -61,7 +61,7 @@ export default class TartilettresPlayer {
         }
     }
 
-    public static async load(module: Tartilettres, game: TartilettresGame, obj: Record<string, any>) {
+    public static async load(game: TartilettresGame, obj: ReturnType<TartilettresPlayer["serialize"]>) {
         const instance = new this(game, await client.users.fetch(obj.user));
         instance.score = obj.score;
         instance.letters = obj.letters;
