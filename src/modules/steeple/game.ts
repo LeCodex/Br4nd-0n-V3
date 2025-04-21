@@ -10,12 +10,11 @@ import { client } from "client";
 type TileName = Exclude<keyof typeof Tiles, "default">;
 
 export default class SteepleGame extends Game {
-    board: Tile[] = [];
+    board: Tile<any>[] = [];
     order: string[] = [];
     players: Record<string, SteeplePlayer> = {};
     summary: string[] = [];
     nextTimestamp = DateTime.local();
-    enabled = Object.keys(Tiles).filter((e) => e !== "default") as TileName[];
     turn = 1;
     timeout?: NodeJS.Timeout = undefined;
     gamerules = {};
@@ -50,7 +49,7 @@ export default class SteepleGame extends Game {
 
     generateBoard(size: number) {
         for (let i = 0; i < 4; i++) {
-            this.enabled.forEach((element) => this.board.push(new Tiles[element](this)));
+            Object.keys(Tiles).filter((e) => e !== "default").forEach((element) => this.board.push(new Tiles[element as TileName](this)));
         }
 
         for (let i = this.board.length; i < size; i++) {
@@ -121,7 +120,7 @@ export default class SteepleGame extends Game {
         const embed = new EmbedBuilder()
             .setTitle("Steeple Chaise")
             .setColor(this.module.color)
-            .setFooter({ text: "Tour #" + this.turn + " • Mettez une réaction à ce message pour rejoindr et changer de pion!" })
+            .setFooter({ text: "Tour #" + this.turn + " • Mettez une réaction à ce message pour rejoindre et changer de pion!" })
 
         if (this.summary.length) {
             let totalLength = 0;
@@ -235,7 +234,6 @@ export default class SteepleGame extends Game {
             players: Object.fromEntries(Object.entries(this.players).map(([k, v]) => [k, v.serialize()])),
             summary: this.summary,
             nextTimestamp: this.nextTimestamp.toMillis(),
-            enabled: this.enabled,
             turn: this.turn,
             gamerules: this.gamerules,
             waitDuration: this.waitDuration,
@@ -246,12 +244,11 @@ export default class SteepleGame extends Game {
     static async load(module: Steeple, channelId: string, obj: ReturnType<SteepleGame["serialize"]>): Promise<SteepleGame> {
         const instance = new this(module, channelId);
         instance.paused = obj.paused;
-        instance.board = obj.board.map((e) => new Tiles[e.cls as TileName](instance));
+        instance.board = obj.board.map((e) => new Tiles[e.cls as TileName](instance, e.data));
         instance.order = obj.order;
         instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]) => [k, await SteeplePlayer.load(instance, v)])));
         instance.summary = obj.summary;
         instance.nextTimestamp = DateTime.fromMillis(obj.nextTimestamp) as DateTime<true>;
-        instance.enabled = obj.enabled;
         instance.turn = obj.turn;
         instance.gamerules = obj.gamerules;
         instance.waitDuration = obj.waitDuration;

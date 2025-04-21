@@ -4,12 +4,12 @@ import { Emoji } from "discord.js";
 import SteeplePlayer from "./player";
 import { Clean, Comfortable, Prepared, UnderPressure } from "./effects";
 
-export default abstract class Tile {
+export default abstract class Tile<T extends Record<string, any> | void = void> {
     emoji: string | Emoji;
     abstract name: string;
     abstract description: string;
 
-    constructor(public game: SteepleGame, id: string, fallback: string) {
+    constructor(public game: SteepleGame, id: string, fallback: string, public data: T) {
         this.emoji = fallback;
         getEmoji(id, fallback).then(e => { this.emoji = e; });
     }
@@ -26,7 +26,8 @@ export default abstract class Tile {
 
     serialize() {
         return {
-            cls: this.constructor.name
+            cls: this.constructor.name,
+            data: this.data
         };
     }
 }
@@ -49,7 +50,7 @@ export class Cactus extends Tile {
     }
 
     effect(player: SteeplePlayer, index: number, amount: number) {
-        this.game.summary.push(`🌵 ${player.toString()} a refusé d'aller s'asseoir sur un cactus et est revenu en arrière.`);
+        this.game.summary.push(`${this.emoji} ${player.toString()} a refusé d'aller s'asseoir sur un cactus et est revenu en arrière.`);
         player.index -= amount;
     }
 }
@@ -78,7 +79,7 @@ export class Couch extends Tile {
     }
 
     effect(player: SteeplePlayer, index: number, amount: number) {
-        this.game.summary.push(`🛋️ ${player.toString()} est arrivé sur un canapé, et va vouloir y rester..️.`);
+        this.game.summary.push(`${this.emoji} ${player.toString()} est arrivé sur un canapé, et va vouloir y rester..️.`);
         player.addEffect(new Comfortable(this.game, player));
     }
 }
@@ -92,7 +93,7 @@ export class Cart extends Tile {
     }
 
     effect(player: SteeplePlayer, index: number, amount: number) {
-        this.game.summary.push(`🛒 ${player.toString()} s'est installé dans le caddie`);
+        this.game.summary.push(`${this.emoji} ${player.toString()} s'est installé dans le caddie`);
         player.addEffect(new Prepared(this.game, player));
     }
 }
@@ -116,10 +117,10 @@ export class Carousel extends Tile {
         }, { minDist: Infinity, target: undefined as SteeplePlayer | undefined }).target;
 
         if (target) {
-            this.game.summary.push(`🎠${player.toString()} a pris le carrousel pour inverser de place avec " + target.toString() + "!`);
+            this.game.summary.push(`${this.emoji} ${player.toString()} a pris le carrousel pour inverser de place avec " + target.toString() + "!`);
             [target.index, player.index] = [player.index, target.index];
         } else {
-            this.game.summary.push(`🎠 ${player.toString()} n'avait personne avec qui échanger de place...`);
+            this.game.summary.push(`${this.emoji} ${player.toString()} n'avait personne avec qui échanger de place...`);
         }
     }
 }
@@ -140,11 +141,11 @@ export class BusStop extends Tile {
             let stopIndex = this.game.board.indexOf(stop);
             let distance = stopIndex - player.index;
 
-            this.game.summary.push(`🚏 ${player.toString()} a pris le bus sur ${Math.abs(distance)} ${Math.abs(distance) > 1 ? "cases" : "case"} en ${distance > 0 ? "avant" : "arrière"}`);
+            this.game.summary.push(`${this.emoji} ${player.toString()} a pris le bus sur ${Math.abs(distance)} ${Math.abs(distance) > 1 ? "cases" : "case"} en ${distance > 0 ? "avant" : "arrière"}`);
 
             player.index = stopIndex;
         } else {
-            this.game.summary.push(`🚏 ${player.toString()} a attendu longtemps à l'arrêt de bus...`);
+            this.game.summary.push(`${this.emoji} ${player.toString()} a attendu longtemps à l'arrêt de bus...`);
         }
     }
 }
@@ -168,7 +169,7 @@ export class Box extends Tile {
                 player.move(rndAmount);
             });
         } else {
-            this.game.summary.push(`📦 La boîte craque mais ne cède pas...`);
+            this.game.summary.push(`${this.emoji} La boîte craque mais ne cède pas...`);
         }
     }
 }
@@ -196,5 +197,25 @@ export class Bathtub extends Tile {
 
     effect(player: SteeplePlayer, index: number, amount: number) {
         player.addEffect(new Clean(this.game, player));
+    }
+}
+
+export class Sign extends Tile<{ player?: string }> {
+    name = "Panneau";
+    description = "Faites de nouveau avancer le joueur dont le nom est marqué, puis marquez votre nom";
+
+    constructor(game: SteepleGame, data: { player?: string } = {}) {
+        super(game, "0", "🪧", data);
+    }
+
+    effect(player: SteeplePlayer, index: number, amount: number): void {
+        if (this.data.player) {
+            const other = this.game.players[this.data.player];
+            this.game.summary.push(`${this.emoji} ${other.toString()} avance de nouveau!`)
+            other.move(this.game.order.indexOf(this.data.player) + 1);
+        }
+
+        this.game.summary.push(`${this.emoji} ${player.toString()} marque son nom sur le panneau`)
+        this.data.player = player.user.id;
     }
 }
