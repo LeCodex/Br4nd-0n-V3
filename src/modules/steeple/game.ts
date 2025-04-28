@@ -32,7 +32,7 @@ export default class SteepleGame extends Game {
     override async start(interaction: ChatInputCommandInteraction) {
         this.generateBoard(60);
         this.setupTimeout();
-        await this.sendBoard();
+        await this.sendBoardAndSave();
         await interaction.reply({ content: "Started", flags: MessageFlags.Ephemeral });
     }
 
@@ -99,10 +99,10 @@ export default class SteepleGame extends Game {
         if (oldIndex > -1) this.order.splice(oldIndex, 1);
         this.order.splice(index - (oldIndex > index ? 2 : 1), 0, interaction.user.id);
         await interaction.reply({ content: `Vous êtes désormais en ${index}e position`, flags: MessageFlags.Ephemeral });
-        await this.sendBoard(true);
+        await this.sendBoardAndSave(true);
     }
 
-    async sendBoard(edit = false, replace = false) {
+    async sendBoardAndSave(edit = false, replace = false) {
         let board = "";
         const lineSize = 12;
         for (let i = 0; i < Math.ceil(this.board.length / lineSize); i++) {
@@ -212,7 +212,7 @@ export default class SteepleGame extends Game {
             const player = this.getPlayerFromUser(user);
             if (!banned_emojis.includes(reaction.emoji.toString())) {
                 player.emoji = reaction.emoji.toString();
-                await this.sendBoard(true);
+                await this.sendBoardAndSave(true);
             }
         });
     }
@@ -236,7 +236,7 @@ export default class SteepleGame extends Game {
 
         this.turn++;
         this.setupTimeout();
-        await this.sendBoard();
+        await this.sendBoardAndSave();
     }
 
     protected serialize() {
@@ -265,14 +265,14 @@ export default class SteepleGame extends Game {
         instance.turn = obj.turn;
         instance.gamerules = obj.gamerules;
         instance.waitDuration = obj.waitDuration;
+        instance.setupTimeout();
 
         const message = obj.message && await (await client.channels.fetch(channelId) as SendableChannels).messages.fetch(obj.message)
         if (message) {
             instance.setupCollector(message);
         } else {
-            await instance.sendBoard();
+            await instance.sendBoardAndSave();
         }
-        instance.setupTimeout();
         return instance;
     }
 }

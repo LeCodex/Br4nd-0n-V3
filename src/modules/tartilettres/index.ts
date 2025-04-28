@@ -13,7 +13,7 @@ export default class Tartilettres extends GameModule() {
 
     constructor() {
         super("tarti");
-        this.words = new Set(this.readConfigFile("fr.txt")?.split("\n").map((e) => e.trim()))
+        this.words = new Set(this.readConfigFile("fr.txt")?.split("\n").map((e) => e.trim()));
     }
 
     protected async instantiate(interaction: ChatInputCommandInteraction) {

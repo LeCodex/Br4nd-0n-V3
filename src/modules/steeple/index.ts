@@ -17,6 +17,19 @@ export default class Steeple extends GameModule() {
         return new SteepleGame(this, interaction.channelId);
     }
 
+    public async onToggled(game: SteepleGame): Promise<void> {
+        if (game.paused) {
+            clearTimeout(game.timeout);
+            delete game.timeout;
+        } else {
+            game.setupTimeout();
+        }
+    }
+
+    public async onDeleted(game: SteepleGame): Promise<void> {
+        clearTimeout(game.timeout);
+    }
+
     @GameCommand({
         subcommand: "move", description: "Remonte en première place, ou descend à la place donnée", options: [
             { name: "place", type: ApplicationCommandOptionType.Integer, description: "La place voulue" }
@@ -28,7 +41,7 @@ export default class Steeple extends GameModule() {
 
     @GameCommand({ subcommand: "show", description: "Renvoie le message du jeu", pausable: false })
     async show(game: SteepleGame, interaction: ChatInputCommandInteraction) {
-        await game.sendBoard(false, true);
+        await game.sendBoardAndSave(false, true);
         await interaction.reply({ content: "Resent", flags: MessageFlags.Ephemeral });
     }
 
