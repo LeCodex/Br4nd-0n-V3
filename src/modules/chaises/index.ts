@@ -1,0 +1,31 @@
+import { ChatInputCommandInteraction } from "discord.js";
+import { Game, GameCommand } from "modules/game";
+import GameModule from "modules/game/base";
+import ChaisesGame from "./game";
+import ChaisesPlayer from "./player";
+
+export default class Chaises extends GameModule() {
+    protected cls = ChaisesGame;
+    name = "Tasses musicales";
+    description = "TOUT LE MONDE VEUT PRENDRE?";
+    color = 0xad8d52;
+
+    constructor() {
+        super("chaises");
+    }
+
+    protected async instantiate(interaction: ChatInputCommandInteraction): Promise<Game> {
+        return new ChaisesGame(this, interaction.channelId);
+    }
+
+    @GameCommand({ subcommand: "sit", description: "T'asseoie sur une chaise au hasard" })
+    public async sit(game: ChaisesGame, interaction: ChatInputCommandInteraction) {
+        const player = game.players[interaction.user.id] ??= new ChaisesPlayer(game, interaction.user);
+        await player.rollDice(interaction);
+    }
+
+    @GameCommand({ subcommand: "show", description: "Renvoie le dernier message de jeu", pausable: false })
+    public async show(game: ChaisesGame, interaction: ChatInputCommandInteraction) {
+        await game.resendMessage();
+    }
+}
