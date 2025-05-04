@@ -122,7 +122,6 @@ export default class YamJamGame extends Game {
         const instance = new this(module, channelId);
         instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]) => [k, await YamJamPlayer.load(instance, v)])));
         instance.dice = obj.dice;
-        instance.paused = obj.paused;
         instance.lastPlayed = obj.lastPlayed;
         instance.lastTimestamp = obj.lastTimestamp;
 

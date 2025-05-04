@@ -63,7 +63,6 @@ export default class TartilettresGame extends Game {
 
     static async load(module: Tartilettres, channelId: string, obj: Record<string, any>): Promise<TartilettresGame> {
         const instance = new this(module, channelId);
-        instance.paused = obj.paused;
         instance.lastPlayed = obj.lastPlayed;
         instance.wordLength = obj.wordLength ?? 7;
         instance.saidWords = obj.saidWords ?? [];

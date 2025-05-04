@@ -249,7 +249,6 @@ export default class DedalleuxGame extends Game {
 
     static async load(module: Dedalleux, channelId: string, obj:  ReturnType<DedalleuxGame["serialize"]>): Promise<Game> {
         const instance = new this(module, channelId);
-        instance.paused = obj.paused;
         instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]: [string, any]) => [k, await DedalleuxPlayer.load(instance, v)])));
         instance.nextTimestamp = DateTime.fromMillis(obj.nextTimestamp ?? 0);
         instance.gamerules = obj.gamerules;

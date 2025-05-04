@@ -17,7 +17,9 @@ export default function GameModule<T extends Game>() {
                 if (!data) continue;
                 try {
                     Logger.log(`Loading game of ${this.commandName} in channel ${channelId}`);
-                    this.games[channelId] = await this.cls.load(this, channelId, data);
+                    const game = await this.cls.load(this, channelId, data);
+                    game.paused = data.paused;
+                    this.games[channelId] = game;
                 } catch (e) {
                     await ErrorHandler.handle(undefined, e);
                 }

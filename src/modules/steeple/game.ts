@@ -256,7 +256,6 @@ export default class SteepleGame extends Game {
 
     static async load(module: Steeple, channelId: string, obj: ReturnType<SteepleGame["serialize"]>): Promise<SteepleGame> {
         const instance = new this(module, channelId);
-        instance.paused = obj.paused;
         instance.board = obj.board.map((e) => new Tiles[e.cls as TileName](instance, e.data));
         instance.order = obj.order;
         instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]) => [k, await SteeplePlayer.load(instance, v)])));

@@ -118,7 +118,6 @@ export default class ChaisesGame extends Game {
 
     static async load(module: Chaises, channelId: string, obj: ReturnType<ChaisesGame["serialize"]>): Promise<ChaisesGame> {
         const instance = new this(module, channelId);
-        instance.paused = obj.paused;
         instance.previousPlayers = obj.previousPlayers;
         instance.waitAmount = obj.waitAmount;
         instance.chairs = obj.chairs;
