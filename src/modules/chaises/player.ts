@@ -17,7 +17,8 @@ export default class ChaisesPlayer {
         }
 
         const result = Math.floor(Math.random() * this.game.chairs.length);
-        await interaction.reply(`${this} a lancé un ${result+1}!`);
+        const chairs = this.game.chairs.filter(e => e === this.user.id).length + 1;
+        await interaction.reply(`${this} a lancé un ${result+1}! (${chairs} chaise${chairs > 1 ? "s" : ""} au total)`);
         await this.game.markChair(result, this);
     }
 
