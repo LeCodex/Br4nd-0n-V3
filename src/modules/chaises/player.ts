@@ -17,7 +17,7 @@ export default class ChaisesPlayer {
 
         const result = Math.floor(Math.random() * this.game.chairs.length);
         const successful = this.game.markChair(result, this);
-        const chairs = this.game.chairs.filter(e => e === this.user.id).length + 1;
+        const chairs = this.game.chairs.filter(e => e === this.user.id).length;
         const suffix = successful ? `${chairs} chaise${chairs > 1 ? "s" : ""} au total` : `🧂`;
         await interaction.reply(`${this} a lancé un ${result + 1}! (${suffix})`);
         await this.game.sendBoardAndSave();
