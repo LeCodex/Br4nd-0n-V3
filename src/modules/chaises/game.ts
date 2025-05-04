@@ -80,7 +80,7 @@ export default class ChaisesGame extends Game {
         await this.save();
     }
 
-    async markChair(index: number, player: ChaisesPlayer) {
+    markChair(index: number, player: ChaisesPlayer) {
         // Mark the player as having played
         this.previousPlayers.push(player.user.id);
         if (this.previousPlayers.length > this.waitAmount) this.previousPlayers.shift();
@@ -88,16 +88,17 @@ export default class ChaisesGame extends Game {
         if (!this.chairs[index]) {
             // Just place the cutout in the chair
             this.chairs[index] = player.user.id;
+            return true;
         } else if (this.chairs[index] == player.user.id) {
             // Burn all the cutouts
             this.chairs = this.chairs.map(e => e == player.user.id ? undefined : e);
+            return false;
         } else {
             // Replace the cutout and give a point
             this.players[this.chairs[index]].score++;
             this.chairs[index] = player.user.id;
+            return true;
         }
-
-        await this.sendBoardAndSave();
     }
 
     async resendMessage() {

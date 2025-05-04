@@ -12,14 +12,15 @@ export default class ChaisesPlayer {
 
     async rollDice(interaction: ChatInputCommandInteraction) {
         if (this.game.previousPlayers.includes(this.user.id)) {
-            await interaction.reply({ content: "Veuillez attendre que les autres joueurs jouent", flags: MessageFlags.Ephemeral });
-            return;
+            return interaction.reply({ content: "Veuillez attendre que les autres joueurs jouent", flags: MessageFlags.Ephemeral });
         }
 
         const result = Math.floor(Math.random() * this.game.chairs.length);
+        const successful = this.game.markChair(result, this);
         const chairs = this.game.chairs.filter(e => e === this.user.id).length + 1;
-        await interaction.reply(`${this} a lancé un ${result+1}! (${chairs} chaise${chairs > 1 ? "s" : ""} au total)`);
-        await this.game.markChair(result, this);
+        const suffix = successful ? `${chairs} chaise${chairs > 1 ? "s" : ""} au total` : `🧂`;
+        await interaction.reply(`${this} a lancé un ${result + 1}! (${suffix})`);
+        await this.game.sendBoardAndSave();
     }
 
     toString() {
