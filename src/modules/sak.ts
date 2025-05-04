@@ -108,8 +108,8 @@ export default class Sakatasses extends BotModule {
         return interaction.reply({
             embeds: [
                 new EmbedBuilder()
-                    .setTitle(`${this.cupEmoji} Ajout de tasses`)
-                    .setDescription(`${users.map((e) => e.toString()).join(", ")} ${users.length > 1 ? "ont" : "a"} ${amount >= 0 ? "gagné" : "perdu"} ${Math.abs(amount)} tasse${amount > 0 ? "s" : ""}!`)
+                    .setTitle(`${this.cupEmoji} ${amount >= 0 ? "Gain" : "Perte"} de tasses`)
+                    .setDescription(`${users.map((e) => e.toString()).join(", ")} ${users.length > 1 ? "ont" : "a"} ${amount >= 0 ? "gagné" : "perdu"} ${Math.abs(amount)} tasse${Math.abs(amount) > 1 ? "s" : ""}!`)
                     .setColor(this.color)
             ]
         });
