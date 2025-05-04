@@ -9,6 +9,7 @@ import YamJam from "./yamjam";
 import Say from "./say";
 import Steeple from "./steeple";
 import Chaises from "./chaises";
+import Coupdjus from "./coupdjus";
 
 export const modules: (new () => BotModule)[] = [
     Ping,
@@ -21,4 +22,5 @@ export const modules: (new () => BotModule)[] = [
     Sakatasses,
     Steeple,
     Chaises,
+    Coupdjus,
 ];
