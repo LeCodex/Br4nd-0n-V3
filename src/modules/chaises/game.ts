@@ -46,7 +46,12 @@ export default class ChaisesGame extends Game {
         }
 
         const embed = createRankEmbed(
-            { description: board, color: this.module.color, title: `[TASSES MUSICALES] ${this.title ?? ""}` },
+            {
+                description: board,
+                color: this.module.color,
+                title: `[TASSES MUSICALES] ${this.title ?? ""}`,
+                footer: { text: "Mettez une réaction à ce message pour rejoindre et changer de pion!" }
+            },
             "Joueurs",
             Object.values(this.players).map((e) => ({ user: e.user, playerStr: `${e.emoji} ${e.user.toString()}`, score: [e.score, e.chairs], scoreStr: `**${e.score}** 🏅 | **${e.chairs}** 🪑` })),
             "Score"
