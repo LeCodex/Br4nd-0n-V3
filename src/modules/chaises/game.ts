@@ -95,9 +95,9 @@ export default class ChaisesGame extends Game {
         }
     }
 
-    async resendMessage() {
+    async resendMessage(interaction: RepliableInteraction) {
         await this.boardMessage?.delete();
-        await this.sendBoardAndSave();
+        await this.sendBoardAndSave({ interaction });
     }
 
     private setupCollector(message: Message) {

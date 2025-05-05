@@ -26,6 +26,6 @@ export default class Chaises extends GameModule() {
 
     @GameCommand({ subcommand: "show", description: "Renvoie le dernier message de jeu", pausable: false })
     public async show(game: ChaisesGame, interaction: ChatInputCommandInteraction) {
-        await game.resendMessage();
+        await game.resendMessage(interaction);
     }
 }
