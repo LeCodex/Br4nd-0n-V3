@@ -194,7 +194,7 @@ export default class CoupdjusGame extends Game {
         if (obj.nextTimestamp) instance.nextTimestamp = DateTime.fromMillis(obj.nextTimestamp);
         instance.waitDuration = obj.waitDuration;
         instance.maxActions = obj.maxActions;
-        if (obj.view) instance.view = new CoupdjusView(instance, await CoupdjusView.load(obj.view));
+        if (obj.view?.message) instance.view = new CoupdjusView(instance, await CoupdjusView.load(obj.view));
         instance.setupTimeout();
         await instance.sendInfoAndSave();
         return instance;
