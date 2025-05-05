@@ -134,12 +134,12 @@ export function toRanked<U extends { score: Array<number> }>(array: Array<U>) {
     }, { rank: -1, lastScore: [] as Array<number>, result: [] as (U & { rank: number })[] }).result;
 }
 
-export function createRankEmbed(options: APIEmbed, playersTitle: string, players: Array<{ user: User, score: Array<number> }>, scoreTitle: string, scoreEmoji: string | Emoji): APIEmbed
-export function createRankEmbed(options: APIEmbed, playersTitle: string, players: Array<{ user: User, score: Array<number>, scoreStr: string }>, scoreTitle: string): APIEmbed
-export function createRankEmbed(options: APIEmbed, playersTitle: string, players: Array<{ user: User, score: Array<number>, scoreStr?: string }>, scoreTitle: string, scoreEmoji?: string | Emoji): APIEmbed {
+export function createRankEmbed(options: APIEmbed, playersTitle: string, players: Array<{ user: User, score: Array<number>, playerStr?: string }>, scoreTitle: string, scoreEmoji: string | Emoji): APIEmbed
+export function createRankEmbed(options: APIEmbed, playersTitle: string, players: Array<{ user: User, score: Array<number>, scoreStr: string, playerStr?: string }>, scoreTitle: string): APIEmbed
+export function createRankEmbed(options: APIEmbed, playersTitle: string, players: Array<{ user: User, score: Array<number>, scoreStr?: string, playerStr?: string }>, scoreTitle: string, scoreEmoji?: string | Emoji): APIEmbed {
     const ranked = toRanked(players);
     const playersLines = maxCharsLines(
-        ranked.map((e) => `${getRankEmoji(e.rank)} **${e.rank + 1}.** ${e.user?.toString() ?? "Joueur non trouvé"}`)
+        ranked.map((e) => `${getRankEmoji(e.rank)} **${e.rank + 1}.** ${e.playerStr ?? e.user?.toString() ?? "Joueur non trouvé"}`)
             .join("\n")
     );
     const scoreLines = maxCharsLines(ranked.map((e) => ({ value: e.scoreStr ?? `**${e.score[0]}** ${scoreEmoji}`, score: e.score })).map((e) => e.value).join("\n"));
@@ -182,3 +182,5 @@ export function randomlyPick<T extends string | unknown[]>(input: T) {
 }
 
 export const NUMBER_EMOJIS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
+export const COLORED_SQUARES = ["🟥", "🟧", "🟨", "🟩", "🟦", "🟪", "🟫", "⬜"];
+export const BANNED_EMOJIS = ["⬛", "◼", "◾", "▪", "🖤", "〰", "➗", "✖", "➖", "➕", "➰", "🪑"];

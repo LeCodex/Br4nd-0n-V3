@@ -6,7 +6,7 @@ import { ChatInputCommandInteraction, EmbedBuilder, Message, MessageFlags, React
 import { shuffle } from "lodash";
 import Steeple from ".";
 import { client } from "client";
-import { createRankEmbed } from "utils";
+import { BANNED_EMOJIS, createRankEmbed } from "utils";
 
 type TileName = Exclude<keyof typeof Tiles, "default">;
 
@@ -208,9 +208,8 @@ export default class SteepleGame extends Game {
         this.collector.on('collect', async (reaction, user) => {
             await reaction.users.remove(user);
             if (this.paused) return;
-            const banned_emojis = ["⬛", "◼", "◾", "▪", "🖤", "〰", "➗", "✖", "➖", "➕", "➰"];
             const player = this.getPlayerFromUser(user);
-            if (!banned_emojis.includes(reaction.emoji.toString())) {
+            if (!BANNED_EMOJIS.includes(reaction.emoji.toString())) {
                 player.emoji = reaction.emoji.toString();
                 await this.sendBoardAndSave(true);
             }

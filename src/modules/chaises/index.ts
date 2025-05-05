@@ -20,7 +20,7 @@ export default class Chaises extends GameModule() {
 
     @GameCommand({ subcommand: "sit", description: "T'asseoie sur une chaise au hasard" })
     public async sit(game: ChaisesGame, interaction: ChatInputCommandInteraction) {
-        const player = game.players[interaction.user.id] ??= new ChaisesPlayer(game, interaction.user);
+        const player = game.getPlayerFromUser(interaction.user);
         await player.rollDice(interaction);
     }
 

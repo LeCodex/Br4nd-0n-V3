@@ -1,82 +1,71 @@
 import { Game } from "modules/game";
 import ChaisesPlayer from "./player";
-import { ChatInputCommandInteraction, Message, MessageFlags, SendableChannels } from "discord.js";
+import { APIEmbedField, ChatInputCommandInteraction, Message, MessageFlags, ReactionCollector, RepliableInteraction, SendableChannels, User } from "discord.js";
 import Chaises from ".";
 import { client } from "client";
+import { BANNED_EMOJIS, createRankEmbed, getRankEmoji } from "utils";
 
 export default class ChaisesGame extends Game {
     players: Record<string, ChaisesPlayer> = {};
     boardMessage?: Message;
+    title?: string;
+    message?: string;
     previousPlayers: Array<string> = [];
     waitAmount = 2;
     chairs: Array<string | undefined> = [];
+    collector?: ReactionCollector;
 
     constructor(module: Chaises, channelId: string) {
         super(module, channelId);
     }
 
-    async start(interaction: ChatInputCommandInteraction) {
-        for (let i = 0; i < 50; i++) this.chairs.push(undefined);
-        await this.sendBoardAndSave();
-        await interaction.reply({ content: "Started", flags: MessageFlags.Ephemeral })
+    getPlayerFromUser(user: User) {
+        return this.players[user.id] ??= new ChaisesPlayer(this, user);
     }
 
-    async sendBoardAndSave() {
-        let message = "";
-        const columns: Array<Array<string>> = [];
-        let rowCount = 0
-        const maxRowCount = 5;
-        for (let i = 0; i < maxRowCount; i++) columns.push([]);
+    async start(interaction: ChatInputCommandInteraction) {
+        for (let i = 0; i < 50; i++) this.chairs.push(undefined);
+        await this.sendBoardAndSave({ interaction, title: "Début de partie" });
+    }
 
-        // Store columns
-        const maxIndexLength = String(this.chairs.length-1).length;
-        this.chairs.forEach((chair, i) => {
-            const indexString = (i+1).toString().padStart(maxIndexLength, "0");
-            const placeString = chair ? this.players[chair].toString() : "..." 
-            columns[rowCount].push(`[${indexString}] ${placeString}`);
-            rowCount = (rowCount + 1) % maxRowCount;
-        });
+    async sendBoardAndSave(options?: { interaction?: RepliableInteraction, title?: string, message?: string, edit?: boolean }) {
+        if (options?.title) this.title = options.title;
+        if (options?.message) this.message = options.message;
 
-        // Render chairs with padding
-        rowCount = 0;
-        let i = 0;
-        const columnsMaxLengths = columns.map(e => e.reduce((acc, str) => Math.max(acc, str.length), 0));
-        while (i < columns[rowCount].length) {
-            const tileString = columns[rowCount][i];
-            message += tileString;
-
-            if (++rowCount == maxRowCount) {
-                rowCount = 0; i++;
-                message += "\n";
-            } else {
-                const padding = columnsMaxLengths[rowCount-1] - tileString.length;
-                if (padding > 0) message += " ".repeat(padding);
-                message += " | ";
-            };
-        }
-
-        // Render scores
-        message += "\n- SCORES -\n";
-        const playersByScore: Record<number, Array<ChaisesPlayer>> = {};
-        let maxScore = 0;
-        for (const player of Object.values(this.players)) {
-            if (!playersByScore[player.score]) playersByScore[player.score] = [];
-            if (maxScore < player.score) maxScore = player.score;
-            playersByScore[player.score].push(player);
-        }
-
-        for (let i = maxScore; i > 0; i--) {
-            if (playersByScore[i]) {
-                message += `${i}. ${playersByScore[i].map(e => e.toString()).join(", ")}\n`;
+        let board = this.message ? `${this.message}\n\n` : "";
+        let line = "", i = 0;
+        const lineLength = 10;
+        for (const chair of this.chairs) {
+            line += chair ? this.players[chair].emoji : "🪑";
+            i++;
+            if (i >= lineLength) {
+                board += line + "\n";
+                line = "";
+                i = 0;
             }
         }
 
-        // Render last players
-        message += "\n- DERNIERS JOUEURS -\n";
-        message += this.previousPlayers.map(e => this.players[e].toString()).join(", ");
+        const embed = createRankEmbed(
+            { description: board, color: this.module.color, title: `[TASSES MUSICALES] ${this.title ?? ""}` },
+            "Joueurs",
+            Object.values(this.players).map((e) => ({ user: e.user, playerStr: `${e.emoji} ${e.user.toString()}`, score: [e.score, e.chairs], scoreStr: `**${e.score}** 🏅 | **${e.chairs}** 🪑` })),
+            "Score"
+        )
 
-        message = "```\n" + message + "```";
-        this.boardMessage = await this.channel?.send(message);
+        // Render last players
+        embed.fields?.push({
+            name: "Derniers joueurs",
+            value: this.previousPlayers.map(e => this.players[e].toString()).join(", ")
+        });
+
+        if (options?.edit && this.boardMessage) {
+            this.boardMessage.edit({ embeds: [embed] });
+        } else {
+            this.boardMessage = options?.interaction
+                ? (await options.interaction.reply({ embeds: [embed], withResponse: true })).resource?.message ?? undefined
+                : await this.channel?.send({ embeds: [embed] });
+        }
+        if (this.boardMessage) this.setupCollector(this.boardMessage);
         await this.save();
     }
 
@@ -106,11 +95,31 @@ export default class ChaisesGame extends Game {
         await this.sendBoardAndSave();
     }
 
+    private setupCollector(message: Message) {
+        if (this.collector) {
+            this.collector.stop();
+            delete this.collector;
+        }
+
+        this.collector = message.createReactionCollector({ dispose: true });
+        this.collector.on('collect', async (reaction, user) => {
+            await reaction.users.remove(user);
+            if (this.paused) return;
+            const player = this.getPlayerFromUser(user);
+            if (!BANNED_EMOJIS.includes(reaction.emoji.toString())) {
+                player.emoji = reaction.emoji.toString();
+                await this.sendBoardAndSave({ edit: true });
+            }
+        });
+    }
+
     protected serialize() {
         return {
             ...super.serialize(),
             players: Object.fromEntries(Object.entries(this.players).map(([k, v]) => [k, v.serialize()])),
             boardMessage: this.boardMessage?.id,
+            title: this.title,
+            message: this.message,
             previousPlayers: this.previousPlayers,
             waitAmount: this.waitAmount,
             chairs: this.chairs
@@ -123,9 +132,12 @@ export default class ChaisesGame extends Game {
         instance.waitAmount = obj.waitAmount;
         instance.chairs = obj.chairs;
         instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]) => [k, await ChaisesPlayer.load(instance, v)])))
+        instance.title = obj.title;
+        instance.message = obj.message;
         if (obj.boardMessage) {
             instance.boardMessage = await (await client.channels.fetch(channelId) as SendableChannels).messages.fetch(obj.boardMessage);
         }
+        await instance.sendBoardAndSave({ edit: true });
         return instance;
     }
 }

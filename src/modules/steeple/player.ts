@@ -1,7 +1,7 @@
 import { User } from "discord.js";
 import SteepleGame from "./game";
 import Effect, * as Effects from "./effects";
-import { randomlyPick } from "utils";
+import { COLORED_SQUARES, randomlyPick } from "utils";
 import { client } from "client";
 
 type EffectName = Exclude<keyof typeof Effects, "default">;
@@ -15,8 +15,7 @@ export default class SteeplePlayer {
 
     constructor(public game: SteepleGame, public user: User) {
         this.user = user;
-        let defaultEmojis = ["🟥", "🟧", "🟨", "🟩", "🟦", "🟪", "🟫", "⬜"];
-        this.emoji = randomlyPick(defaultEmojis);
+        this.emoji = randomlyPick(COLORED_SQUARES);
     }
 
     get rankScore() { return [this.score, this.index]; }
