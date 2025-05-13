@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, EmbedBuilder, MessageFlags, User } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder, MessageFlags, RepliableInteraction, User } from "discord.js";
 import CoupdjusGame from "./game";
 import Fruit from "./fruits";
 import { randomlyPick } from "utils";
@@ -21,9 +21,9 @@ export default class CoupdjusPlayer {
         this.fruit.effect();
     }
 
-    async sendInfo(interaction: ChatInputCommandInteraction) {
+    async sendInfo(interaction: RepliableInteraction) {
         const embed = new EmbedBuilder()
-            .setDescription("Fruit: " + this.fruit.fullName + (this.recipes.length ? "\n\nRecettes:\n • " + this.recipes.join("\n • ") : ""))
+            .setDescription(`Recettes:\n${this.recipes.map(e => `- ${e}`).join("\n")}`)
             .setColor(this.game.module.color);
 
         await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });

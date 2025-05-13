@@ -1,7 +1,8 @@
-import { Message, ButtonStyle, MessageComponentInteraction } from "discord.js";
+import { Message, ButtonStyle, MessageComponentInteraction, ButtonInteraction } from "discord.js";
 import CoupdjusGame from "./game";
 import GameView from "modules/game/view";
 import { NUMBER_EMOJIS } from "utils";
+import { Button } from "view";
 
 export default class CoupdjusView extends GameView<CoupdjusGame> {
     constructor(game: CoupdjusGame, message?: Message) {
@@ -20,5 +21,11 @@ export default class CoupdjusView extends GameView<CoupdjusGame> {
 
     public async callback(interaction: MessageComponentInteraction, index: number) {
         await this.game.tryAndPlayFruit(interaction, index);
+    }
+
+    @Button({ row: 2, label: "Voir ses recettes", style: ButtonStyle.Primary, pausable: false })
+    public async ingredient(interaction: ButtonInteraction) {
+        const player = this.game.players[interaction.user.id];
+        await player.sendInfo(interaction);
     }
 }
