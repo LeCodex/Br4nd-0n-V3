@@ -3,6 +3,7 @@ import CoupdjusGame from "./game";
 import GameView from "modules/game/view";
 import { NUMBER_EMOJIS } from "utils";
 import { Button } from "view";
+import CoupdjusPlayer from "./player";
 
 export default class CoupdjusView extends GameView<CoupdjusGame> {
     constructor(game: CoupdjusGame, message?: Message) {
@@ -24,8 +25,8 @@ export default class CoupdjusView extends GameView<CoupdjusGame> {
     }
 
     @Button({ row: 2, label: "Voir ses recettes", style: ButtonStyle.Primary, pausable: false })
-    public async ingredient(interaction: ButtonInteraction) {
-        const player = this.game.players[interaction.user.id];
+    public async recipes(interaction: ButtonInteraction) {
+        const player = this.game.players[interaction.user.id] ??= new CoupdjusPlayer(this.game, interaction.user);
         await player.sendInfo(interaction);
     }
 }

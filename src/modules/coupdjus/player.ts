@@ -23,7 +23,7 @@ export default class CoupdjusPlayer {
 
     async sendInfo(interaction: RepliableInteraction) {
         const embed = new EmbedBuilder()
-            .setDescription(`Recettes:\n${this.recipes.map(e => `- ${e}`).join("\n")}`)
+            .setDescription(`**Recettes:**\n${this.recipes.length ? this.recipes.map(e => `- ${e}`).join("\n") : "- Aucune!"}`)
             .setColor(this.game.module.color);
 
         await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
