@@ -28,21 +28,24 @@ export default class CoupdjusGame extends Game {
 
     async start(interaction: ChatInputCommandInteraction) {
         await this.sendInfoAndSave();
-        this.setupTimeout();
+        this.setupTimeout(true);
         await interaction.reply({ content: "Started", flags: MessageFlags.Ephemeral });
     }
 
-    setupTimeout(newTurn = true) {
+    setupTimeout(newTurn = false) {
         clearTimeout(this.timeout);
         const now = DateTime.local();
+        if (!this.nextTimestamp) {
+            this.nextTimestamp = now;
+        }
+
         if (newTurn) {
-            if (!this.nextTimestamp) this.nextTimestamp = DateTime.local();
             this.nextTimestamp = this.nextTimestamp.plus(this.waitDuration).set({ second: 0, millisecond: 0 });
             if (!this.waitDuration.minutes) this.nextTimestamp = this.nextTimestamp.set({ minute: 0 });
         }
         const time = this.nextTimestamp!.toMillis() - now.toMillis();
 
-        // console.log(this.nextTimestamp, now, this.waitDuration, time);
+        console.log(this.nextTimestamp, now, this.waitDuration, time);
         this.timeout = setTimeout(() => { this.recharge(); }, time);
     }
 
@@ -191,7 +194,7 @@ export default class CoupdjusGame extends Game {
         instance.title = obj.title;
         instance.summary = obj.summary;
         instance.blenders = obj.blenders.map((e) => e.map((f) => Fruit.load(instance.players[f.player], f)));
-        if (obj.nextTimestamp) instance.nextTimestamp = DateTime.fromMillis(obj.nextTimestamp);
+        instance.nextTimestamp = DateTime.fromMillis(obj.nextTimestamp ?? 0);
         instance.waitDuration = obj.waitDuration;
         instance.maxActions = obj.maxActions;
         if (obj.view?.message) instance.view = new CoupdjusView(instance, await CoupdjusView.load(obj.view));

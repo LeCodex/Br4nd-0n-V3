@@ -69,8 +69,7 @@ export default class DedalleuxGame extends Game {
     }
 
     setupTimeout(newTurn: boolean = true) {
-        if (this.timeout) clearTimeout(this.timeout);
-
+        clearTimeout(this.timeout);
         const now = DateTime.local();
         if (!this.nextTimestamp) {
             this.nextTimestamp = now;
@@ -80,8 +79,8 @@ export default class DedalleuxGame extends Game {
             this.nextTimestamp = this.nextTimestamp.plus(this.waitDuration).set({ second: 0, millisecond: 0 });
             if (!this.waitDuration.minutes) this.nextTimestamp = this.nextTimestamp.set({ minute: 0 });
         }
-
         const time = this.nextTimestamp.toMillis() - now.toMillis();
+        
         this.timeout = setTimeout(() => { this.nextTurn(time <= 0); }, time);
     }
 

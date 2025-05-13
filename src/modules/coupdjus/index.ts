@@ -33,7 +33,7 @@ export default class Coupdjus extends GameModule() {
 
     @GameCommand({ subcommand: "show", description: "Renvoie le message du jeu", pausable: false })
     public async show(game: CoupdjusGame, interaction: ChatInputCommandInteraction) {
-        await game.sendInfoAndSave(undefined, undefined, true, true);
+        await game.sendInfoAndSave(undefined, undefined, false, true);
         await interaction.reply({ content: "Resent", flags: MessageFlags.Ephemeral });
     }
 }
