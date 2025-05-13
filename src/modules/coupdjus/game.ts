@@ -53,6 +53,8 @@ export default class CoupdjusGame extends Game {
         const player = this.players[interaction.user.id] ??= new CoupdjusPlayer(this, interaction.user);
         if (player.actions == 0) {
             await interaction.reply({ content: "Vous n'avez plus d'actions, veuillez attendre", flags: MessageFlags.Ephemeral });
+        } else if (this.lastPlayed === player.user.id) {
+            await interaction.reply({ content: "Veuillez attendre qu'un autre joueur joue", flags: MessageFlags.Ephemeral });
         } else if (index < 0 || index >= this.blenders.length) {
             await interaction.reply({ content: "Veuillez renseigner un index présent sous un des mixeurs", flags: MessageFlags.Ephemeral });
         } else if (this.blenders[index].some(e => e.player === player)) {
