@@ -22,7 +22,7 @@ export default class Steeple extends GameModule() {
             clearTimeout(game.timeout);
             delete game.timeout;
         } else {
-            game.setupTimeout();
+            game.setupTimeout(false);
         }
     }
 
