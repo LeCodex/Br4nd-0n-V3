@@ -91,8 +91,8 @@ export default class SteepleGame extends Game {
         if (index === 1 && this.order[0] === interaction.user.id) {
             return interaction.reply({ content: "Vous ne pouvez pas remonter en 1e place si vous y êtes déjà", flags: MessageFlags.Ephemeral });
         }
-        if (this.order.indexOf(interaction.user.id) >= index - 1) {
-            return interaction.reply({ content: "Vous ne pouvez spécifier qu'un index qui vous fait redescendre", flags: MessageFlags.Ephemeral });
+        if (index > 1 && this.order.indexOf(interaction.user.id) >= index - 1) {
+            return interaction.reply({ content: "Vous ne pouvez spécifier qu'un index qui vous fait redescendre ou la 1e place", flags: MessageFlags.Ephemeral });
         }
 
         const oldIndex = this.order.indexOf(interaction.user.id);
