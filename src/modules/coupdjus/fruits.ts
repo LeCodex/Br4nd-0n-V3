@@ -1,4 +1,3 @@
-import CoupdjusGame from "./game";
 import CoupdjusPlayer from "./player";
 
 export default class Fruit {

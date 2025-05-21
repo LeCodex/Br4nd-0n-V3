@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, EmbedBuilder, MessageFlags, RepliableInteraction, User } from "discord.js";
+import { EmbedBuilder, MessageFlags, RepliableInteraction, User } from "discord.js";
 import CoupdjusGame from "./game";
 import Fruit from "./fruits";
 import { randomlyPick } from "utils";

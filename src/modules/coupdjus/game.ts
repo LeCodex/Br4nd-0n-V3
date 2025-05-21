@@ -10,6 +10,7 @@ import Coupdjus from ".";
 export default class CoupdjusGame extends Game {
     players: Record<string, CoupdjusPlayer> = {};
     lastPlayed = "";
+    canImmediatelyPlayInBlenders: number[] = [];
     title = "";
     summary = "";
     blenders: Array<Array<Fruit>> = [[], [], [], [], [], []];
@@ -53,7 +54,7 @@ export default class CoupdjusGame extends Game {
         const player = this.players[interaction.user.id] ??= new CoupdjusPlayer(this, interaction.user);
         if (player.actions == 0) {
             await interaction.reply({ content: "Vous n'avez plus d'actions, veuillez attendre", flags: MessageFlags.Ephemeral });
-        } else if (this.lastPlayed === player.user.id) {
+        } else if (this.lastPlayed === player.user.id && !this.canImmediatelyPlayInBlenders.includes(index)) {
             await interaction.reply({ content: "Veuillez attendre qu'un autre joueur joue", flags: MessageFlags.Ephemeral });
         } else if (index < 0 || index >= this.blenders.length) {
             await interaction.reply({ content: "Veuillez renseigner un index présent sous un des mixeurs", flags: MessageFlags.Ephemeral });
@@ -125,8 +126,9 @@ export default class CoupdjusGame extends Game {
 
     async nextTurn(player: CoupdjusPlayer, message: string) {
         const summary = [];
-        const gains: Record<string, number> = {}
-        for (const blender of this.blenders) {
+        this.canImmediatelyPlayInBlenders.length = 0;
+        const gains: Record<string, number> = {};
+        for (const [i, blender] of this.blenders.entries()) {
             if (blender.length >= 3) {
                 gains[blender[0].player.user.id] = (gains[blender[0].player.user.id] ?? 0) + 1;
                 gains[blender[1].player.user.id] = (gains[blender[1].player.user.id] ?? 0) + 1;
@@ -151,6 +153,7 @@ export default class CoupdjusGame extends Game {
                 }
 
                 blender.length = 0;
+                this.canImmediatelyPlayInBlenders.push(i);
             }
         }
 
@@ -171,7 +174,7 @@ export default class CoupdjusGame extends Game {
         }
 
         this.setupTimeout(true);
-        await this.sendInfoAndSave("🔄 Recharge des actions", undefined, false);
+        await this.sendInfoAndSave("🔄 Recharge des actions", undefined, false, true);
     }
 
     protected serialize() {
