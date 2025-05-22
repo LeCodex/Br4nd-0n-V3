@@ -143,14 +143,17 @@ export default class SteepleGame extends Game {
                 value: ""
             }
             this.summary.forEach((element, i) => {
-                totalLength += (element + "\n").length;
+                const newLine = element + "\n";
+                totalLength += newLine.length;
                 if (totalLength >= 1024) {
                     embed.addFields(field);
-                    field.value = "";
-                    field.name = "Suite du résumé"
-                    totalLength = (element + "\n").length;
+                    field = {
+                        name: "Suite du résumé",
+                        value: ""
+                    };
+                    totalLength = newLine.length;
                 }
-                field.value += element + "\n";
+                field.value += newLine;
             });
             if (field.value.trim().length) embed.addFields(field);
         }
