@@ -138,7 +138,7 @@ export default class SteepleGame extends Game {
 
         if (this.summary.length) {
             let totalLength = 0;
-            const field = {
+            let field = {
                 name: "Résumé du dernier lancer",
                 value: ""
             }
