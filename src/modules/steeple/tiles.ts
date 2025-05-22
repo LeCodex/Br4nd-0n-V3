@@ -117,7 +117,7 @@ export class Carousel extends Tile {
         }, { minDist: Infinity, target: undefined as SteeplePlayer | undefined }).target;
 
         if (target) {
-            this.game.summary.push(`${this.emoji} ${player.toString()} a pris le carrousel pour inverser de place avec " + target.toString() + "!`);
+            this.game.summary.push(`${this.emoji} ${player.toString()} a pris le carrousel pour inverser de place avec ${target.toString()}!`);
             [target.index, player.index] = [player.index, target.index];
         } else {
             this.game.summary.push(`${this.emoji} ${player.toString()} n'avait personne avec qui échanger de place...`);
@@ -211,11 +211,11 @@ export class Sign extends Tile<{ player?: string }> {
     effect(player: SteeplePlayer, index: number, amount: number): void {
         if (this.data.player) {
             const other = this.game.players[this.data.player];
-            this.game.summary.push(`${this.emoji} ${other.toString()} avance de nouveau!`)
+            this.game.summary.push(`${this.emoji} ${other.toString()} a avancé de nouveau!`)
             other.move(this.game.order.indexOf(this.data.player) + 1);
         }
 
-        this.game.summary.push(`${this.emoji} ${player.toString()} marque son nom sur le panneau`)
+        this.game.summary.push(`${this.emoji} ${player.toString()} a marqué son nom sur le panneau`)
         this.data.player = player.user.id;
     }
 }
