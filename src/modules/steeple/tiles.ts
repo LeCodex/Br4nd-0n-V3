@@ -18,6 +18,10 @@ export default abstract class Tile<T extends Record<string, any> | void = void> 
         return `${this.emoji.toString()} ${this.name}`;
     }
 
+    get icon() {
+        return this.emoji;
+    }
+
     tryToMove(player: SteeplePlayer, index: number) {
         return true;
     }
@@ -206,6 +210,10 @@ export class Sign extends Tile<{ player?: string }> {
 
     constructor(game: SteepleGame, data: { player?: string } = {}) {
         super(game, "0", "🪧", data);
+    }
+
+    get icon() {
+        return this.data.player ? this.game.players[this.data.player].emoji : this.emoji;
     }
 
     effect(player: SteeplePlayer, index: number, amount: number): void {

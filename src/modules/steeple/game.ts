@@ -113,7 +113,7 @@ export default class SteepleGame extends Game {
             for (let j = 0; j < lineSize; j++) {
                 if (lineSize * i + j >= this.board.length) break;
 
-                boardLine += this.board[lineSize * i + j].emoji.toString();
+                boardLine += this.board[lineSize * i + j].icon.toString();
                 const column = Object.values(this.players).filter(e => e.index === lineSize * i + j).map(e => e.emoji);
                 playerColumns.push(column);
                 maxPlayers = Math.max(maxPlayers, column.length);
