@@ -97,7 +97,7 @@ export default class SteepleGame extends Game {
 
         const oldIndex = this.order.indexOf(interaction.user.id);
         if (oldIndex > -1) this.order.splice(oldIndex, 1);
-        this.order.splice(index - (oldIndex > index ? 1 : 2), 0, interaction.user.id);
+        this.order.splice(index - 1, 0, interaction.user.id);
         player.movedThisTurn = true;
         await interaction.reply({ content: `Vous êtes désormais en ${index}e position`, flags: MessageFlags.Ephemeral });
         await this.sendBoardAndSave(true);
