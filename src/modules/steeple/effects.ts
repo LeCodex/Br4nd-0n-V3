@@ -67,8 +67,8 @@ export class UnderPressure extends Effect<{ armed: boolean, index: number }> {
             this.used = true;
             if (index === this.data.index) {
                 this.game.summary.push(`💥 BOUM! ${this.player.toString()} est resté trop longtemps au même endroit!`);
-                const amount = -Math.floor(Math.random() * 11 + 2);
-                this.player.move(amount);
+                const amount = Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6) + 2;
+                this.player.move(-amount);
             } else {
                 this.game.summary.push(`🧨 ${this.player.toString()} a bougé à temps`);
             }
