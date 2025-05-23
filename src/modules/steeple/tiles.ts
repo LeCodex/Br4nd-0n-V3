@@ -169,8 +169,8 @@ export class Box extends Tile {
             this.game.summary.push(`💫 La boîte en carton a cassé!`);
 
             playersOn.forEach((player) => {
-                const rndAmount = -Math.floor(Math.random() * 11 + 2);
-                player.move(rndAmount);
+                const rndAmount = Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6) + 2;
+                player.move(-rndAmount);
             });
         } else {
             this.game.summary.push(`${this.emoji} La boîte craque mais ne cède pas...`);
