@@ -108,26 +108,30 @@ export default class SteepleGame extends Game {
         const lineSize = 12;
         for (let i = 0; i < Math.ceil(this.board.length / lineSize); i++) {
             const playerColumns: string[][] = [];
-            let boardLine = "";
-            let maxPlayers = 0;
+            let line = "";
+            let maxHeight = 0;
             for (let j = 0; j < lineSize; j++) {
                 if (lineSize * i + j >= this.board.length) break;
-
-                boardLine += this.board[lineSize * i + j].icon.toString();
+                line += this.board[lineSize * i + j].icon.toString();
                 const column = Object.values(this.players).filter(e => e.index === lineSize * i + j).map(e => e.emoji);
                 playerColumns.push(column);
-                maxPlayers = Math.max(maxPlayers, column.length);
+                maxHeight = Math.max(maxHeight, column.length);
             }
 
-            for (let j = playerColumns.length; j > 0; j--) {
-                if (playerColumns[j - 1].length) break;
-                playerColumns.pop();
+            for (let k = 0; k < maxHeight; k++) {
+                let lastFullIndex = 0;
+                let playerLine = "";
+                for (const [j, column] of playerColumns.entries()) {
+                    const playerIcon = column[k];
+                    if (playerIcon) {
+                        for (let _ = lastFullIndex; _ < j; _++) playerLine += "⬛";
+                        lastFullIndex = j + 1;
+                        playerLine += playerIcon;
+                    }
+                }
+                line = playerLine + "\n" + line;
             }
-
-            let line = "";
-            for (let j = maxPlayers; j > 0; j--) line += playerColumns.map(e => e.length >= j ? e[j - 1] : "⬛").join("") + "\n";
-            line += boardLine;
-
+            
             board += line + "\n\n";
         }
 
