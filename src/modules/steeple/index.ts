@@ -45,6 +45,11 @@ export default class Steeple extends GameModule() {
         await interaction.reply({ content: "Resent", flags: MessageFlags.Ephemeral });
     }
 
+    @GameCommand({ subcommand: "rules", description: "Affiche les effets des cases", pausable: false })
+    async rules(game: SteepleGame, interaction: ChatInputCommandInteraction) {
+        return interaction.reply({ embeds: [game.rulesEmbed], flags: MessageFlags.Ephemeral });
+    }
+
     @GameCommand({ subcommand: "rank", description: "Affiche le classement", pausable: false })
     async rank(game: SteepleGame, interaction: ChatInputCommandInteraction) {
         await interaction.reply({ embeds: [game.rankEmbed] });

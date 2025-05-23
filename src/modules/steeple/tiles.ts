@@ -121,7 +121,8 @@ export class Carousel extends Tile {
         }, { minDist: Infinity, target: undefined as SteeplePlayer | undefined }).target;
 
         if (target) {
-            this.game.summary.push(`${this.emoji} ${player.toString()} a pris le carrousel pour inverser de place avec ${target.toString()}!`);
+            const distance = Math.abs(player.index - target.index);
+            this.game.summary.push(`${this.emoji} ${player.toString()} a pris le carrousel pour inverser de place avec ${target.toString()} à ${distance} case${distance > 1 ? "s" : ""} de distance!`);
             [target.index, player.index] = [player.index, target.index];
         } else {
             this.game.summary.push(`${this.emoji} ${player.toString()} n'avait personne avec qui échanger de place...`);
@@ -156,7 +157,7 @@ export class BusStop extends Tile {
 
 export class Box extends Tile {
     name = "Boîte en carton";
-    description = "Si plus de 3 joueurs sont dessus, ils doivent tous reculer de 2d6 cases";
+    description = "Si plusieurs joueurs sont dessus, ils doivent tous reculer de 2d6 cases";
 
     constructor(game: SteepleGame) {
         super(game, "0", "📦");
@@ -180,7 +181,7 @@ export class Box extends Tile {
 
 export class Dynamite extends Tile {
     name = "Dynamite";
-    description = "Si tu restes dessus pendant un tour complet, elle explose et tu recules de 2d6 cases";
+    description = "Si tu ne quittes pas cette case avant la fin de ton prochain tour, elle explose et tu recules de 2d6 cases";
 
     constructor(game: SteepleGame) {
         super(game, "0", "🧨");
@@ -193,7 +194,7 @@ export class Dynamite extends Tile {
 
 export class Bathtub extends Tile {
     name = "Baignoire";
-    description = "Empêche le prochain effet de s'activer";
+    description = "Empêche le prochain effet sur lequel tu arrives de s'activer";
 
     constructor(game: SteepleGame) {
         super(game, "0", "🛁");
@@ -206,7 +207,7 @@ export class Bathtub extends Tile {
 
 export class Sign extends Tile<{ player?: string }> {
     name = "Panneau";
-    description = "Faites de nouveau avancer le joueur dont le nom est marqué, puis marquez votre nom";
+    description = "Fait de nouveau avancer le joueur dont le nom est marqué, puis marque ton nom";
 
     constructor(game: SteepleGame, data: { player?: string } = {}) {
         super(game, "0", "🪧", data);

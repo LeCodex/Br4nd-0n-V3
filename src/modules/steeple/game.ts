@@ -2,7 +2,7 @@ import { DateTime, DurationLikeObject } from "luxon";
 import { Game } from "modules/game";
 import Tile, * as Tiles from "./tiles";
 import SteeplePlayer from "./player";
-import { ChatInputCommandInteraction, EmbedBuilder, Message, MessageFlags, ReactionCollector, SendableChannels, User } from "discord.js";
+import { APIEmbed, ChatInputCommandInteraction, EmbedBuilder, Message, MessageFlags, ReactionCollector, SendableChannels, User } from "discord.js";
 import { shuffle } from "lodash";
 import Steeple from ".";
 import { client } from "client";
@@ -46,6 +46,17 @@ export default class SteepleGame extends Game {
             Object.values(this.players).map((e) => ({ user: e.user, score: e.rankScore, scoreStr: `**${e.score}** 🔄 | **${e.index}** 🪑` })),
             "Score"
         );
+    }
+
+    get rulesEmbed(): APIEmbed {
+        return {
+            title: "Effets des cases",
+            description: Object.keys(Tiles).filter((e) => e !== "default").map((e) => {
+                const instance = new Tiles[e as TileName](this);
+                return `**${instance.emoji} ${instance.name}**: ${instance.description}`;
+            }).join("\n"),
+            color: this.module.color
+        };
     }
 
     setupTimeout(newTurn = false) {
