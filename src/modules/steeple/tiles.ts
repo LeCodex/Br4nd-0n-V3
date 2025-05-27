@@ -3,6 +3,7 @@ import SteepleGame from "./game";
 import { Emoji } from "discord.js";
 import SteeplePlayer from "./player";
 import { Clean, Comfortable, Prepared, UnderPressure } from "./effects";
+import { shuffle } from "lodash";
 
 export default abstract class Tile<T extends Record<string, any> | void = void> {
     emoji: string | Emoji;
@@ -111,7 +112,7 @@ export class Carousel extends Tile {
     }
 
     effect(player: SteeplePlayer, index: number, amount: number) {
-        const target = Object.values(this.game.players).reduce((acc, element) => {
+        const target = shuffle(Object.values(this.game.players)).reduce((acc, element) => {
             let dist = Math.abs(element.index - player.index);
             if (dist < acc.minDist && element != player) {
                 acc.minDist = dist;
