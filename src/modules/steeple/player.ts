@@ -50,8 +50,6 @@ export default class SteeplePlayer {
             canTriggerEffect = element.postMove(this.index) && canTriggerEffect;
         });
 
-        this.effects = this.effects.filter(e => !e.used);
-
         if (canTriggerEffect) {
             this.game.board[this.index].effect?.(this, this.index, amount);
         }
