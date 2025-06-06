@@ -247,7 +247,7 @@ export default class SteepleGame extends Game {
 
         this.order.forEach(element => {
             const player = this.players[element];
-            player.effects.forEach((effect) => {
+            player.forEachEffect((effect) => {
                 effect.throwEnd(player);
             });
         });

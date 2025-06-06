@@ -7,27 +7,27 @@ export default abstract class Effect<T extends Record<string, unknown> | void = 
 
     constructor(public game: SteepleGame, public player: SteeplePlayer, public data: T) { }
 
-    tryToMove(index: number) {
+    tryToMove(index: number): boolean {
         return true;
     }
 
-    preMove(index: number, amount: number) {
+    preMove(index: number, amount: number): number {
         return amount;
     }
 
-    onMove(index: number, amount: number) {
+    onMove(index: number, amount: number): void {
         return;
     }
 
-    postMove(index: number) {
+    postMove(index: number): boolean {
         return true;
     }
 
-    turnEnd(index: number) {
+    turnEnd(index: number): void {
         return;
     }
 
-    throwEnd(player: SteeplePlayer) {
+    throwEnd(player: SteeplePlayer): void {
         return;
     }
 

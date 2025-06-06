@@ -20,18 +20,25 @@ export default class SteeplePlayer {
 
     get rankScore() { return [this.score, this.index]; }
 
+    /** Stops when one element returns true */
+    forEachEffect(fn: (element: Effect, index: Number, array: Array<Effect>) => boolean | void) {
+        const result = this.effects.some(fn);
+        this.effects = this.effects.filter(e => !e.used);
+        return result;
+    }
+
     move(amount: number) {
         if (!amount) {
             this.game.summary.push(`⏺️ ${this.toString()} a fait du sur-place`);
             return;
         }
 
-        this.effects.forEach(element => {
+        this.forEachEffect(element => {
             amount = element.preMove(this.index, amount);
         });
 
         const newIndex = (this.index + amount + this.game.board.length) % this.game.board.length;
-        if (!this.effects.every(e => e.tryToMove(newIndex))) return;
+        if (!this.forEachEffect(e => !e.tryToMove(newIndex))) return;
         if (!this.game.board[newIndex].tryToMove(this, newIndex)) return;
 
         const oldIndex = this.index;
@@ -39,15 +46,14 @@ export default class SteeplePlayer {
 
         this.game.summary.push(`${amount > 0 ? "▶️" : "◀️"} ${this.toString()} a ${amount > 0 ? "avancé" : "reculé"} de ${Math.abs(amount)} ${Math.abs(amount) > 1 ? "cases" : "case"}`);
 
-        this.effects.forEach(element => {
+        this.forEachEffect(element => {
             element.onMove(this.index, amount);
         });
 
         this.checkForWrapping();
 
-        let canTriggerEffect = this.index !== oldIndex;
-        this.effects.forEach(element => {
-            canTriggerEffect = element.postMove(this.index) && canTriggerEffect;
+        let canTriggerEffect = this.index !== oldIndex && this.forEachEffect(element => {
+            return element.postMove(this.index);
         });
 
         if (canTriggerEffect) {
@@ -78,10 +84,9 @@ export default class SteeplePlayer {
         const place = this.game.order.indexOf(this.user.id);
         if (place <= diceResult) this.move(place + 1);
 
-        this.effects.forEach(element => {
+        this.forEachEffect(element => {
             element.turnEnd(this.index);
         });
-        this.effects = this.effects.filter(e => !e.used);
     }
 
     addEffect(effect: Effect<any>) {

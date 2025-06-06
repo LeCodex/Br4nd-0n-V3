@@ -223,7 +223,6 @@ export class Sign extends Tile<{ player?: string }> {
             const other = this.game.players[this.data.player];
             this.game.summary.push(`${this.emoji} ${other.toString()} a avancé de nouveau!`)
             other.move(this.game.order.indexOf(this.data.player) + 1);
-            other.effects = other.effects.filter(e => !e.used);
         }
 
         this.game.summary.push(`${this.emoji} ${player.toString()} a marqué son nom sur le panneau`)
