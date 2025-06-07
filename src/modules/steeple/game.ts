@@ -282,7 +282,6 @@ export default class SteepleGame extends Game {
         instance.turn = obj.turn;
         instance.gamerules = obj.gamerules;
         instance.waitDuration = obj.waitDuration;
-        instance.setupTimeout(false);
 
         const message = obj.message && await (await client.channels.fetch(channelId) as SendableChannels).messages.fetch(obj.message)
         if (message) {
@@ -290,6 +289,7 @@ export default class SteepleGame extends Game {
         } else {
             await instance.sendBoardAndSave();
         }
+        instance.setupTimeout(false);
         return instance;
     }
 }

@@ -52,8 +52,8 @@ export default class SteeplePlayer {
 
         this.checkForWrapping();
 
-        let canTriggerEffect = this.index !== oldIndex && this.forEachEffect(element => {
-            return element.postMove(this.index);
+        const canTriggerEffect = this.index !== oldIndex && !this.forEachEffect(element => {
+            return !element.postMove(this.index);
         });
 
         if (canTriggerEffect) {
