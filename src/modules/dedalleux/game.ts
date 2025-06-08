@@ -222,7 +222,7 @@ export default class DedalleuxGame extends Game {
         this.setupTimeout(true);
 
         if (!noSend) {
-            await this.sendBoard(true);
+            await this.sendBoard(true, false);
             this.save();
         }
     }
