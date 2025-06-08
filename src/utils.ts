@@ -64,16 +64,16 @@ export class ObjectKeyMap<K extends Object, V> extends Map<K, V> {
     }
 }
 
-export function aStar(start: Vector2, goal: Vector2, isEmpty: (pos: Vector2) => boolean): Vector2[] {
-    function reconstructPath(cameFrom: WeakMap<Vector2, Vector2>, current: Vector2) {
-        const totalPath = [current];
-        while (cameFrom.has(current)) {
-            current = cameFrom.get(current)!;
-            totalPath.unshift(current);
-        }
-        return totalPath;
+function reconstructPath(cameFrom: WeakMap<Vector2, Vector2>, current: Vector2) {
+    const totalPath = [current];
+    while (cameFrom.has(current)) {
+        current = cameFrom.get(current)!;
+        totalPath.unshift(current);
     }
+    return totalPath;
+}
 
+export function aStar(start: Vector2, goal: Vector2, isEmpty: (pos: Vector2) => boolean): Vector2[] {
     const openSet = [start];
     const closedSet = [];
     const cameFrom = new ObjectKeyMap<Vector2, Vector2>();

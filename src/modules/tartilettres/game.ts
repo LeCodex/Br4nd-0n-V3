@@ -25,7 +25,7 @@ export default class TartilettresGame extends Game {
         if (!word || typeof word !== "string") {
             return interaction.reply({ content: "Veuillez rensigner un mot valide", flags: MessageFlags.Ephemeral });
         } else if (this.lastPlayed === interaction.user.id) {
-            return interaction.reply({ content: "Veuillez attendre qu'un autre joueur jour", flags: MessageFlags.Ephemeral });
+            return interaction.reply({ content: "Veuillez attendre qu'un autre joueur joue", flags: MessageFlags.Ephemeral });
         }
         return player.playWord(word, interaction);
     }
