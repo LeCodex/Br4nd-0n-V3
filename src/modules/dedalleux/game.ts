@@ -146,7 +146,7 @@ export default class DedalleuxGame extends Game {
         });
     }
 
-    async sendBoard(resend: boolean = false, edit: boolean = false) {
+    async sendBoard(resend: boolean = false, edit: boolean = true) {
         let embed = new EmbedBuilder()
             .setTitle(`Dédalleux • Sens de rotation des murs: ${this.clockwiseRotation ? "🔁" : "🔄"}`)
             .setFooter({ text: `Tour #${this.turn} • Nombre d'ingrédients ramassés: ${this.pickedUp}` })
@@ -220,7 +220,7 @@ export default class DedalleuxGame extends Game {
         this.setupTimeout(true);
 
         if (!noSend) {
-            await this.sendBoard();
+            await this.sendBoard(true);
             this.save();
         }
     }
@@ -264,7 +264,7 @@ export default class DedalleuxGame extends Game {
         instance.generateBoard();
         instance.generatePath();
         instance.setupTimeout();
-        await instance.sendBoard(false, true);
+        await instance.sendBoard();
         await instance.save();
         return instance;
     }
