@@ -67,7 +67,7 @@ export default class DedalleuxGame extends Game {
         this.path = aStar(this.pawn, this.goal, (pos) => this.board[pos.y]?.[pos.x] === -1);
     }
 
-    setupTimeout(newTurn: boolean = true) {
+    setupTimeout(newTurn: boolean = false) {
         clearTimeout(this.timeout);
         const now = DateTime.local();
         if (!this.nextTimestamp) {
@@ -249,6 +249,7 @@ export default class DedalleuxGame extends Game {
 
     static async load(module: Dedalleux, channelId: string, obj:  ReturnType<DedalleuxGame["serialize"]>): Promise<Game> {
         const instance = new this(module, channelId);
+        instance.paused = obj.paused
         instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]: [string, any]) => [k, await DedalleuxPlayer.load(instance, v)])));
         instance.nextTimestamp = DateTime.fromMillis(obj.nextTimestamp ?? 0);
         instance.gamerules = obj.gamerules;
@@ -265,7 +266,7 @@ export default class DedalleuxGame extends Game {
         }
         instance.generateBoard();
         instance.generatePath();
-        instance.setupTimeout();
+        if (!instance.paused) instance.setupTimeout();
         await instance.sendBoard();
         await instance.save();
         return instance;
