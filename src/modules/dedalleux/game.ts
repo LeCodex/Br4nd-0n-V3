@@ -1,4 +1,4 @@
-Oimport { ChatInputCommandInteraction, EmbedBuilder, Emoji } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder, Emoji } from "discord.js";
 import { DateTime } from "luxon";
 import { Vector2 } from "interfaces";
 import { Game } from "modules/game";
