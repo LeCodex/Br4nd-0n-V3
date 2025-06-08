@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, EmbedBuilder, Emoji } from "discord.js";
+Oimport { ChatInputCommandInteraction, EmbedBuilder, Emoji } from "discord.js";
 import { DateTime } from "luxon";
 import { Vector2 } from "interfaces";
 import { Game } from "modules/game";
@@ -64,7 +64,7 @@ export default class DedalleuxGame extends Game {
     }
 
     generatePath() {
-        this.path = aStar(this.pawn, this.goal, (pos) => this.board[pos.x]?.[pos.y] === -1);
+        this.path = aStar(this.pawn, this.goal, (pos) => this.board[pos.y]?.[pos.x] === -1);
     }
 
     setupTimeout(newTurn: boolean = true) {
