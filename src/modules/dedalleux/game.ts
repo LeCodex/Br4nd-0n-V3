@@ -80,7 +80,7 @@ export default class DedalleuxGame extends Game {
         }
         const time = this.nextTimestamp.toMillis() - now.toMillis();
         
-        this.timeout = setTimeout(() => { this.nextTurn(time <= 0); }, time);
+        this.timeout = setTimeout(() => { this.nextTurn(time < 0); }, time);
     }
 
     createWalls() {
@@ -121,8 +121,8 @@ export default class DedalleuxGame extends Game {
             const cy = Math.floor(i / (this.colors.length / 2)) * 2 + 1
             const cx = (i % Math.floor(this.colors.length / 2)) * 2 + 1;
             this.board[cy][cx] = element.color + this.colors.length / 2;
-            const ry = Math.round(cy + Math.sin(element.direction * Math.PI / 2));
-            const rx = Math.round(cx + Math.cos(element.direction * Math.PI / 2));
+            const ry = cy + [0, 1, 0, -1][element.direction];
+            const rx = cx + [1, 0, -1, 0][element.direction];
             this.board[ry][rx] = element.color;
         });
     }
@@ -197,12 +197,14 @@ export default class DedalleuxGame extends Game {
     async nextTurn(noSend: boolean = false) {
         Object.values(this.players).forEach((element) => { element.turnedOnce = false; element.gainedOnePoint = false; });
 
-        let winners: DedalleuxPlayer[] = [];
-        while ((this.pawn.x != this.goal.x || this.pawn.y != this.goal.y) && this.path.length) {
+        const winners: DedalleuxPlayer[] = [];
+        while ((this.pawn.x !== this.goal.x || this.pawn.y !== this.goal.y) && this.path.length) {
             this.pawn = this.path.shift()!;
 
             if (this.items.find(e => e.x === this.pawn.x && e.y === this.pawn.y)) this.pickedUp++;
-            Object.values(this.players).forEach((element) => { if (this.pawn.x === this.items[element.item].x && this.pawn.y === this.items[element.item].y) winners.push(element) });
+            Object.values(this.players).forEach((element) => {
+                if (this.pawn.x === this.items[element.item].x && this.pawn.y === this.items[element.item].y) winners.push(element);
+            });
         }
 
         for (const player of winners) {
