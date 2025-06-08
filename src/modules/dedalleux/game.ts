@@ -60,7 +60,6 @@ export default class DedalleuxGame extends Game {
         this.setupTimeout();
         await this.sendBoard();
         await this.save();
-        await interaction.deferReply();
         await super.start(interaction);
     }
 
