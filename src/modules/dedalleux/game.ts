@@ -80,7 +80,7 @@ export default class DedalleuxGame extends Game {
         }
         const time = this.nextTimestamp.toMillis() - now.toMillis();
         
-        this.timeout = setTimeout(() => { this.nextTurn(time < 0); }, time);
+        this.timeout = setTimeout(() => { this.nextTurn(); }, time);
     }
 
     createWalls() {
