@@ -10,7 +10,7 @@ export default class DB {
         return `${this.getCollectionPath(collection)}/${name.toLowerCase()}.json`;
     }
 
-    public static async save(collection: string, name: string, data: any) {
+    public static async save(collection: string, name: string, data: unknown) {
         const json = JSON.stringify(data, undefined, 4);
         if (!fs.existsSync(this.getCollectionPath(collection))) fs.mkdirSync(this.getCollectionPath(collection), { recursive: true });
         fs.writeFile(this.getSavePath(collection, name), json, err => { if (err != null) Logger.error(err) });
