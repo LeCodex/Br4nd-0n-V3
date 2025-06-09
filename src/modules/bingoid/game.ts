@@ -3,7 +3,7 @@ import { Game } from "modules/game";
 import * as Balls from "./ball";
 import BingoidPlayer from "./player";
 import { call, randomlyPick } from "utils";
-import { range } from "lodash";
+import { range, uniq } from "lodash";
 import Bingoid from ".";
 import { BingoidCard, Tile } from "./card";
 
@@ -50,7 +50,7 @@ export default class BingoidGame extends Game {
 
     public async takeBall(interaction: ChatInputCommandInteraction) {
         const player = this.players[interaction.user.id] ??= new BingoidPlayer(this, interaction.user);
-        if (this.history.slice(0, 2).map(e => e.player).includes(player)) {
+        if (false &&this.history.slice(0, 2).map(e => e.player).includes(player)) {
             return await interaction.reply({ content: "Veuillez attendre que les autres joueurs jouent", flags: MessageFlags.Ephemeral });
         }
 
@@ -155,8 +155,8 @@ export default class BingoidGame extends Game {
             if (!tile.marked) return false;
         }
         this.summary.push(message);
-        for (const tile of tiles) {
-            tile.marked!.scorePoints(score);
+        for (const player of uniq(tiles.map((e) => e.marked))) {
+            player?.scorePoints(score);
         }
         return true;
     }

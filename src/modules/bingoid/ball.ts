@@ -46,7 +46,7 @@ export class RussianBall extends Ball {
 
     take(context: RollContext): void {
         this.game.summary.push(`${this.emoji} ${context.player} lance la **${this.name}**!`);
-        context.player.scorePoints(Math.floor(Math.random() * 3) - 1);
+        context.player.scorePoints([1, 1, -1][Math.floor(Math.random() * 3)]);
     }
 }
 
@@ -54,12 +54,17 @@ export class ErasableBall extends Ball {
     name = "Boule Effaçable";
 
     constructor(game: BingoidGame) {
-        super(game, "bblanc", "⚪");
+        super(game, "borange", "🟠");
     }
 
     take(context: RollContext): void {
         if (this.game.cantMark(context.roll)) {
             const newRoll = Math.floor(Math.random() * 20) + 1;
+            this.game.summary.push(`${this.emoji} ${context.player} a effacé le **${context.roll}** pour y marquer un **${newRoll}**!`);
+            if (this.game.cantMark(newRoll)) {
+                this.game.summary.push(`${this.emoji} Le **${newRoll}** n'est toujours pas cochable!`);
+                context.player.scorePoints(-1);
+            }
             this.game.summary.push(`${this.emoji} ${context.player} a effacé le **${context.roll}** pour y marquer un **${newRoll}**!`);
             context.roll = newRoll;
         } else {
@@ -72,12 +77,15 @@ export class FacetedBall extends Ball {
     name = "Boule à Facettes";
 
     constructor(game: BingoidGame) {
-        super(game, "borange", "🟠");
+        super(game, "bblanc", "⚪");
     }
 
     take(context: RollContext): void {
         this.game.summary.push(`${this.emoji} Un bingo rapportera **5 points bonus**!`);
-        context.onBingo.push(() => { context.player.scorePoints(5); });
+        context.onBingo.push(() => {
+            this.game.summary.push(`${this.emoji} Un bingo est arrivé!`);
+            context.player.scorePoints(5);
+        });
     }
 }
 
