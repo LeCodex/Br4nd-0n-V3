@@ -102,10 +102,11 @@ export default class BingoidGame extends Game {
         }
         card += "\n";
 
+        const maxPlayerLength = Math.max(...Object.values(this.players).map((e) => e.user.displayName.length));
         for (const player of Object.values(this.players).sort((a, b) => b.score - a.score)) {
             const marked = this.card.flat().filter((e) => e.marked === player);
             const markedStr = marked.length ? ` (${marked.map((e) => e.number).join(", ")})` : "";
-            card += `${player.user.displayName} : ${player.score}${markedStr}\n`;
+            card += `${player.user.displayName.padEnd(maxPlayerLength, " ")} : ${player.score}${markedStr}\n`;
         }
 
         const fields = [
