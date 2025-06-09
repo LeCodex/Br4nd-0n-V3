@@ -5,6 +5,7 @@ import { client } from "client";
 export default class BingoidPlayer {
     score = 0;
     salt = 0;
+    nextRollTimestamp = 0;
 
     constructor(public game: BingoidGame, public user: User) { }
 
@@ -31,7 +32,8 @@ export default class BingoidPlayer {
         return {
             user: this.user.id,
             score: this.score,
-            salt: this.salt
+            salt: this.salt,
+            nextRollTimestamp: this.nextRollTimestamp
         };
     }
 
@@ -39,6 +41,7 @@ export default class BingoidPlayer {
         const instance = new this(game, await client.users.fetch(obj.user));
         instance.score = obj.score;
         instance.salt = obj.salt;
+        instance.nextRollTimestamp = obj.nextRollTimestamp;
         return instance;
     }
 }

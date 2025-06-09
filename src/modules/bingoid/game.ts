@@ -50,9 +50,10 @@ export default class BingoidGame extends Game {
 
     public async takeBall(interaction: ChatInputCommandInteraction) {
         const player = this.players[interaction.user.id] ??= new BingoidPlayer(this, interaction.user);
-        if (false &&this.history.slice(0, 2).map(e => e.player).includes(player)) {
-            return await interaction.reply({ content: "Veuillez attendre que les autres joueurs jouent", flags: MessageFlags.Ephemeral });
+        if (player.nextRollTimestamp > Date.now()) {
+            return await interaction.reply({ content: `Veuillez attendre <t:${Math.floor(player.nextRollTimestamp / 1000)}:t> pour jouer de nouveau`, flags: MessageFlags.Ephemeral });
         }
+        player.nextRollTimestamp = Date.now() + 60 * 60 * 1000;
 
         const roll = Math.floor(Math.random() * 20) + 1;
         const ball = this.balls.shift();
@@ -103,7 +104,7 @@ export default class BingoidGame extends Game {
         for (const player of Object.values(this.players).sort((a, b) => b.score - a.score)) {
             const marked = this.card.flat().filter((e) => e.marked === player);
             const markedStr = marked.length ? ` (${marked.map((e) => e.number).join(", ")})` : "";
-            card += `${player.user.displayName} : ${player.score}${markedStr}`;
+            card += `${player.user.displayName} : ${player.score}${markedStr}\n`;
         }
 
         const fields = [

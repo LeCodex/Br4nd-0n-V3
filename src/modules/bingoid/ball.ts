@@ -104,7 +104,7 @@ export class PetanqueBall extends Ball {
                 this.game.summary.push(`${this.emoji} La **${this.name}** a tapé ${other}!`);
                 context.player.steal(other, 1);
             } else {
-                this.game.summary.push(`${this.emoji} La ${context.player} a coché un numéro`);
+                this.game.summary.push(`${this.emoji} ${context.player} a coché un numéro`);
             }
         })
     }
@@ -114,7 +114,7 @@ export class PruneBall extends Ball {
     name = "Boule à la Prune";
 
     constructor(game: BingoidGame) {
-        super(game, "bviolet", "🟣");
+        super(game, "bmauve", "🟣");
     }
 
     take(context: RollContext): void {
