@@ -24,9 +24,8 @@ export async function replyOrFollowUp(interaction: RepliableInteraction, options
 }
 
 export async function replyMultiple(interaction: RepliableInteraction, sentences: string[]) {
-    // var sentences = content.split(", ");
-    var form = sentences.shift()!;
-    for (var sentence of sentences) {
+    let form = sentences.shift()!;
+    for (let sentence of sentences) {
         if (form.length + sentence.length >= 1990) {
             await replyOrFollowUp(interaction, "```\n" + form + "```");
             form = "";
@@ -64,16 +63,16 @@ export class ObjectKeyMap<K extends Object, V> extends Map<K, V> {
     }
 }
 
-export function aStar(start: Vector2, goal: Vector2, isEmpty: (pos: Vector2) => boolean): Vector2[] {
-    function reconstructPath(cameFrom: WeakMap<Vector2, Vector2>, current: Vector2) {
-        const totalPath = [current];
-        while (cameFrom.has(current)) {
-            current = cameFrom.get(current)!;
-            totalPath.unshift(current);
-        }
-        return totalPath;
+function reconstructPath(cameFrom: WeakMap<Vector2, Vector2>, current: Vector2) {
+    const totalPath = [current];
+    while (cameFrom.has(current)) {
+        current = cameFrom.get(current)!;
+        totalPath.unshift(current);
     }
+    return totalPath;
+}
 
+export function aStar(start: Vector2, goal: Vector2, isEmpty: (pos: Vector2) => boolean): Vector2[] {
     const openSet = [start];
     const closedSet = [];
     const cameFrom = new ObjectKeyMap<Vector2, Vector2>();
@@ -184,3 +183,5 @@ export function randomlyPick<T extends string | unknown[]>(input: T) {
 export const NUMBER_EMOJIS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
 export const COLORED_SQUARES = ["🟥", "🟧", "🟨", "🟩", "🟦", "🟪", "🟫", "⬜"];
 export const BANNED_EMOJIS = ["⬛", "◼", "◾", "▪", "🖤", "〰", "➗", "✖", "➖", "➕", "➰", "🪑"];
+
+export function call(e: () => void) { e(); }

@@ -10,6 +10,7 @@ import Say from "./say";
 import Steeple from "./steeple";
 import Chaises from "./chaises";
 import Coupdjus from "./coupdjus";
+import Bingoid from "./bingoid";
 
 export const modules: (new () => BotModule)[] = [
     Ping,
@@ -23,4 +24,5 @@ export const modules: (new () => BotModule)[] = [
     Steeple,
     Chaises,
     Coupdjus,
+    Bingoid,
 ];
