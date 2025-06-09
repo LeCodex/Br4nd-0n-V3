@@ -45,8 +45,6 @@ export default class CoupdjusGame extends Game {
             if (!this.waitDuration.minutes) this.nextTimestamp = this.nextTimestamp.set({ minute: 0 });
         }
         const time = this.nextTimestamp!.toMillis() - now.toMillis();
-
-        console.log(this.nextTimestamp, now, this.waitDuration, time);
         this.timeout = setTimeout(() => { this.recharge(); }, time);
     }
 
