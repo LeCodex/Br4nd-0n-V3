@@ -29,6 +29,7 @@ interface HistoryElement {
 }
 
 export default class BingoidGame extends Game {
+    declare module: Bingoid;
     players: Record<string, BingoidPlayer> = {};
     ballAmount = 5;
     balls: Array<Balls.default> = [];

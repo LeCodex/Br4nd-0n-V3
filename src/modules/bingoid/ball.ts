@@ -1,4 +1,4 @@
-import { getEmoji, randomlyPick } from "utils";
+import { randomlyPick } from "utils";
 import BingoidGame, { RollContext } from "./game";
 import { Emoji } from "discord.js";
 import { shuffle } from "lodash";
@@ -7,9 +7,8 @@ export default abstract class Ball {
     emoji: string | Emoji;
     abstract name: string;
 
-    constructor(public game: BingoidGame, id: string, fallback: string) {
-        this.emoji = fallback;
-        getEmoji(id, fallback).then(e => { this.emoji = e; });
+    constructor(public game: BingoidGame, key: string) {
+        this.emoji = this.game.module.emojis[key];
     }
 
     abstract take(context: RollContext): void;
@@ -29,7 +28,7 @@ export class ClassicBall extends Ball {
     name = "Boule Classique";
 
     constructor(game: BingoidGame) {
-        super(game, "bjaune", "🟡");
+        super(game, "yellow");
     }
 
     take(context: RollContext) {
@@ -41,7 +40,7 @@ export class RussianBall extends Ball {
     name = "Boule Russe";
 
     constructor(game: BingoidGame) {
-        super(game, "brouge", "🔴");
+        super(game, "red");
     }
 
     take(context: RollContext): void {
@@ -54,7 +53,7 @@ export class ErasableBall extends Ball {
     name = "Boule Effaçable";
 
     constructor(game: BingoidGame) {
-        super(game, "borange", "🟠");
+        super(game, "orange");
     }
 
     take(context: RollContext): void {
@@ -77,7 +76,7 @@ export class FacetedBall extends Ball {
     name = "Boule à Facettes";
 
     constructor(game: BingoidGame) {
-        super(game, "bblanc", "⚪");
+        super(game, "white");
     }
 
     take(context: RollContext): void {
@@ -93,7 +92,7 @@ export class PetanqueBall extends Ball {
     name = "Boule de Pétanque";
 
     constructor(game: BingoidGame) {
-        super(game, "bgris", "⚫");
+        super(game, "black");
     }
 
     take(context: RollContext): void {
@@ -114,7 +113,7 @@ export class PruneBall extends Ball {
     name = "Boule à la Prune";
 
     constructor(game: BingoidGame) {
-        super(game, "bmauve", "🟣");
+        super(game, "purple");
     }
 
     take(context: RollContext): void {
@@ -133,7 +132,7 @@ export class UspideDownCup extends Ball {
     name = "Boule Cachée";
 
     constructor(game: BingoidGame) {
-        super(game, "essat", "❔");
+        super(game, "mystery");
     }
 
     take(context: RollContext): void {
@@ -147,7 +146,7 @@ export class PlayDohBall extends Ball {
     name = "Boule de Pâte à Modeler";
 
     constructor(game: BingoidGame) {
-        super(game, "bvert", "🟢");
+        super(game, "green");
     }
 
     effects: Array<(context: RollContext) => void> = [
