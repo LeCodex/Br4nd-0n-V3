@@ -59,7 +59,7 @@ export class ErasableBall extends Ball {
     take(context: RollContext): void {
         if (this.game.cantMark(context.roll)) {
             const newRoll = Math.floor(Math.random() * 20) + 1;
-            this.game.summary.push(`${this.emoji} Le **${context.roll}** n'est pas cochable: ${context.player} a effacé le **${context.roll}** pour y marquer un **${newRoll}**!`);
+            this.game.summary.push(`${this.emoji} Le **${context.roll}** n'est pas cochable: ${context.player} l'a effacé pour y marquer un **${newRoll}**!`);
             if (this.game.cantMark(newRoll)) {
                 this.game.summary.push(`${this.emoji} Le **${newRoll}** n'est toujours pas cochable!`);
                 context.player.scorePoints(-1);
