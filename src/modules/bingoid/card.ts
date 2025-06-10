@@ -14,10 +14,10 @@ export class BingoidCard extends Array<Array<Tile>> {
     rowBingos: Array<boolean>;
     columnBingos: Array<boolean>;
 
-    constructor(size: number, maxNumber: number) {
+    constructor(size: number, public maxNumber: number) {
         super();
-        const numbers = shuffle(range(1, maxNumber + 1));
         const sizeRange = range(size);
+        const numbers = shuffle(range(1, maxNumber + 1));
         for (let i = 0; i < size; i++) {
             this.push([]);
             for (let j = 0; j < size; j++) {
@@ -32,6 +32,16 @@ export class BingoidCard extends Array<Array<Tile>> {
         return this.uldrBingo && this.urdlBingo && this.cornerBingo && this.rowBingos.every(identity) && this.rowBingos.every(identity);
     }
 
+    rerollNumbers(clearMarked: boolean = false) {
+        const numbers = shuffle(range(1, this.maxNumber + 1));
+        for (const row of this) {
+            for (const tile of row) {
+                tile.number = numbers.pop()!;
+                if (clearMarked) tile.marked = undefined;
+            }
+        }
+    }
+
     serialize() {
         return {
             tiles: [...this].map((row) => row.map((e) => ({ ...e, marked: e.marked?.user.id }))),
@@ -40,11 +50,12 @@ export class BingoidCard extends Array<Array<Tile>> {
             cornerBingo: this.cornerBingo,
             rowBingos: this.rowBingos,
             columnBingos: this.columnBingos,
+            maxNumber: this.maxNumber
         };
     }
 
     static load(game: BingoidGame, obj: ReturnType<BingoidCard["serialize"]>): BingoidCard {
-        const instance = new this(0, 0);
+        const instance = new this(0, obj.maxNumber);
         instance.push(...obj.tiles.map((row) => row.map((e) => ({ ...e, marked: e.marked ? game.players[e.marked] : undefined }))));
         instance.uldrBingo = obj.uldrBingo;
         instance.urdlBingo = obj.urdlBingo;

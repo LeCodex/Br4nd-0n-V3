@@ -243,6 +243,78 @@ export class PlayDohBall extends Ball {
                 this.game.summary.push(`${this.emoji} Personne n'a précédemment tiré un **${context.roll}**`);
             }
         },
+        // Gagne 3 point si le nombre n'est pas sur la fiche et 0 si tu marques un nouveau nombre
+        (context) => {
+            this.game.summary.push(`${this.emoji} Les points hors bingo sont **inversés**!`);
+            [context.newlyMarkedPoints, context.notOnCardPoints] = [context.notOnCardPoints, context.newlyMarkedPoints];
+        },
+        // Tu donnes 2 points au dernier joueur
+        (context) => {
+            this.game.summary.push(`${this.emoji} ${context.player} aide le **dernier joueur**!`);
+            context.player.steal(this.game.rankedPlayers.toReversed()[0], -2);
+        },
+        // Un joueur au hasard en dessous de toi dans le classement tire la boule à ta place
+        (context) => {
+            const lower = this.game.rankedPlayers.filter((e) => e.score < context.player.score);
+            if (lower.length) {
+                context.player = randomlyPick(lower);
+                this.game.summary.push(`${this.emoji} ${context.player} a moins de points et **vole la boule**!`);
+            } else {
+                this.game.summary.push(`${this.emoji} Personne ne s'avance pour voler la boule`)
+            }
+        },
+        // Si le numéro est au centre, gagne 2 points
+        (context) => {
+            const position = this.game.positionOf(context.roll);
+            if (position && position.x > 0 && position.y > 0 && position.x < this.game.cardSize - 1 && position.y < this.game.cardSize - 1) {
+                this.game.summary.push(`${this.emoji} Le numéro est **au centre**!`);
+                context.player.scorePoints(2);
+            } else {
+                this.game.summary.push(`${this.emoji} Le numéro n'est pas au centre...`);
+            }
+        },
+        // Mélange les boules
+        (context) => {
+            this.game.summary.push(`${this.emoji} Les balles ont été **mélangées**!`);
+            this.game.balls = shuffle(this.game.balls);
+        },
+        // Si le plus petit numéro du carton n'est pas coché, tu marques ce nombre de points
+        (context) => {
+            const minNumber = Math.min(...this.game.card.flat().map((e) => e.number));
+            const tile = this.game.getTileWithNumber(minNumber)!;
+            if (tile.marked) {
+                this.game.summary.push(`${this.emoji} Le plus petit numéro est **coché**...`);
+            } else {
+                this.game.summary.push(`${this.emoji} Le plus petit numéro **n'est pas coché**!`);
+                context.player.scorePoints(minNumber);
+            }
+        },
+        // Toutes les personnes qui ont un nombre de points inférieur ou égal au numéro marquent un point
+        (context) => {
+            const scoring = Object.values(this.game.players).filter((e) => e.score <= context.roll);
+            this.game.summary.push(`${this.emoji} Tous les joueurs avec **${context.roll}** points ou moins gagne **1 point**!`);
+            scoring.forEach((e) => e.scorePoints(1));
+        },
+        // Si la personne au-dessus de toi au classement a au moins 5 points de plus, tu lui en voles un
+        (context) => {
+            let previousPlayer;
+            for (const player of this.game.rankedPlayers) {
+                if (player.score > context.player.score) {
+                    previousPlayer = player
+                } else if (player.score === context.player.score) {
+                    break;
+                }
+            }
+            if (previousPlayer && previousPlayer.score - context.player.score >= 5) {
+                this.game.summary.push(`${this.emoji} ${previousPlayer} a plus de **5 points de différence** avec ${context.player}!`);
+                context.player.steal(previousPlayer, 1);
+            }
+        },
+        // Change les numéros du carton, mais pas les coches
+        (context) => {
+            this.game.summary.push(`${this.emoji} Les numéros de la grille ont été **tirés de nouveau**!`);
+            this.game.card.rerollNumbers();
+        }
     ];
 
     take(context: RollContext): void {

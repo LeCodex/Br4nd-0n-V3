@@ -13,7 +13,7 @@ export default class BingoidPlayer {
         amount = -Math.min(-amount, this.score);
         if (amount === 0) return;
         this.score += amount;
-        this.game.summary.push(`**${amount > 0 ? "🏅" : "❌"} ${this} ${amount > 0 ? "gagne" : "perd"} ${Math.abs(amount)} ${Math.abs(amount) > 1 ? "points" : "point"}**`);
+        this.game.summary.push(`${amount > 0 ? "🏅" : "❌"} ${this} ${amount > 0 ? "gagne" : "perd"} **${Math.abs(amount)} ${Math.abs(amount) > 1 ? "points" : "point"}**`);
     }
 
     public steal(other: BingoidPlayer, amount: number) {
@@ -21,7 +21,7 @@ export default class BingoidPlayer {
         if (amount === 0) return;
         this.score += amount;
         other.score -= amount;
-        this.game.summary.push(`**↔️ ${this} ${amount > 0 ? "vole" : "donne"} ${Math.abs(amount)} ${Math.abs(amount) > 1 ? "points" : "point"} à ${other}**`);
+        this.game.summary.push(`↔️ ${this} ${amount > 0 ? "vole" : "donne"} ${Math.abs(amount)} **${Math.abs(amount) > 1 ? "points" : "point"}** à ${other}`);
     }
 
     toString() {

@@ -39,6 +39,7 @@ export default class BingoidGame extends Game {
     cardSize = 4;
     maxNumber = 20;
     card = new BingoidCard(this.cardSize, this.maxNumber);
+    cardNumber = 1;
     summary: Array<string> = [];
     ballClasses = Object.entries(Balls).filter(([k]) => k !== "default").map(([_, v]) => v);
     lastRolledBy: Partial<Record<number, BingoidPlayer>> = {};
@@ -92,6 +93,10 @@ export default class BingoidGame extends Game {
         }
     }
 
+    public get rankedPlayers() {
+        return Object.values(this.players).sort((a, b) => b.score - a.score);
+    }
+
     public async sendBoardAndSave(interaction: RepliableInteraction) {
         let card = "";
         for (const row of this.card) {
@@ -104,14 +109,14 @@ export default class BingoidGame extends Game {
         card += "\n";
 
         const maxPlayerLength = Math.max(...Object.values(this.players).map((e) => e.user.displayName.length));
-        for (const player of Object.values(this.players).sort((a, b) => b.score - a.score)) {
+        for (const player of this.rankedPlayers) {
             const marked = this.card.flat().filter((e) => e.marked === player);
             const markedStr = marked.length ? ` (${marked.map((e) => e.number).join(", ")})` : "";
             card += `${player.user.displayName.padEnd(maxPlayerLength, " ")} : ${player.score}${markedStr}\n`;
         }
 
         const fields = [
-            { name: "Grille", value: `\`\`\`${card}\`\`\`` },
+            { name: `Grille n°${this.cardNumber}`, value: `\`\`\`${card}\`\`\`` },
             { name: "Boules", value: this.balls.map((e) => e.emoji).join("")}
         ];
         if (this.summary.length) fields.unshift({ name: "Résumé du tirage", value: this.summary.join("\n") });
@@ -145,6 +150,17 @@ export default class BingoidGame extends Game {
         return !tile || tile.marked;
     }
 
+    public positionOf(number: number) {
+        for (const [y, row] of this.card.entries()) {
+            for (const [x, tile] of row.entries()) {
+                if (tile.number === number) {
+                    return { x, y };
+                }
+            }
+        }
+        return undefined;
+    }
+
     public getRandomBall() {
         const ballClass = randomlyPick(this.ballClasses) as ConcreteBalls[keyof ConcreteBalls];
         return new ballClass(this);
@@ -152,6 +168,7 @@ export default class BingoidGame extends Game {
 
     private generateCard() {
         this.card = new BingoidCard(this.cardSize, this.maxNumber);
+        this.cardNumber++;
     }
 
     private checkIfAllMarkedAndScore(tiles: Array<Tile>, message: string, score: number) {
@@ -205,6 +222,7 @@ export default class BingoidGame extends Game {
             cardSize: this.cardSize,
             maxNumber: this.maxNumber,
             card: this.card.serialize(),
+            cardNumber: this.cardNumber,
             summary: this.summary,
             lastRolledBy: Object.fromEntries(Object.entries(this.lastRolledBy).map(([k, v]) => [k, v!.user.id])),
         };
@@ -221,6 +239,7 @@ export default class BingoidGame extends Game {
         instance.cardSize = obj.cardSize;
         instance.maxNumber = obj.maxNumber;
         instance.card = BingoidCard.load(instance, obj.card);
+        instance.cardNumber = obj.cardNumber;
         instance.summary = obj.summary;
         instance.lastRolledBy = Object.fromEntries(Object.entries(obj.lastRolledBy).map(([k, v]) => [k, instance.players[v]]));
         return instance;
