@@ -195,7 +195,7 @@ export class PlayDohBall extends Ball {
                 }
             });
         },
-        // Si le numéro tiré ne coche rien, le joueur donne un point à celui qui a le plus de sel (égalité à déterminer)
+        // Si le numéro tiré ne coche rien, le joueur donne un point à celui qui a le plus de sel (égalité au hasard)
         (context) => {
             const cantMark = this.game.cantMark(context.roll);
             context.postMark.push(() => {

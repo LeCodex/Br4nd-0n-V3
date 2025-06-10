@@ -6,6 +6,7 @@ import { call, randomlyPick } from "utils";
 import { range, uniq } from "lodash";
 import Bingoid from ".";
 import { BingoidCard, Tile } from "./card";
+import { DateTime } from "luxon";
 
 type ConcreteBalls = Omit<typeof Balls, "default">;
 
@@ -54,7 +55,7 @@ export default class BingoidGame extends Game {
         if (player.nextRollTimestamp > Date.now()) {
             return await interaction.reply({ content: `Veuillez attendre <t:${Math.floor(player.nextRollTimestamp / 1000)}:t> pour jouer de nouveau`, flags: MessageFlags.Ephemeral });
         }
-        player.nextRollTimestamp = Date.now() + 60 * 60 * 1000;
+        player.nextRollTimestamp = DateTime.utc().plus({ hour: 1 }).set({ minute: 0, second: 0, millisecond: 0 }).toMillis();
 
         const roll = Math.floor(Math.random() * 20) + 1;
         const ball = this.balls.shift();
