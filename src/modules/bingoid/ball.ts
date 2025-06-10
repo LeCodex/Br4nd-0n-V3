@@ -64,7 +64,6 @@ export class ErasableBall extends Ball {
                 this.game.summary.push(`${this.emoji} Le **${newRoll}** n'est toujours pas cochable!`);
                 context.player.scorePoints(-1);
             }
-            this.game.summary.push(`${this.emoji} ${context.player} a effacé le **${context.roll}** pour y marquer un **${newRoll}**!`);
             context.roll = newRoll;
         } else {
             this.game.summary.push(`${this.emoji} Pas besoin de remplacer le **${context.roll}**`);
