@@ -155,6 +155,8 @@ export class PlayDohBall extends Ball {
             if (tile?.marked) {
                 this.game.summary.push(`${this.emoji} ${context.player} vole le **${context.roll}**!`);
                 tile.marked = undefined;
+            } else {
+                this.game.summary.push(`${this.emoji} Pas de vol nécesssaire`);
             }
         },
         // Le joueur coche le numéro le plus petit qui n'a pas encore été coché
@@ -257,8 +259,10 @@ export class PlayDohBall extends Ball {
         (context) => {
             const lower = this.game.rankedPlayers.filter((e) => e.score < context.player.score);
             if (lower.length) {
-                context.player = randomlyPick(lower);
-                this.game.summary.push(`${this.emoji} ${context.player} a moins de points et **vole la boule**!`);
+                const newPlayer = randomlyPick(lower);
+                this.game.summary.push(`${this.emoji} ${newPlayer} a moins de points et **vole la boule**! ${context.player} est 🧂 salé!`);
+                context.player.salt++;
+                context.player = newPlayer;
             } else {
                 this.game.summary.push(`${this.emoji} Personne ne s'avance pour voler la boule`)
             }
@@ -273,10 +277,15 @@ export class PlayDohBall extends Ball {
                 this.game.summary.push(`${this.emoji} Le numéro n'est pas au centre...`);
             }
         },
-        // Mélange les boules
+        // Remplace les boules par des boules cachées
         (context) => {
-            this.game.summary.push(`${this.emoji} Les balles ont été **mélangées**!`);
-            this.game.balls = shuffle(this.game.balls);
+            this.game.balls = this.game.balls.map((e) => new UspideDownCup(this.game));
+            this.game.summary.push(`${this.emoji} Les boules ont été toutes remplacées par des **${this.game.balls[0]}**!`);
+        },
+        // Remplace les boules par des boules de pâte à modeler
+        (context) => {
+            this.game.balls = this.game.balls.map((e) => new PlayDohBall(this.game));
+            this.game.summary.push(`${this.emoji} Les boules ont été toutes remplacées par des **${this.game.balls[0]}**!`);
         },
         // Si le plus petit numéro du carton n'est pas coché, tu marques ce nombre de points
         (context) => {
@@ -289,10 +298,10 @@ export class PlayDohBall extends Ball {
                 context.player.scorePoints(minNumber);
             }
         },
-        // Toutes les personnes qui ont un nombre de points inférieur ou égal au numéro marquent un point
+        // Toutes les personnes qui ont un nombre de points inférieur ou égal à ton score marquent un point
         (context) => {
-            const scoring = Object.values(this.game.players).filter((e) => e.score <= context.roll);
-            this.game.summary.push(`${this.emoji} Tous les joueurs avec **${context.roll}** points ou moins gagne **1 point**!`);
+            const scoring = Object.values(this.game.players).filter((e) => e.score <= context.player.score);
+            this.game.summary.push(`${this.emoji} Tous les joueurs avec moins de points que ${context.player} gagnent **1 point**!`);
             scoring.forEach((e) => e.scorePoints(1));
         },
         // Si la personne au-dessus de toi au classement a au moins 5 points de plus, tu lui en voles un
