@@ -33,11 +33,11 @@ export default class Bingoid extends GameModule() {
 
     @GameCommand({ subcommand: "take", description: "Tire la boule suivante" })
     public async take(game: BingoidGame, interaction: ChatInputCommandInteraction) {
-        game.takeBall(interaction);
+        await game.takeBall(interaction);
     }
 
     @GameCommand({ subcommand: "show", description: "Renvoie le message de jeu", pausable: false })
     public async show(game: BingoidGame, interaction: ChatInputCommandInteraction) {
-        game.sendBoardAndSave(interaction);
+        await game.sendBoardAndSave(interaction);
     }
 }

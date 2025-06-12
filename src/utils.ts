@@ -1,4 +1,4 @@
-import { APIEmbed, Emoji, InteractionReplyOptions, MessagePayload, RepliableInteraction, Snowflake, User } from "discord.js";
+import { APIEmbed, Emoji, InteractionEditReplyOptions, InteractionReplyOptions, MessagePayload, RepliableInteraction, Snowflake, User } from "discord.js";
 import { CharOf, Vector2 } from "./interfaces";
 import { client } from "client";
 
@@ -18,6 +18,14 @@ export function getRankEmoji(rank: number) {
 export async function replyOrFollowUp(interaction: RepliableInteraction, options: string | MessagePayload | InteractionReplyOptions) {
     if (interaction.replied) {
         await interaction.followUp(options)
+    } else {
+        await interaction.reply(options);
+    }
+}
+
+export async function replyOrEdit(interaction: RepliableInteraction, options: string | MessagePayload | (InteractionEditReplyOptions & InteractionReplyOptions)) {
+    if (interaction.replied || interaction.deferred) {
+        await interaction.editReply(options)
     } else {
         await interaction.reply(options);
     }

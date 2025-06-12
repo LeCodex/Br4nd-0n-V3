@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction, MessageFlags, RepliableInteraction } from 
 import { Game } from "modules/game";
 import * as Balls from "./ball";
 import BingoidPlayer from "./player";
-import { call, randomlyPick } from "utils";
+import { call, randomlyPick, replyOrEdit } from "utils";
 import { range, uniq } from "lodash";
 import Bingoid from ".";
 import { BingoidCard, Tile } from "./card";
@@ -57,6 +57,8 @@ export default class BingoidGame extends Game {
             return await interaction.reply({ content: `Veuillez attendre <t:${Math.floor(player.nextRollTimestamp / 1000)}:t> pour jouer de nouveau`, flags: MessageFlags.Ephemeral });
         }
         player.nextRollTimestamp = DateTime.utc().plus({ hour: 1 }).set({ minute: 0, second: 0, millisecond: 0 }).toMillis();
+
+        await interaction.deferReply();
 
         const roll = Math.floor(Math.random() * 20) + 1;
         const ball = this.balls.shift();
@@ -121,7 +123,7 @@ export default class BingoidGame extends Game {
         ];
         if (this.summary.length) fields.unshift({ name: "Résumé du tirage", value: this.summary.join("\n") });
 
-        await interaction.reply({ embeds: [{ title: "Bingoid", color: this.module.color, fields }] });
+        await replyOrEdit(interaction, { embeds: [{ title: "Bingoid", color: this.module.color, fields }] });
         await this.save();
     };
 
