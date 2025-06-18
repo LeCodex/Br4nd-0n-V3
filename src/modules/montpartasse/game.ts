@@ -214,6 +214,7 @@ export default class MontpartasseGame extends Game {
         this.view?.end();
         delete this.view;
         delete this.lastPlayed;
+        delete this.lastIndex;
         await this.sendBoard();
     }
 
