@@ -5,7 +5,7 @@ import { BotModule, AdminCommand } from "../base";
 import { Game } from ".";
 import ErrorHandler from "errors";
 
-export default function GameModule<T extends Game>() {
+export default function GameModule() {
     abstract class GameModule extends BotModule {
         protected abstract cls: typeof Game;
         protected games: Record<string, Game> = {};
@@ -24,7 +24,7 @@ export default function GameModule<T extends Game>() {
                     await ErrorHandler.handle(undefined, e);
                 }
             }
-            this.ready = true;
+            super.onLoaded();
         }
 
         public async onToggled(game: Game) {}

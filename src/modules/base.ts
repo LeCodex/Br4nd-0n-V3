@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, Message, MessageFlags, OmitPartialGroupDMChannel, Snowflake } from "discord.js";
 import * as fs from "fs";
 import { BotCommand, BotSubcommandMetadata, ChatInputAplicationSubcommandData } from "interfaces";
+import Logger from "logger";
 
 export const BotCommands = Symbol("BotCommands");
 export const AdminCommands = Symbol("AdminCommands");
@@ -45,7 +46,10 @@ export abstract class BotModule {
         }
     }
 
-    public async onLoaded() { }
+    public async onLoaded() {
+        Logger.log(`Module ${this.name} finished loading successfully`);
+        this.ready = true;
+    }
     public onMessage(message: OmitPartialGroupDMChannel<Message<boolean>>) { }
 }
 

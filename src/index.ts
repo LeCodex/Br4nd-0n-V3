@@ -98,7 +98,7 @@ client.on("ready", async () => {
             }
         }
 
-        Logger.log(`Loaded module ${instance.name} (${instance.description}) with ${instance.commands.length} + ${instance.adminCommands.length} commands`);
+        Logger.log(`Starting loading module ${instance.name} (${instance.description}) with ${instance.commands.length} + ${instance.adminCommands.length} commands`);
         instance.onLoaded();
     }
 
