@@ -54,6 +54,7 @@ export default class YamJamGame extends Game {
         }
 
         this.lastTimestamp = Date.now();
+        this.lastPlayed = "";
         this.resetTimeout();
         await this.sendMessage(true);
         await this.save();
