@@ -10,8 +10,8 @@ export default class MontpartasseView extends GameView<MontpartasseGame> {
             maxValues: 1,
             placeholder: "Echanger une tasse...",
             options: this.game.stack.map(
-                (e, i) => !e.player ? { emoji: e.emoji, label: `${i+1}. ${e.name}`, description: e.description, value: i.toString() } : undefined
-            ).filter((e) => typeof e !== "undefined"),
+                (e, i) => ({ emoji: e.emoji, label: `${i+1}. ${e.name} ${e.player ? `de ${e.player.user.displayName}` : ""}`, description: e.description, value: i.toString() })
+            ),
             callback: async (interaction) => { this.game.swapCup(interaction as StringSelectMenuInteraction) }
         });
     }

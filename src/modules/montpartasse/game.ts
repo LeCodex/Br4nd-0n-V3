@@ -92,8 +92,11 @@ export default class MontpartasseGame extends Game {
         }
         const interval = this.waitTime * 60 * 1000;
         player.nextTimestamp = Math.floor(DateTime.utc().plus({ minute: this.waitTime }).toMillis() / interval) * interval;
-        if (this.stack[index].player) {
-            return interaction.reply({ content: "Cette tasse appartient à un.e joueur.se et ne peut pas être remplacée", flags: MessageFlags.Ephemeral });
+
+        const previousPlayer = this.stack[index].player;
+        if (previousPlayer) {
+            previousPlayer.score++;
+            this.summary.push(`🔄 ${previousPlayer} gagne 1 point en ayant sa tasse délogée`)
         }
 
         await interaction.deferUpdate();
@@ -116,10 +119,6 @@ export default class MontpartasseGame extends Game {
         const group = this.checkEnd();
         if (group) {
             await this.stackFalls(player, group);
-        } else if (this.stack.every((e) => e.player)) {
-            this.stack.forEach((e) => { delete e.player; });
-            this.summary.push("🔄 Aucune tasse ne peut être échangée mais la pile n'est pas tombée: **les appartenances ont été effacées.**");
-            await this.sendBoard();
         }
         await this.save();
     }
@@ -239,7 +238,7 @@ export default class MontpartasseGame extends Game {
             summary: this.summary,
             view: this.view?.serialize(),
             waitTime: this.waitTime,
-        }
+        };
     }
 
     static async load(module: Montpartasse, channelId: string, obj: ReturnType<MontpartasseGame["serialize"]>): Promise<MontpartasseGame> {
@@ -252,6 +251,6 @@ export default class MontpartasseGame extends Game {
         if (obj.view) instance.view = new MontpartasseView(instance, await View.load(obj.view));
         await instance.sendBoard();
         await instance.save();
-        return instance
+        return instance;
     }
 }
