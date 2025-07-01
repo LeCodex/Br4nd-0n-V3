@@ -94,15 +94,19 @@ export default class MontpartasseGame extends Game {
         player.nextTimestamp = Math.floor(DateTime.utc().plus({ minute: this.waitTime }).toMillis() / interval) * interval;
 
         const previousPlayer = this.stack[index].player;
-        if (previousPlayer) {
-            previousPlayer.score++;
-            this.summary.push(`🔄 ${previousPlayer} gagne 1 point en ayant sa tasse délogée`)
+        if (previousPlayer === player) {
+            return interaction.reply({ content: "Cette tasse appartient à un.e autre joueur.se et ne peut pas être remplacée", flags: MessageFlags.Ephemeral });
         }
 
         await interaction.deferUpdate();
         this.lastPlayed = player;
         this.lastIndex = index;
         this.summary.length = 0;
+
+        if (previousPlayer) {
+            previousPlayer.score++;
+            this.summary.push(`🔄 ${previousPlayer} gagne 1 point en ayant sa tasse délogée`)
+        }
 
         const handCup = player.hand.shift()!;
         handCup.player = player;
