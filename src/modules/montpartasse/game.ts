@@ -202,7 +202,7 @@ export default class MontpartasseGame extends Game {
         if (group.some((e) => e.player)) {
             embed.description += `Chaque autre joueur.se gagne **1 point pour chacune de ses tasses dans le groupe qui a fait chuter la pile**:\n`;
             for (const cup of group) {
-                if (cup.player) {
+                if (cup.player && cup.player !== responsible) {
                     embed.description += `- ${cup.emoji} ${cup.player} gagne 1 point\n`;
                     cup.player.score++;
                 }
