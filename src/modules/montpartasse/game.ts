@@ -90,13 +90,12 @@ export default class MontpartasseGame extends Game {
         if (player.nextTimestamp > Date.now()) {
             return await interaction.reply({ content: `Veuillez attendre <t:${Math.floor(player.nextTimestamp / 1000)}:t> pour jouer de nouveau`, flags: MessageFlags.Ephemeral });
         }
-        const interval = this.waitTime * 60 * 1000;
-        player.nextTimestamp = Math.floor(DateTime.utc().plus({ minute: this.waitTime }).toMillis() / interval) * interval;
-
         const previousPlayer = this.stack[index].player;
         if (previousPlayer === player) {
-            return interaction.reply({ content: "Cette tasse appartient à un.e autre joueur.se et ne peut pas être remplacée", flags: MessageFlags.Ephemeral });
+            return interaction.reply({ content: "Cette tasse vous appartient et ne peut pas être remplacée", flags: MessageFlags.Ephemeral });
         }
+        const interval = this.waitTime * 60 * 1000;
+        player.nextTimestamp = Math.floor(DateTime.utc().plus({ minute: this.waitTime }).toMillis() / interval) * interval;
 
         await interaction.deferUpdate();
         this.lastPlayed = player;
