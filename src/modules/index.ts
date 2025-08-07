@@ -12,6 +12,7 @@ import Chaises from "./chaises";
 import Coupdjus from "./coupdjus";
 import Bingoid from "./bingoid";
 import Montpartasse from "./montpartasse";
+import GrosseAnim from "./grosseanim";
 
 export const modules: (new () => BotModule)[] = [
     Ping,
@@ -27,4 +28,5 @@ export const modules: (new () => BotModule)[] = [
     Coupdjus,
     Bingoid,
     Montpartasse,
+    GrosseAnim
 ];
