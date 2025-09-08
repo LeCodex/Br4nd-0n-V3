@@ -1,10 +1,11 @@
 import DB from "db";
 import { AdminCommand, BotCommand, BotModule } from "./base"
 import Logger from "logger";
-import { ApplicationCommandOptionType, ApplicationCommandUserOption, ChatInputCommandInteraction, EmbedBuilder, Emoji, MessageFlags, PermissionFlagsBits, User } from "discord.js";
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandUserOption, ChatInputCommandInteraction, EmbedBuilder, Emoji, MessageFlags, ModalBuilder, PermissionFlagsBits, TextInputBuilder, TextInputStyle, User } from "discord.js";
 import { times } from "lodash";
 import { createRankEmbed, getEmoji } from "utils";
 import { client } from "client";
+import { ConfirmView } from "../view/utils";
 
 export default class Sakatasses extends BotModule {
     public name: string = "Sakatasses";
@@ -94,7 +95,7 @@ export default class Sakatasses extends BotModule {
         }
         
         this.checkExistence(interaction.guildId);
-        const users: User[] = []
+        const users: User[] = [];
         for (let i = 0; i < 24; i++) {
             const user = interaction.options.get(`user${i + 1}`)?.user;
             if (!user) continue;
@@ -113,5 +114,41 @@ export default class Sakatasses extends BotModule {
                     .setColor(this.color)
             ]
         });
+    }
+
+    @AdminCommand({ subcommand: "clear", description: "Supprime toutes les données" })
+    public async clear(interaction: ChatInputCommandInteraction) {
+        const guildId = interaction.guildId;
+        if (!guildId) {
+            return interaction.reply({ content: "Not in a guild", flags: MessageFlags.Ephemeral });
+        }
+        
+        this.checkExistence(guildId);
+        const confirmView = new ConfirmView(async (btnInteraction, confirmed) => {
+            interaction.deleteReply();
+            if (confirmed) {
+                this.sak[guildId] = {};
+                await DB.save(this.commandName, guildId, this.sak[guildId]);
+                await btnInteraction.reply({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setTitle(`${this.cupEmoji} Suppression des tasses`)
+                            .setDescription(`Les tasses ont été supprimées!`)
+                            .setColor(this.color)
+                    ]
+                });
+            } else {
+                await btnInteraction.reply({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setTitle(`${this.cupEmoji} Suppression des tasses`)
+                            .setDescription(`Les tasses n'ont pas été supprimées`)
+                            .setColor(this.color)
+                    ],
+                    flags: MessageFlags.Ephemeral
+                });
+            }
+        });
+        return confirmView.reply(interaction, { flags: MessageFlags.Ephemeral });
     }
 }
