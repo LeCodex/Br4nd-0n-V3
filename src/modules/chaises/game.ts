@@ -95,6 +95,19 @@ export default class ChaisesGame extends Game {
         }
     }
 
+    async clearAndScore(interaction: RepliableInteraction) {
+        const scoredPoints: Record<string, number> = {};
+        for (const [i, id] of this.chairs.entries()) {
+            const player = id && this.players[id];
+            if (player) {
+                this.chairs[i] = undefined;
+                player.score++;
+                scoredPoints[id] = (scoredPoints[id] ?? 0) + 1;
+            }
+        }
+        await this.sendBoardAndSave({ interaction, title: "Vidage des chaises", message: `Les chaises ont été vidées\n${Object.entries(scoredPoints).map(([k, v]) => `${this.players[k]} a gagné ${v} points`).join('\n')}` });
+    }
+
     async resendMessage(interaction: RepliableInteraction) {
         await this.boardMessage?.delete();
         await this.sendBoardAndSave({ interaction });
