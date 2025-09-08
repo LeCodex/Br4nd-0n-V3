@@ -15,11 +15,13 @@ export function getRankEmoji(rank: number) {
     return "🏅";
 }
 
-export async function replyOrFollowUp(interaction: RepliableInteraction, options: string | MessagePayload | InteractionReplyOptions) {
+export async function replyOrFollowUp(interaction: RepliableInteraction, options: string | MessagePayload | Omit<InteractionReplyOptions, "withResponse">) {
     if (interaction.replied) {
-        await interaction.followUp(options)
+        return interaction.followUp(options)
+    } else if (typeof options === "string" || options instanceof MessagePayload) {
+        await interaction.reply(options)
     } else {
-        await interaction.reply(options);
+        return (await interaction.reply({ ...options, withResponse: true })).resource?.message;
     }
 }
 

@@ -3,7 +3,7 @@ import ChaisesPlayer from "./player";
 import { ChatInputCommandInteraction, Message, ReactionCollector, RepliableInteraction, SendableChannels, User } from "discord.js";
 import Chaises from ".";
 import { client } from "client";
-import { BANNED_EMOJIS, createRankEmbed } from "utils";
+import { BANNED_EMOJIS, createRankEmbed, replyOrFollowUp } from "utils";
 
 export default class ChaisesGame extends Game {
     players: Record<string, ChaisesPlayer> = {};
@@ -67,7 +67,7 @@ export default class ChaisesGame extends Game {
             this.boardMessage.edit({ embeds: [embed] });
         } else {
             this.boardMessage = options?.interaction
-                ? (await options.interaction.reply({ embeds: [embed], withResponse: true })).resource?.message ?? undefined
+                ? await replyOrFollowUp(options.interaction, { embeds: [embed] }) ?? undefined
                 : await this.channel?.send({ embeds: [embed] });
         }
         if (this.boardMessage) this.setupCollector(this.boardMessage);
