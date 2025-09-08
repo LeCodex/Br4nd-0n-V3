@@ -26,7 +26,7 @@ export default class ChaisesPlayer {
         const result = Math.floor(Math.random() * this.game.chairs.length);
         const successful = this.game.markChair(result, this);
         const suffix = successful ? `${this.chairs} chaise${this.chairs > 1 ? "s" : ""} au total` : `🧂`;
-        await interaction.reply(successful ? `Vous vous êtes assis sur la chaise n°${result + 1}` : `Vous avez perdu toutes vos chaises!`);
+        await interaction.reply({ content: successful ? `Vous vous êtes assis sur la chaise n°${result + 1}` : `Vous avez perdu toutes vos chaises!`, flags: MessageFlags.Ephemeral });
         await this.game.sendBoardAndSave({ interaction, title: `Lancer de ${this.user.displayName}`, message: `${this} a lancé un ${result + 1}! (${suffix})`, edit: true });
         // Force the message to not be edited
         if (!successful) delete this.game.boardMessage;

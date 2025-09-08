@@ -1,9 +1,9 @@
 import { Game } from "modules/game";
 import ChaisesPlayer from "./player";
-import { APIEmbedField, ChatInputCommandInteraction, Message, MessageFlags, ReactionCollector, RepliableInteraction, SendableChannels, User } from "discord.js";
+import { ChatInputCommandInteraction, Message, ReactionCollector, RepliableInteraction, SendableChannels, User } from "discord.js";
 import Chaises from ".";
 import { client } from "client";
-import { BANNED_EMOJIS, createRankEmbed, getRankEmoji } from "utils";
+import { BANNED_EMOJIS, createRankEmbed } from "utils";
 
 export default class ChaisesGame extends Game {
     players: Record<string, ChaisesPlayer> = {};
