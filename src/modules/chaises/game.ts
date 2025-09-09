@@ -33,14 +33,16 @@ export default class ChaisesGame extends Game {
         if (options?.message) this.message = options.message;
 
         let board = this.message ? `${this.message}\n\n` : "";
-        let line = "", i = 0;
+        let playerLine = "", chairLine = "", i = 0;
         const lineLength = 10;
         for (const chair of this.chairs) {
-            line += chair ? this.players[chair].emoji : "🪑";
+            playerLine += chair ? this.players[chair].emoji : "⬛";
+            chairLine += "🪑";
             i++;
             if (i >= lineLength) {
-                board += line + "\n";
-                line = "";
+                board += playerLine + "\n" + chairLine + "\n";
+                playerLine = "";
+                chairLine = "";
                 i = 0;
             }
         }
@@ -55,7 +57,7 @@ export default class ChaisesGame extends Game {
             "Joueurs",
             Object.values(this.players).map((e) => ({ user: e.user, playerStr: `${e.emoji} ${e.user.toString()}`, score: [e.score, e.chairs], scoreStr: `**${e.score}** 🏅 | **${e.chairs}** 🪑` })),
             "Score"
-        )
+        );
 
         // Render last players
         embed.fields?.push({
