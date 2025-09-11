@@ -40,7 +40,7 @@ export default class ChaisesGame extends Game {
             chairLine += "🪑";
             i++;
             if (i >= lineLength) {
-                board += playerLine + "\n" + chairLine + "\n";
+                board += playerLine + "\n" + chairLine + "\n\n";
                 playerLine = "";
                 chairLine = "";
                 i = 0;
