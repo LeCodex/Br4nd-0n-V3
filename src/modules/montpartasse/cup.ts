@@ -17,7 +17,7 @@ export default abstract class Cup {
     get color() { return (this.constructor as typeof Cup).color; }
 
     constructor(public game: MontpartasseGame, key: string, public player?: MontpartassePlayer) {
-        this.emoji = game.module.emojis[key].toString();
+        this.emoji = game.module.emojis[key]!.toString();
     }
 
     whenPlayed(index: number) { }

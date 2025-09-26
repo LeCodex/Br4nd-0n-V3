@@ -143,7 +143,7 @@ export class BusStop extends Tile {
         let stops = this.game.board.filter((e, i) => e.constructor.name === this.constructor.name && i != index);
 
         if (stops.length) {
-            let stop = stops[Math.floor(Math.random() * stops.length)];
+            let stop = stops[Math.floor(Math.random() * stops.length)]!;
             let stopIndex = this.game.board.indexOf(stop);
             let distance = stopIndex - player.index;
 
@@ -215,12 +215,12 @@ export class Sign extends Tile<{ player?: string }> {
     }
 
     get icon() {
-        return this.data.player ? this.game.players[this.data.player].emoji : this.emoji;
+        return this.data.player ? this.game.players[this.data.player]!.emoji : this.emoji;
     }
 
     effect(player: SteeplePlayer, index: number, amount: number): void {
         if (this.data.player) {
-            const other = this.game.players[this.data.player];
+            const other = this.game.players[this.data.player]!;
             this.game.summary.push(`${this.emoji} ${other.toString()} a avancé de nouveau!`)
             other.move(this.game.order.indexOf(this.data.player) + 1);
         }

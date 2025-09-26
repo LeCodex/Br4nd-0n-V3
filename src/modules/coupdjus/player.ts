@@ -17,7 +17,7 @@ export default class CoupdjusPlayer {
 
     async playFruit(index: number) {
         this.actions--;
-        this.game.blenders[index].push(this.fruit);
+        this.game.blenders[index]!.push(this.fruit);
         this.fruit.effect();
     }
 

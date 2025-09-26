@@ -33,8 +33,8 @@ export default class YamJamGame extends Game {
 
         const keys = Object.keys(figures);
         for (let i = 0; i < 6; i++) {
-            const key = keys.splice(Math.floor(Math.random() * keys.length), 1)[0];
-            this.scoreCategories[key] = figures[key];
+            const key = keys.splice(Math.floor(Math.random() * keys.length), 1)[0]!;
+            this.scoreCategories[key] = figures[key]!;
         }
         this.scoreCategories.chance = {name: "Chance (Somme des dés)", count: (player) => player.tray.reduce((a, e) => a + e + 1, 0)}
 
@@ -62,7 +62,7 @@ export default class YamJamGame extends Game {
 
     async sendMessage(resend = false) {
         const embed = new EmbedBuilder()
-            .setTitle("[YAMS] Dés disponibles" + (this.lastPlayed ? " | Dernier dé pris par " + this.players[this.lastPlayed].user.displayName : ""))
+            .setTitle("[YAMS] Dés disponibles" + (this.lastPlayed ? " | Dernier dé pris par " + this.players[this.lastPlayed]!.user.displayName : ""))
             .setDescription(this.dice.map(e => this.module.faces[e]).join(""))
             .setColor(this.module.color)
 

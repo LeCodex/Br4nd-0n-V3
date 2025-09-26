@@ -84,7 +84,7 @@ export class Clean extends Effect {
     name = "🧼 Propre 🧼";
 
     postMove(index: number) {
-        if (this.game.board[index].effect) {
+        if (this.game.board[index]!.effect) {
             this.game.summary.push(`🧼 ${this.player.toString()} n'active pas l'effet grâce à sa douche`);
             this.used = true;
             return false;

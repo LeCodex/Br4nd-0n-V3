@@ -8,7 +8,7 @@ export default abstract class Ball {
     abstract name: string;
 
     constructor(public game: BingoidGame, key: string) {
-        this.emoji = this.game.module.emojis[key];
+        this.emoji = this.game.module.emojis[key]!;
     }
 
     abstract take(context: RollContext): void;
@@ -45,7 +45,7 @@ export class RussianBall extends Ball {
 
     take(context: RollContext): void {
         this.game.summary.push(`${this.emoji} ${context.player} lance la **${this.name}**!`);
-        context.player.scorePoints([1, 1, -1][Math.floor(Math.random() * 3)]);
+        context.player.scorePoints([1, 1, -1][Math.floor(Math.random() * 3)]!);
     }
 }
 
@@ -253,7 +253,7 @@ export class PlayDohBall extends Ball {
         // Tu donnes 2 points au dernier joueur
         (context) => {
             this.game.summary.push(`${this.emoji} ${context.player} aide le **dernier joueur**!`);
-            context.player.steal(this.game.rankedPlayers.toReversed()[0], -2);
+            context.player.steal(this.game.rankedPlayers.toReversed()[0]!, -2);
         },
         // Un joueur au hasard en dessous de toi dans le classement tire la boule à ta place
         (context) => {

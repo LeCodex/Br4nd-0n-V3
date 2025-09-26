@@ -102,8 +102,8 @@ export function aStar(start: Vector2, goal: Vector2, isEmpty: (pos: Vector2) => 
         closedSet.push(current);
         openSet.splice(openSet.indexOf(current), 1);
         for (let r = 0; r < 4; r++) {
-            const dx = [1, 0, -1, 0][r];
-            const dy = [0, 1, 0, -1][r];
+            const dx = [1, 0, -1, 0][r]!;
+            const dy = [0, 1, 0, -1][r]!;
             const neighbor: Vector2 = {
                 x: current.x + dx,
                 y: current.y + dy
@@ -132,7 +132,7 @@ export function toMultiSorted<T>(array: Array<T>, compareFn: (a: T, b: T) => Arr
 }
 
 export function toRanked<U extends { score: Array<number> }>(array: Array<U>) {
-    const sorted = toMultiSorted(array, (a, b) => a.score.map((e, i) => b.score[i] - e));
+    const sorted = toMultiSorted(array, (a, b) => a.score.map((e, i) => b.score[i]! - e));
     return sorted.reduce((a, e) => {
         if (e.score.some((e, i) => e < (a.lastScore[i] ?? Infinity))) {
             a.lastScore = e.score;
@@ -186,6 +186,7 @@ export function maxCharsLines(message: string, chars: number = 1024) {
 
 export function randomlyPick<T extends string>(input: T): CharOf<T>
 export function randomlyPick<T extends readonly unknown[]>(input: T): T[number]
+export function randomlyPick<T extends unknown[]>(input: T): T[number]
 export function randomlyPick<T extends string | unknown[]>(input: T) {
     return input[Math.floor(Math.random() * input.length)];
 }

@@ -98,7 +98,7 @@ export default class DedalleuxGame extends Game {
             let d = Math.round(Math.cos(element.direction * Math.PI / 2)) + this.colors.length / 2 * Math.round(Math.sin(element.direction * Math.PI / 2));
 
             if (i + d >= 0 && i + d < this.walls.length) {
-                let neighbor = this.walls[i + d];
+                let neighbor = this.walls[i + d]!;
                 let tries = 0;
                 while ((neighbor.direction + 2) % 4 === element.direction && tries < 4) {
                     element.direction = Math.floor(Math.random() * 4);
@@ -113,17 +113,17 @@ export default class DedalleuxGame extends Game {
         for (let y = 0; y < this.colors.length + 1; y++) {
             this.board.push([]);
             for (let x = 0; x < this.colors.length + 1; x++) {
-                this.board[y].push(-1);
+                this.board[y]!.push(-1);
             }
         }
 
         this.walls.forEach((element, i) => {
             const cy = Math.floor(i / (this.colors.length / 2)) * 2 + 1
             const cx = (i % Math.floor(this.colors.length / 2)) * 2 + 1;
-            this.board[cy][cx] = element.color + this.colors.length / 2;
-            const ry = cy + [0, 1, 0, -1][element.direction];
-            const rx = cx + [1, 0, -1, 0][element.direction];
-            this.board[ry][rx] = element.color;
+            this.board[cy]![cx] = element.color + this.colors.length / 2;
+            const ry = cy + [0, 1, 0, -1][element.direction]!;
+            const rx = cx + [1, 0, -1, 0][element.direction]!;
+            this.board[ry]![rx] = element.color;
         });
     }
 
@@ -179,7 +179,7 @@ export default class DedalleuxGame extends Game {
                 if (o) return o.item;
 
                 if (this.path.find(g => g.x === tx && g.y === ty)) return "🔸";
-                return f === -1 ? "⬛" : this.colors[f].toString();
+                return f === -1 ? "⬛" : this.colors[f]!.toString();
             }).join("")
         ).join("\n"));
 
@@ -203,7 +203,7 @@ export default class DedalleuxGame extends Game {
 
             if (this.items.find(e => e.x === this.pawn.x && e.y === this.pawn.y)) this.pickedUp++;
             Object.values(this.players).forEach((element) => {
-                if (this.pawn.x === this.items[element.item].x && this.pawn.y === this.items[element.item].y) winners.push(element);
+                if (this.pawn.x === this.items[element.item]!.x && this.pawn.y === this.items[element.item]!.y) winners.push(element);
             });
         }
 

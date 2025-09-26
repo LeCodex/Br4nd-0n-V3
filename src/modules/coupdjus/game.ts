@@ -56,7 +56,7 @@ export default class CoupdjusGame extends Game {
             await interaction.reply({ content: "Veuillez attendre qu'un autre joueur joue", flags: MessageFlags.Ephemeral });
         } else if (index < 0 || index >= this.blenders.length) {
             await interaction.reply({ content: "Veuillez renseigner un index présent sous un des mixeurs", flags: MessageFlags.Ephemeral });
-        } else if (this.blenders[index].some(e => e.player === player)) {
+        } else if (this.blenders[index]!.some(e => e.player === player)) {
             await interaction.reply({ content: "Vous avez déjà joué dans ce mixeur", flags: MessageFlags.Ephemeral });
         } else {
             this.summary = "";
@@ -72,11 +72,11 @@ export default class CoupdjusGame extends Game {
 
         const rows = [];
         for (let i = 0; i < this.blenders.length; i ++) {
-            const blender = this.blenders[i];
+            const blender = this.blenders[i]!;
             let row = NUMBER_EMOJIS[i] + "🍶⬛";
 
             for (let j = 0; j < 3; j++)
-                row += blender.length > j ? blender[j].emoji : "⬛";
+                row += blender.length > j ? blender[j]!.emoji : "⬛";
 
             row += " - ";
             row += blender.map(e => e.player.user.toString()).join(", ");
@@ -128,8 +128,8 @@ export default class CoupdjusGame extends Game {
         const gains: Record<string, number> = {};
         for (const [i, blender] of this.blenders.entries()) {
             if (blender.length >= 3) {
-                gains[blender[0].player.user.id] = (gains[blender[0].player.user.id] ?? 0) + 1;
-                gains[blender[1].player.user.id] = (gains[blender[1].player.user.id] ?? 0) + 1;
+                gains[blender[0]!.player.user.id] = (gains[blender[0]!.player.user.id] ?? 0) + 1;
+                gains[blender[1]!.player.user.id] = (gains[blender[1]!.player.user.id] ?? 0) + 1;
 
                 const recipe = blender.map(e => e.emoji).join("");
                 summary.push(`La recette ${recipe} a été complétée!`);
@@ -137,7 +137,7 @@ export default class CoupdjusGame extends Game {
                 let used = false;
                 for (const player of Object.values(this.players)) {
                     if (player.recipes.includes(recipe)) {
-                        gains[blender[2].player.user.id] = (gains[blender[2].player.user.id] ?? 0) + 1;
+                        gains[blender[2]!.player.user.id] = (gains[blender[2]!.player.user.id] ?? 0) + 1;
                         gains[player.user.id] = (gains[player.user.id] ?? 0) + 1;
                         used = true;
                         summary.push(`${player.user.toString()} a cette recette!`);
@@ -156,9 +156,9 @@ export default class CoupdjusGame extends Game {
         }
 
         for (const id of Object.keys(gains)) {
-            const ply = this.players[id]
-            ply.score += gains[id];
-            summary.push(`${ply.user.toString()} a gagné ${gains[id]}  ${gains[id] > 1 ? "points" : "point"}`)
+            const ply = this.players[id]!;
+            ply.score += gains[id]!;
+            summary.push(`${ply.user.toString()} a gagné ${gains[id]}  ${gains[id]! > 1 ? "points" : "point"}`)
         }
 
         this.lastPlayed = player.user.id;
@@ -196,7 +196,7 @@ export default class CoupdjusGame extends Game {
         instance.lastPlayed = obj.lastPlayed;
         instance.title = obj.title;
         instance.summary = obj.summary;
-        instance.blenders = obj.blenders.map((e) => e.map((f) => Fruit.load(instance.players[f.player], f)));
+        instance.blenders = obj.blenders.map((e) => e.map((f) => Fruit.load(instance.players[f.player]!, f)));
         instance.nextTimestamp = DateTime.fromMillis(obj.nextTimestamp ?? 0);
         instance.waitDuration = obj.waitDuration;
         instance.maxActions = obj.maxActions;

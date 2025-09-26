@@ -129,7 +129,7 @@ export default class CompoteDePommesGame extends Game {
     // 1) Vous ajoutez à votre panier autant de pommes que le nombre de fois où vous avez fait 1.
     roll1(player: CompoteDePommesPlayer, letter: CharOf<"AEIOUY">) {
         player.incrementEffect(1);
-        player.gain(player.effects[1]);
+        player.gain(player.effects[1]!);
     }
 
     // 2) Planquez 5 pommes de votre panier s'il est plus gros que votre coffre, sinon ajoutez-les à votre panier.
@@ -199,14 +199,14 @@ export default class CompoteDePommesGame extends Game {
     
     // 14) Vous volez deux pommes au panier du joueur ayant joué avant vous.
     roll14(player: CompoteDePommesPlayer, letter: CharOf<"AEIOUY">) {
-        if (this.history.length) {
+        if (this.history[0]) {
             player.steal(this.history[0], 2);
         }
     }
     
     // 15) Si vous hurlez A, E ou I, vous volez trois pommes au panier du joueur précédent, sinon il vous les vole.
     roll15(player: CompoteDePommesPlayer, letter: CharOf<"AEIOUY">) {
-        if (this.history.length) {
+        if (this.history[0]) {
             if (letter === "A" || letter === "E" || letter === "I") {
                 player.steal(this.history[0], 3);
             } else {
@@ -217,14 +217,14 @@ export default class CompoteDePommesGame extends Game {
     
     // 16) Si vous avez moins de pommes que le joueur précédent et que vous hurlez O ou U, vous lui volez la moitié des pommes de son panier.
     roll16(player: CompoteDePommesPlayer, letter: CharOf<"AEIOUY">) {
-        if (this.history.length && player.apples < this.history[0].apples && (letter === "O" || letter === "U")) {
+        if (this.history[0] && player.apples < this.history[0].apples && (letter === "O" || letter === "U")) {
             player.steal(this.history[0], Math.ceil(this.history[0].basket / 2));
         }
     }
     
     // 17) Le joueur précédent perd une pomme de son panier, vous aussi si vous hurlez O ou U.
     roll17(player: CompoteDePommesPlayer, letter: CharOf<"AEIOUY">) {
-        if (this.history.length) this.history[0].gain(-1);
+        if (this.history[0]) this.history[0].gain(-1);
         if (letter === "O" || letter === "U") player.gain(-1);
     }
     
@@ -268,7 +268,7 @@ export default class CompoteDePommesGame extends Game {
         const instance = new this(module, channelId, obj.nextRefill);
         instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]: [string, any]) => [k, await CompoteDePommesPlayer.load(instance, v)])));
         instance.maxHands = obj.maxHands;
-        instance.history = obj.history.map((e: string) => instance.players[e]);
+        instance.history = obj.history.map((e) => instance.players[e]!);
         instance.lastLetterPlayer = Object.fromEntries(Object.entries(obj.lastLetterPlayer).map(([k, v]) => [k, instance.players[v]]))
         instance.setupTimeout();
         return instance;

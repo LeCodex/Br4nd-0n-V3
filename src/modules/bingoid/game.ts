@@ -189,18 +189,18 @@ export default class BingoidGame extends Game {
         const cardRange = range(this.cardSize);
         for (let i = 0; i < this.cardSize; i++) {
             if (!this.card.rowBingos[i])
-                newBingo = (this.card.rowBingos[i] = this.checkIfAllMarkedAndScore(cardRange.map((j) => this.card[i][j]), `**➡️ La ligne ${i + 1} a un bingo!**`, context.rowColumnBingoPoints)) || newBingo;
+                newBingo = (this.card.rowBingos[i] = this.checkIfAllMarkedAndScore(cardRange.map((j) => this.card[i]![j]!), `**➡️ La ligne ${i + 1} a un bingo!**`, context.rowColumnBingoPoints)) || newBingo;
 
             if (!this.card.columnBingos[i])
-                newBingo = (this.card.columnBingos[i] = this.checkIfAllMarkedAndScore(cardRange.map((j) => this.card[j][i]), `**⬇️ La colonne ${i + 1} a un bingo!**`, context.rowColumnBingoPoints)) || newBingo;
+                newBingo = (this.card.columnBingos[i] = this.checkIfAllMarkedAndScore(cardRange.map((j) => this.card[j]![i]!), `**⬇️ La colonne ${i + 1} a un bingo!**`, context.rowColumnBingoPoints)) || newBingo;
         }
         if (!this.card.uldrBingo)
-            newBingo = (this.card.uldrBingo = this.checkIfAllMarkedAndScore(cardRange.map((i) => this.card[i][i]), `**↘️ La diagonale a un bingo!**`, context.diagonalBingoPoints)) || newBingo;
+            newBingo = (this.card.uldrBingo = this.checkIfAllMarkedAndScore(cardRange.map((i) => this.card[i]![i]!), `**↘️ La diagonale a un bingo!**`, context.diagonalBingoPoints)) || newBingo;
 
         if (!this.card.urdlBingo)
-            newBingo = (this.card.urdlBingo = this.checkIfAllMarkedAndScore(cardRange.map((i) => this.card[i][this.cardSize - i - 1]), `**↙️ La diagonale a un bingo!**`, context.diagonalBingoPoints)) || newBingo;
+            newBingo = (this.card.urdlBingo = this.checkIfAllMarkedAndScore(cardRange.map((i) => this.card[i]![this.cardSize - i - 1]!), `**↙️ La diagonale a un bingo!**`, context.diagonalBingoPoints)) || newBingo;
 
-        const corners = [this.card[0][0], this.card[0][this.cardSize - 1], this.card[this.cardSize - 1][0], this.card[this.cardSize - 1][this.cardSize - 1]];
+        const corners = [this.card[0]![0]!, this.card[0]![this.cardSize - 1]!, this.card[this.cardSize - 1]![0]!, this.card[this.cardSize - 1]![this.cardSize - 1]!];
         if (!this.card.cornerBingo)
             newBingo = (this.card.cornerBingo = this.checkIfAllMarkedAndScore(corners, `**🔄 Les coins ont un bingo!**`, context.cornerBingoPoints)) || newBingo;
 
@@ -237,7 +237,7 @@ export default class BingoidGame extends Game {
         instance.ballAmount = obj.ballAmount;
         instance.balls = obj.balls.map(e => new Balls[e.cls as keyof ConcreteBalls](instance));
         instance.historyMaxLength = obj.historyMaxLength;
-        instance.history = obj.history.map((e) => ({ ...e, player: instance.players[e.player] }));
+        instance.history = obj.history.map((e) => ({ ...e, player: instance.players[e.player]! }));
         instance.cardSize = obj.cardSize;
         instance.maxNumber = obj.maxNumber;
         instance.card = BingoidCard.load(instance, obj.card);

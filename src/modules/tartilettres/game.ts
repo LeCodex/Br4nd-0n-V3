@@ -56,7 +56,7 @@ export default class TartilettresGame extends Game {
             ...super.serialize(),
             players: Object.fromEntries(Object.entries(this.players).map(([k, v]) => [k, v.serialize()])),
             lastPlayed: this.lastPlayed,
-            wordLength: this.wordLength,
+            bosslength: this.wordLength,
             saidWords: this.saidWords
         };
     }
@@ -64,7 +64,7 @@ export default class TartilettresGame extends Game {
     static async load(module: Tartilettres, channelId: string, obj: Record<string, any>): Promise<TartilettresGame> {
         const instance = new this(module, channelId);
         instance.lastPlayed = obj.lastPlayed;
-        instance.wordLength = obj.wordLength ?? 7;
+        instance.wordLength = obj.bosslength ?? 7;
         instance.saidWords = obj.saidWords ?? [];
         instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]: [string, any]) => [k, await TartilettresPlayer.load(instance, v)])));
         return instance;

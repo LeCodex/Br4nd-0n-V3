@@ -8,9 +8,8 @@ import MontpartasseView from "./view";
 import Montpartasse from ".";
 import { DateTime } from "luxon";
 import View from "view";
-import { Concrete } from "interfaces";
 
-const NonDefaultCups = Object.entries(Cups).filter(([k, v]) => k !== "default" ).map(([_, v]) => v) as Array<Omit<typeof Cups, "default">[keyof Omit<typeof Cups, "default">]>;
+const NonDefaultCups = Object.entries(Cups).filter(([k, _]) => k !== "default" ).map(([_, v]) => v) as Array<Omit<typeof Cups, "default">[keyof Omit<typeof Cups, "default">]>;
 const RollableCups = NonDefaultCups.filter((e) => e.canBeRolled);
 const AllColors = ["blue", "orange", "green", "purple", "special"] as const
 const BasicCups = RollableCups.filter((e) => (AllColors as readonly string[]).slice(0, 4).includes(e.color));
@@ -109,7 +108,7 @@ export default class MontpartasseGame extends Game {
 
         const handCup = player.hand.shift()!;
         handCup.player = player;
-        const stackCup = this.stack.splice(index, 1, handCup)[0];
+        const stackCup = this.stack.splice(index, 1, handCup)[0]!;
         player.hand.push(stackCup);
 
         handCup.whenPlayed(index);
@@ -165,7 +164,7 @@ export default class MontpartasseGame extends Game {
 
         for (let i = 0; i < this.stack.length - AllColors.length; i++) {
             const colorTotals: Partial<Record<Cups.CupColor, number>> = {};
-            const group = range(5).map((j) => this.stack[i + j]);
+            const group = range(5).map((j) => this.stack[i + j]!);
             for (const cup of group) {
                 const cupColors = cup.color === "all" ? AllColors : cup.color === "none" ? [] : [cup.color] as const;
                 for (const color of cupColors) {
@@ -189,7 +188,7 @@ export default class MontpartasseGame extends Game {
 
         if (group.length < AllColors.length) {
             embed.description += `Il n'y avait **plus assez de tasses dans la pile**.\n`;
-        } else if (group[0].color === group[1].color) {
+        } else if (group[0]!.color === group[1]!.color) {
             embed.description += `Il y avait **${AllColors.length} tasses de même couleur adjacentes**.\n`;
         } else {
             embed.description += `Il y avait **${AllColors.length} tasses de couleurs différentes adjacentes**.\n`;

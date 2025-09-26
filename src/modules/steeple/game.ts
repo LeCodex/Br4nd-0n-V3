@@ -88,7 +88,7 @@ export default class SteepleGame extends Game {
             this.players[user.id] ??= new SteeplePlayer(this, user);
             this.order.push(user.id);
         }
-        return this.players[user.id];
+        return this.players[user.id]!;
     }
 
     async moveOrder(interaction: ChatInputCommandInteraction, index: number = 1) {
@@ -123,7 +123,7 @@ export default class SteepleGame extends Game {
             let maxHeight = 0;
             for (let j = 0; j < lineSize; j++) {
                 if (lineSize * i + j >= this.board.length) break;
-                line += this.board[lineSize * i + j].icon.toString();
+                line += this.board[lineSize * i + j]!.icon.toString();
                 const column = Object.values(this.players).filter(e => e.index === lineSize * i + j).map(e => e.emoji);
                 playerColumns.push(column);
                 maxHeight = Math.max(maxHeight, column.length);
@@ -188,12 +188,13 @@ export default class SteepleGame extends Game {
                 value: ""
             }
             this.order.forEach((e, i) => {
-                const string = (i + 1) + "․ " + (this.players[e].movedThisTurn ? "" : "__") + this.players[e].toString() + (this.players[e].movedThisTurn ? "" : "__") + ((i + 1) % nbPlayersPerLine === 0 ? "\n" : " | ")
+                const player = this.players[e]!
+                const string = (i + 1) + "․ " + (player.movedThisTurn ? "" : "__") + player.toString() + (player.movedThisTurn ? "" : "__") + ((i + 1) % nbPlayersPerLine === 0 ? "\n" : " | ")
 
                 if (field.value.length + string.length >= 1024) {
                     embed.addFields(field);
                     field.value = "";
-                    field.name = "Suite de l'ordre"
+                    field.name = "Suite de l'ordre";
                 }
 
                 field.value += string;
@@ -240,13 +241,13 @@ export default class SteepleGame extends Game {
         this.summary.length = 0;
 
         this.order.forEach((id) => {
-            this.players[id].doTurn(diceResult);
-            this.players[id].movedThisTurn = false;
+            this.players[id]!.doTurn(diceResult);
+            this.players[id]!.movedThisTurn = false;
             this.summary.push("");
         });
 
         this.order.forEach(element => {
-            const player = this.players[element];
+            const player = this.players[element]!;
             player.forEachEffect((effect) => {
                 effect.throwEnd(player);
             });

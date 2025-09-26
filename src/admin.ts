@@ -34,7 +34,7 @@ export default class AdminPanel {
     }
 
     private async loadMessage() {
-        const save = await DB.get("admin", "message", { channel: process.env.ADMIN_PANEL_CHANNEL!, message: null });
+        const save = await DB.get("admin", "message", { channel: process.env.ADMIN_PANEL_CHANNEL!, message: undefined });
         this.view = new AdminView(await View.load(save));
     }
 

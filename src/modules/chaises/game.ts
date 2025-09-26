@@ -36,7 +36,7 @@ export default class ChaisesGame extends Game {
         let playerLine = "", chairLine = "", i = 0;
         const lineLength = 10;
         for (const chair of this.chairs) {
-            playerLine += chair ? this.players[chair].emoji : "⬛";
+            playerLine += chair ? this.players[chair]!.emoji : "⬛";
             chairLine += "🪑";
             i++;
             if (i >= lineLength) {
@@ -62,7 +62,7 @@ export default class ChaisesGame extends Game {
         // Render last players
         embed.fields?.push({
             name: "Derniers joueurs",
-            value: this.previousPlayers.map(e => this.players[e].toString()).join(", ")
+            value: this.previousPlayers.map(e => this.players[e]!.toString()).join(", ")
         });
 
         if (options?.edit && this.boardMessage) {
@@ -91,7 +91,7 @@ export default class ChaisesGame extends Game {
             return false;
         } else {
             // Replace the cutout and give a point
-            this.players[this.chairs[index]].score++;
+            this.players[this.chairs[index]]!.score++;
             this.chairs[index] = player.user.id;
             return true;
         }

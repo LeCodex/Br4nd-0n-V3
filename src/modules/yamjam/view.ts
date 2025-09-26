@@ -10,7 +10,7 @@ export default class YamJamView extends GameView<YamJamGame> {
         super(game, message);
         for (const [i, emoji] of this.game.dice.entries()) {
             this.setButton({
-                emoji: this.game.module.faces[emoji].toString(),
+                emoji: this.game.module.faces[emoji]!.toString(),
                 style: ButtonStyle.Secondary,
                 callback: async (interaction) => {
                     await this.callback(interaction, i);
@@ -26,7 +26,7 @@ export default class YamJamView extends GameView<YamJamGame> {
 
     @Button({ row: 1, label: "Voir sa fiche", style: ButtonStyle.Primary, pausable: false })
     public async ingredient(interaction: ButtonInteraction) {
-        const player = this.game.players[interaction.user.id];
+        const player = this.game.players[interaction.user.id]!;
         await player.sendSheet(interaction);
     }
 
@@ -42,7 +42,7 @@ export default class YamJamView extends GameView<YamJamGame> {
         this.game.lastTimestamp = Date.now();
 
         for (const p of Object.values(this.game.players)) p.pointsGained = 0;
-        this.game.players[interaction.user.id].takeNumber(index);
+        this.game.players[interaction.user.id]!.takeNumber(index);
 
         this.game.resetTimeout();
         await this.game.sendMessage();

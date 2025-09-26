@@ -8,20 +8,20 @@ export interface Figure {
 export const figures: Record<string, Figure> = {
     triple: {
         name: "3️⃣ Brelan (Somme des dés)", 
-        count: (player) => player.tray.reduce((a, e) => { a[e] += 1; return a }, [0, 0, 0, 0, 0, 0]).filter(e => e >= 3).length ? player.tray.reduce((a, e) => a + e + 1, 0) : 0 
+        count: (player) => player.tray.reduce((a, e) => { a[e]! += 1; return a }, [0, 0, 0, 0, 0, 0]).filter(e => e >= 3).length ? player.tray.reduce((a, e) => a + e + 1, 0) : 0 
     },
     quadruple: {
         name: "4️⃣ Carré (Somme des dés)", 
-        count: (player) => player.tray.reduce((a, e) => { a[e] += 1; return a }, [0, 0, 0, 0, 0, 0]).filter(e => e >= 4).length ? player.tray.reduce((a, e) => a + e + 1, 0) : 0 
+        count: (player) => player.tray.reduce((a, e) => { a[e]! += 1; return a }, [0, 0, 0, 0, 0, 0]).filter(e => e >= 4).length ? player.tray.reduce((a, e) => a + e + 1, 0) : 0 
     },
     doublePairs: {
         name: "2️⃣ Double paire (Somme des dés)", 
-        count: (player) => player.tray.reduce((a, e) => { a[e] += 1; return a }, [0, 0, 0, 0, 0, 0]).filter(e => e >= 2).length >= 2 ? player.tray.reduce((a, e) => a + e + 1, 0) : 0
+        count: (player) => player.tray.reduce((a, e) => { a[e]! += 1; return a }, [0, 0, 0, 0, 0, 0]).filter(e => e >= 2).length >= 2 ? player.tray.reduce((a, e) => a + e + 1, 0) : 0
     },
     full: {
         name: "🏠 Full (25 points)",
         count: (player) => {
-            const counts = player.tray.reduce((a, e) => { a[e] += 1; return a }, [0, 0, 0, 0, 0, 0]);
+            const counts = player.tray.reduce((a, e) => { a[e]! += 1; return a }, [0, 0, 0, 0, 0, 0]);
             return counts.filter(e => e === 2).length === counts.filter(e => e === 3).length && counts.filter(e => e === 2).length === 1 ? 25 : 0;
         }
     },
@@ -49,7 +49,7 @@ export const figures: Record<string, Figure> = {
 
             const totals = sequences.map(e => e.reduce((a, f) => a + f + 1, 0));
             totals.sort();
-            return totals[0];
+            return totals[0]!;
         }
     },
     decreasing: {
@@ -71,7 +71,7 @@ export const figures: Record<string, Figure> = {
 
             const totals = sequences.map(e => e.reduce((a, f) => a + f + 1, 0));
             totals.sort();
-            return totals[0];
+            return totals[0]!;
         }
     },
     fifteen: {
@@ -89,7 +89,7 @@ export const figures: Record<string, Figure> = {
     },
     petals: { 
         name: "💐 Pétales (si tous impairs: 2pts par 3, 4pts par 5)", 
-        count: (player) => player.tray.filter(e => (e + 1) % 2).length === 5 ? player.tray.reduce((a, e) => a + [0, 0, 2, 0, 4, 0][e], 0) : 0 
+        count: (player) => player.tray.filter(e => (e + 1) % 2).length === 5 ? player.tray.reduce((a, e) => a + [0, 0, 2, 0, 4, 0][e]!, 0) : 0 
     },
     price_is_right: { 
         name: "*️⃣ Multiplication (40 ou moins)", 
@@ -100,7 +100,7 @@ export const figures: Record<string, Figure> = {
     },
     repetition: { 
         name: "🔁 Répétition (30 points)", 
-        count: (player) => JSON.stringify(player.tray.reduce((a, e) => { a[e] += 1; return a }, [0, 0, 0, 0, 0, 0])) === JSON.stringify(player.oldTray.reduce((a, e) => { a[e] += 1; return a }, [0, 0, 0, 0, 0, 0])) ? 30 : 0 
+        count: (player) => JSON.stringify(player.tray.reduce((a, e) => { a[e]! += 1; return a }, [0, 0, 0, 0, 0, 0])) === JSON.stringify(player.oldTray.reduce((a, e) => { a[e]! += 1; return a }, [0, 0, 0, 0, 0, 0])) ? 30 : 0 
     },
     dversity: {
         name: "🎆 Diversité (5 points par type de dés)",
@@ -184,6 +184,6 @@ export const figures: Record<string, Figure> = {
     },
     quinte: { 
         name: "🃏 Quinte Flush (60 points)", 
-        count: (player) => player.tray.reduce<[number, boolean]>((a, e) => [e, e === a[0] + 1 && a[1]], [player.tray[0] - 1, true])[1] ? 60 : 0 
+        count: (player) => player.tray.reduce<[number, boolean]>((a, e) => [e, e === a[0] + 1 && a[1]], [player.tray[0]! - 1, true])[1] ? 60 : 0 
     }
 };

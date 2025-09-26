@@ -21,7 +21,7 @@ export class BingoidCard extends Array<Array<Tile>> {
         for (let i = 0; i < size; i++) {
             this.push([]);
             for (let j = 0; j < size; j++) {
-                this[i].push({ number: numbers.pop()!, marked: undefined });
+                this[i]!.push({ number: numbers.pop()!, marked: undefined });
             }
         }
         this.rowBingos = sizeRange.map((_) => false);

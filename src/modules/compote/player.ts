@@ -23,6 +23,7 @@ export default class CompoteDePommesPlayer {
     }
 
     useEffect(index: number, uses: number) {
+        if (!this.effects[index]) return 0;
         const amount = this.effects[index];
         uses = Math.min(amount, uses);
         if (amount) {

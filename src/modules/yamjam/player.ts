@@ -13,7 +13,7 @@ export default class YamJamPlayer {
     constructor(public game: YamJamGame, public user: User) { }
 
     takeNumber(index: number) {
-        this.tray.push(this.game.dice[index]);
+        this.tray.push(this.game.dice[index]!);
         this.game.dice[index] = Math.floor(Math.random() * 6);
 
         if (this.tray.length === 5) {
@@ -44,7 +44,7 @@ export default class YamJamPlayer {
     async sendSheet(interaction: RepliableInteraction) {
         const embed = new EmbedBuilder()
             .setTitle("Score et catégories | Total: " + this.score + (this.oldTray.length ? " | Dernière combinaison: " + this.oldTray.map(e => this.game.module.faces[e]).join("") : ""))
-            .setDescription("```\n" + Object.keys(this.game.scoreCategories).map(e => this.game.scoreCategories[e].name + ": " + (this.points[e] ? this.points[e] : 0)).join("\n") + "```")
+            .setDescription("```\n" + Object.keys(this.game.scoreCategories).map(e => this.game.scoreCategories[e]!.name + ": " + (this.points[e] ? this.points[e] : 0)).join("\n") + "```")
             .setColor(this.game.module.color);
 
         await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });

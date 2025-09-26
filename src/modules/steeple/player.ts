@@ -39,7 +39,7 @@ export default class SteeplePlayer {
 
         const newIndex = (this.index + amount + this.game.board.length) % this.game.board.length;
         if (this.forEachEffect(e => !e.tryToMove(newIndex))) return;
-        if (!this.game.board[newIndex].tryToMove(this, newIndex)) return;
+        if (!this.game.board[newIndex]!.tryToMove(this, newIndex)) return;
 
         const oldIndex = this.index;
         this.index += amount;
@@ -57,7 +57,7 @@ export default class SteeplePlayer {
         });
 
         if (canTriggerEffect) {
-            this.game.board[this.index].effect?.(this, this.index, amount);
+            this.game.board[this.index]!.effect?.(this, this.index, amount);
         }
 
         this.checkForWrapping();

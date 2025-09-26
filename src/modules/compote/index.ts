@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from "discord.js";
-import { GameAdminCommand, GameCommand } from "modules/game"
+import { AdminGameCommand, GameCommand } from "modules/game"
 import GameModule from "../game/base";
 import CompoteDePommesGame from "./game";
 
@@ -58,7 +58,7 @@ export default class CompoteDePommes extends GameModule() {
         return interaction.reply({ embeds: [{ title: `Info de ${player.user.displayName}`, description: player.summary, color: this.color }], flags: MessageFlags.Ephemeral });
     }
 
-    @GameAdminCommand({ subcommand: "refill", description: "Force une distribution des cueillettes" })
+    @AdminGameCommand({ subcommand: "refill", description: "Force une distribution des cueillettes" })
     public async refill(game: CompoteDePommesGame, interaction: ChatInputCommandInteraction) {
         await game.refill();
         return interaction.reply({ content: "Refilled", flags: MessageFlags.Ephemeral });

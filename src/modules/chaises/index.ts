@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction } from "discord.js";
-import { Game, GameAdminCommand, GameCommand } from "modules/game";
+import { Game, AdminGameCommand, GameCommand } from "modules/game";
 import GameModule from "modules/game/base";
 import ChaisesGame from "./game";
 
@@ -28,7 +28,7 @@ export default class Chaises extends GameModule() {
         await game.resendMessage(interaction);
     }
 
-    @GameAdminCommand({ subcommand: "score", description: "Vide les chaises et score les joueurs" })
+    @AdminGameCommand({ subcommand: "score", description: "Vide les chaises et score les joueurs" })
     public async score(game: ChaisesGame, interaction: ChatInputCommandInteraction) {
         await game.clearAndScore(interaction);
     }

@@ -1,6 +1,5 @@
 import { ChatInputCommandInteraction, MessageFlags, User } from "discord.js";
 import TartilettresGame from "./game";
-import Tartilettres from ".";
 import { client } from "client";
 
 export default class TartilettresPlayer {
@@ -45,7 +44,7 @@ export default class TartilettresPlayer {
         if (withTaboo) {
             if (!this.possibleTaboos.length) this.possibleTaboos = "BCDFGHLMNP".split("");
             const index = Math.floor(Math.random() * this.possibleTaboos.length);
-            this.taboo.push(this.possibleTaboos.splice(index, 1)[0]);
+            this.taboo.push(this.possibleTaboos.splice(index, 1)[0]!);
             if (this.taboo.length > 3) this.taboo.shift();
             for (let letter of this.taboo) this.letters[letter] = true;
         }

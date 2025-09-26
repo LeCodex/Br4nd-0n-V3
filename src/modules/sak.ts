@@ -43,7 +43,7 @@ export default class Sakatasses extends BotModule {
             return interaction.reply({ content: "Not in a guild", flags: MessageFlags.Ephemeral });
         }
         this.checkExistence(interaction.guildId);
-        const sak = this.sak[interaction.guildId][interaction.user.id] ??= 0;
+        const sak = this.sak[interaction.guildId]![interaction.user.id] ??= 0;
         return interaction.reply({
             embeds: [
                 new EmbedBuilder()
@@ -69,7 +69,7 @@ export default class Sakatasses extends BotModule {
                     },
                     "Utilisateurs",
                     await Promise.all(
-                        Object.entries(this.sak[interaction.guildId]).map(async ([userId, amount]) => ({ user: await client.users.fetch(userId), score: [amount] }))
+                        Object.entries(this.sak[interaction.guildId]!).map(async ([userId, amount]) => ({ user: await client.users.fetch(userId), score: [amount] }))
                     ),
                     "Tasses",
                     this.cupEmoji
@@ -100,8 +100,8 @@ export default class Sakatasses extends BotModule {
             const user = interaction.options.get(`user${i + 1}`)?.user;
             if (!user) continue;
             users.push(user);
-            this.sak[interaction.guildId][user.id] ??= 0;
-            this.sak[interaction.guildId][user.id] += amount;
+            this.sak[interaction.guildId]![user.id] ??= 0;
+            this.sak[interaction.guildId]![user.id]! += amount;
         }
 
         await DB.save(this.commandName, interaction.guildId, this.sak[interaction.guildId]);

@@ -27,7 +27,7 @@ export default class DedalleuxView extends GameView<DedalleuxGame> {
 
     @Button({ row: 1, label: "Voir son ingrédient", style: ButtonStyle.Primary, pausable: false })
     public async ingredient(interaction: ButtonInteraction) {
-        const player = this.game.players[interaction.user.id];
+        const player = this.game.players[interaction.user.id]!;
         await player.sendItem(interaction);
     }
 
@@ -37,7 +37,7 @@ export default class DedalleuxView extends GameView<DedalleuxGame> {
             return interaction.deferUpdate();
         };
 
-        const player = this.game.players[interaction.user.id];
+        const player = this.game.players[interaction.user.id]!;
         if (player.turnedOnce) {
             return interaction.reply({ content: "Vous avez déjà tourné les murs ce tour", flags: MessageFlags.Ephemeral });
         }
@@ -50,7 +50,7 @@ export default class DedalleuxView extends GameView<DedalleuxGame> {
             for (const [i, element] of this.game.walls.entries()) {
                 if (element.color === index) {
                     let newDir = (element.direction + (this.game.clockwiseRotation ? 1 : -1) + 4) % 4;
-                    let d = [1, 0, -1, 0][newDir] + this.game.colors.length / 2 * [0, 1, 0, -1][newDir];
+                    let d = [1, 0, -1, 0][newDir]! + this.game.colors.length / 2 * [0, 1, 0, -1][newDir]!;
 
                     let shouldTurn = true;
                     if (
@@ -61,7 +61,7 @@ export default class DedalleuxView extends GameView<DedalleuxGame> {
                         // or right of the last,
                         !(d === 1 && (i + 1) % (this.game.colors.length / 2) === 0) &&
                         // and that neighbor occupies that spot
-                        (this.game.walls[i + d].direction + 2) % 4 === newDir
+                        (this.game.walls[i + d]!.direction + 2) % 4 === newDir
                     ) {
                         shouldTurn = false;
                     }

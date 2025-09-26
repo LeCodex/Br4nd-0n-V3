@@ -42,7 +42,7 @@ client.on("ready", async () => {
                 commandData = {
                     name: instance.commandName,
                     dmPermission: instance.dmPermission,
-                    ...instance.commands[0],
+                    ...instance.commands[0]!,
                     type: ApplicationCommandType.ChatInput
                 };
             } else {

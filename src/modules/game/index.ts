@@ -44,7 +44,7 @@ export function GameCommand(metadata: GameSubcommandData): MethodDecorator {
     return GenericGameCommand(metadata, BotCommand(metadata));
 }
 
-export function GameAdminCommand(metadata: ChatInputAplicationSubcommandData<false>): MethodDecorator {
+export function AdminGameCommand(metadata: ChatInputAplicationSubcommandData<false>): MethodDecorator {
     return GenericGameCommand({ ...metadata, pausable: false }, AdminCommand(metadata));
 }
 
