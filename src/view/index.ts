@@ -29,15 +29,15 @@ export default class View {
     private setComponent<T extends NonLinkButtonMessageActionRowComponentData>(component: ComponentHandler<T>, canReplace: boolean = true) {
         let row = component.row ?? this.actionRows.findIndex((e) => !e || e.components.length < 5);
         if (row === -1) row = this.actionRows.length;
-        this.actionRows[row] ??= new ActionRowBuilder();
-        
-        let index = component.index ?? this.actionRows[row].components.findIndex((e) => typeof e === "undefined");
-        if (index === -1) index = this.actionRows[row].components.length;
-        if (this.actionRows[row].components[index] && !canReplace) {
+        const actionRow = this.actionRows[row] ??= new ActionRowBuilder();
+
+        let index = component.index ?? actionRow.components.findIndex((e) => typeof e === "undefined");
+        if (index === -1) index = actionRow.components.length;
+        if (actionRow.components[index] && !canReplace) {
             throw RangeError(`Component is trying to fill an occupied slot`);
         }
         this.components.push(component);
-        this.actionRows[row].components[index] = new component.builder(component);
+        actionRow.components[index] = new component.builder(component);
     }
 
     public setButton(component: ComponentHandlerParameter<InteractionButtonComponentData>) {
@@ -157,6 +157,9 @@ export default class View {
                 }
                 Logger.log(`Running component handler for ${this.constructor.name}`);
                 await component.callback(interaction);
+                if (!interaction.replied && !interaction.deferred) {
+                    await interaction.deferUpdate();
+                }
             }
         }
     }
@@ -188,8 +191,9 @@ export default class View {
         }
     }
 
-    static async load(obj: Record<string, any>) {
+    static async load(obj: ReturnType<View["serialize"]>) {
         try {
+            if (!obj.channel || !obj.message) return undefined;
             const channel = await client.channels.fetch(obj.channel);
             return channel?.isSendable() ? await channel.messages.fetch(obj.message) : undefined;
         } catch {

@@ -1,0 +1,45 @@
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from "discord.js";
+import GameModule from "../game/base";
+import BossleGame from "./game";
+import { AdminGameCommand, GameCommand } from "../game";
+
+export default class Bossle extends GameModule() {
+    cls = BossleGame;
+    name = "Bossle";
+    description = "Combat des monstres avec la langue française";
+    color = 0xB05EF7;
+    words: Set<string>;
+    targetWords: Array<string>;
+    
+    constructor() {
+        super("bossle");
+        this.words = new Set(this.readConfigFile("fr.txt")!.split("\n").map((e) => e.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()));
+        this.targetWords = this.readConfigFile("fr_targets.txt")!.split("\n").map((e) => e.trim());
+    }
+
+    protected async instantiate(interaction: ChatInputCommandInteraction): Promise<BossleGame> {
+        return new BossleGame(this, interaction.channelId);
+    }
+
+    @GameCommand({
+        subcommand: "submit", description: "Envoie un mot", options: [
+            { name: "mot", description: "Le mot à envoyer", type: ApplicationCommandOptionType.String, required: true }
+        ]
+    })
+    public async submit(game: BossleGame, interaction: ChatInputCommandInteraction) {
+        await game.sendAttempt(interaction);
+    }
+
+    @AdminGameCommand({ subcommand: "next", description: "Passe au tour suivant" })
+    public async next(game: BossleGame, interaction: ChatInputCommandInteraction) {
+        await game.nextTurn();
+        await interaction.reply({ content: "Skipped", flags: MessageFlags.Ephemeral });
+    }
+
+    @AdminGameCommand({ subcommand: "kill", description: "Tue le monstre" })
+    public async kill(game: BossleGame, interaction: ChatInputCommandInteraction) {
+        game.monster.health = 0;
+        await 
+        await interaction.reply({ content: "Skipped", flags: MessageFlags.Ephemeral });
+    }
+}
