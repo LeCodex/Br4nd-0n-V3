@@ -34,17 +34,4 @@ export default class Bossle extends GameModule() {
     public async submit(game: BossleGame, interaction: ChatInputCommandInteraction) {
         await game.sendAttempt(interaction);
     }
-
-    @AdminGameCommand({ subcommand: "next", description: "Passe au tour suivant" })
-    public async next(game: BossleGame, interaction: ChatInputCommandInteraction) {
-        await game.nextTurn();
-        await interaction.reply({ content: "Skipped", flags: MessageFlags.Ephemeral });
-    }
-
-    @AdminGameCommand({ subcommand: "kill", description: "Tue le monstre" })
-    public async kill(game: BossleGame, interaction: ChatInputCommandInteraction) {
-        game.monster.health = 0;
-        await 
-        await interaction.reply({ content: "Skipped", flags: MessageFlags.Ephemeral });
-    }
 }

@@ -44,6 +44,10 @@ export default abstract class ShopItem {
         return `${this.cost} :coin: - ${this.emoji} **${this.name}**: ${this.description}${this.uses > 0 ? ` (${this.uses} utilisations)` : ''}`;
     }
 
+    toCondensed() {
+        return `${this.emoji}${' ' + '\\|'.repeat(this.uses)}`;
+    }
+
     serialize() {
         return {
             cls: this.constructor.name as keyof ConcreteItems,

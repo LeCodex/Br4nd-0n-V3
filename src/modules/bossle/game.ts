@@ -75,6 +75,7 @@ export default class BossleGame extends Game {
     public async start(interaction: ChatInputCommandInteraction): Promise<void> {
         await this.newGame();
         await super.start(interaction);
+        await this.save();
     }
 
     setupTimeout() {
@@ -261,7 +262,6 @@ export default class BossleGame extends Game {
             }
         }
         await player.sendAttemptsBoard();
-        await interaction.reply({ content: `\`\`\`\n${player.attempts.map((e) => `${this.renderAttempt(e)} ${e}`).join("\n")}\n${player.finished ? "" : `Lettres restantes: ${player.remainingLetters.join("")}\n`}\`\`\``, flags: MessageFlags.Ephemeral });
 
         if (player.finished && this.isMonsterAlive) {
             this.gainXP(this.emit("finished", { player, xpGained: 5 }).xpGained);
@@ -270,10 +270,11 @@ export default class BossleGame extends Game {
 
         if (!this.isMonsterAlive) {
             const { regenRatio } = this.emit("defeated", { regenRatio: 1/4 });
-            this.gainHealth(this.maxHealth * regenRatio);
+            this.gainHealth(Math.floor(this.maxHealth * regenRatio + .5));
         }
 
         await this.sendBoard({ edit: true });
+        await interaction.reply({ content: `\`\`\`\n${player.attempts.map((e) => `${this.renderAttempt(e)} ${e}`).join("\n")}\n${player.finished ? "" : `Lettres restantes: ${player.remainingLetters.join("")}\n`}\`\`\``, flags: MessageFlags.Ephemeral });
         await this.checkForNewGame();
         await this.save();
     }
@@ -327,7 +328,7 @@ export default class BossleGame extends Game {
                 },
                 {
                     name: `🛡️ Aventuriers`,
-                    value: Object.values(this.players).map((e) => `-# ${e.user}: ${e.lastAttempt ? `\`${this.renderAttempt(e.lastAttempt)}\`` : "Pas d'essai"}`).join("\n")
+                    value: Object.values(this.players).map((e) => `-# ${e}`).join("\n")
                 }
             ],
             color: this.module.color

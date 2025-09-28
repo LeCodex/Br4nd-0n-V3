@@ -60,7 +60,7 @@ export default class BosslePlayer {
     }
 
     toString() {
-        return `${this.user} ${[...this.items].map((e) => `${e.emoji}${' ' + '\\|'.repeat(e.uses)}`).join(", ")}`;
+        return `${this.user}: ${this.lastAttempt ? `\`${this.game.renderAttempt(this.lastAttempt)}\`` : "Pas d'essai"} ${[...this.items].map((i) => i.toCondensed()).join(", ")}`;
     }
 
     serialize() {
