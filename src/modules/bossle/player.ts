@@ -2,6 +2,7 @@ import { Message, SendableChannels, User } from "discord.js";
 import BossleGame, { ConcreteItems, WordleResult } from "./game";
 import ShopItem, * as Items from "./item";
 import { client } from "../../client";
+import { loadItem } from "./utils";
 
 export default class BosslePlayer {
     attempts: Array<string> = [];
@@ -26,6 +27,18 @@ export default class BosslePlayer {
         return !!this.lastAttempt && this.game.attemptToResult(this.lastAttempt).every((e) => e === WordleResult.CORRECT);
     }
 
+    get remainingLetters() {
+        const incorrectLetters = this.attempts.reduce((a, e) => {
+            for (const letter of e) {
+                if (!this.game.targetWord.includes(letter) && !a.includes(letter)) {
+                    a.push(letter);
+                }
+            }
+            return a;
+        }, [] as Array<string>);
+        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").filter((e) => !incorrectLetters.includes(e));
+    }
+
     attemptedLetter(letter: string) {
         return this.attempts.some((e) => e.includes(letter));
     }
@@ -47,7 +60,7 @@ export default class BosslePlayer {
     }
 
     toString() {
-        return `${this.user} ${[...this.items].map((e) => `${e.emoji}${'\\|'.repeat(e.uses)}`).join(", ")}`;
+        return `${this.user} ${[...this.items].map((e) => `${e.emoji}${' ' + '\\|'.repeat(e.uses)}`).join(", ")}`;
     }
 
     serialize() {
@@ -57,7 +70,7 @@ export default class BosslePlayer {
             attemptsBoard: this.attemptsBoard?.id,
             stats: this.stats,
             maxAttempts: this.maxAttempts,
-            items: [...this.items].map((e) => e.constructor.name as keyof ConcreteItems),
+            items: [...this.items].map((e) => e.serialize()),
         }
     }
 
@@ -66,7 +79,7 @@ export default class BosslePlayer {
         instance.attempts = obj.attempts;
         instance.stats = obj.stats;
         instance.maxAttempts = obj.maxAttempts;
-        instance.items = new Set(obj.items.map((e) => new Items[e](game)));
+        instance.items = new Set(obj.items.map((e) => loadItem(game, e)));
         instance.items.forEach((e) => e.buy(instance));
         if (obj.attemptsBoard) {
             instance.attemptsBoard = await (await client.channels.fetch(game.channelId) as SendableChannels).messages.fetch(obj.attemptsBoard);

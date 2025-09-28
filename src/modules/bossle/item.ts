@@ -1,5 +1,5 @@
 import { randomlyPick } from "../../utils";
-import BossleGame, { BossleEventHandler, BossleEvents, WordleResult } from "./game";
+import BossleGame, { BossleEventHandler, BossleEvents, ConcreteItems, WordleResult } from "./game";
 import BosslePlayer from "./player";
 
 export default abstract class ShopItem {
@@ -43,6 +43,13 @@ export default abstract class ShopItem {
     toString() {
         return `${this.cost} :coin: - ${this.emoji} **${this.name}**: ${this.description}${this.uses > 0 ? ` (${this.uses} utilisations)` : ''}`;
     }
+
+    serialize() {
+        return {
+            cls: this.constructor.name as keyof ConcreteItems,
+            uses: this.uses
+        }
+    }
 }
 
 // =================== ONE-SHOT ITEMS ===================
@@ -53,7 +60,7 @@ export class HealthPotion extends ShopItem {
     cost = 3;
 
     buy(player: BosslePlayer): boolean {
-        this.game.channel?.send(`### Vous avez regagné 10 PV!`);
+        this.game.channel?.send(`### 💖 Vous avez regagné 10 PV!`);
         this.game.gainHealth(10);
         return true;
     }
@@ -66,7 +73,7 @@ export class XpPotion extends ShopItem {
     cost = 3;
 
     buy(player: BosslePlayer): boolean {
-        this.game.channel?.send(`### Vous avez gagné 10 XP!`);
+        this.game.channel?.send(`### 🎉 Vous avez gagné 10 XP!`);
         this.game.gainXP(10);
         return true;
     }
@@ -79,7 +86,7 @@ export class FirePotion extends ShopItem {
     cost = 3;
 
     buy(player: BosslePlayer): boolean {
-        this.game.channel?.send(`### Le monstre a pris 3 dégâts!`);
+        this.game.channel?.send(`### 🔥 Le monstre a pris 3 dégâts!`);
         player.damageMonster(3);
         return true;
     }
@@ -92,7 +99,7 @@ export class LookingGlass extends ShopItem {
     cost = 5;
 
     buy(player: BosslePlayer): boolean {
-        this.game.channel?.send(`### Le mot contient un \`${randomlyPick(this.game.targetWord)}\`!`);
+        this.game.channel?.send(`### 🔎 Le mot contient un \`${randomlyPick(this.game.targetWord)}\`!`);
         return true;
     }
 }
@@ -104,7 +111,7 @@ export class CriticalPotion extends ShopItem {
     cost = 6;
 
     buy(player: BosslePlayer): boolean {
-        this.game.channel?.send(`### Les dégâts sont doublés ce tour-ci!`);
+        this.game.channel?.send(`### 💥 Les dégâts sont doublés ce tour-ci!`);
         this.game.untilEndOfTurn("monsterDamage", (context) => {
             context.amount *= 2;
         })
@@ -127,7 +134,9 @@ export class Medkit extends ShopItem {
     buy(player: BosslePlayer): boolean {
         this.giveTo(player);
         this.on("defeated", (context) => {
-            context.regenRatio += 1 / 4;
+            if (this.use()) {
+                context.regenRatio += 1 / 4;
+            }
         });
         return true;
     }
@@ -147,9 +156,8 @@ export class Shield extends ShopItem {
     buy(player: BosslePlayer): boolean {
         this.giveTo(player);
         this.on("result", (context) => {
-            if (context.player === this.owner && context.player.attempts.length === 1) {
+            if (context.player === this.owner && context.player.attempts.length === 1 && this.use()) {
                 context.result = context.result.filter((e) => e !== WordleResult.INCORRECT);
-                this.use();
             }
         });
         return true;
@@ -203,7 +211,7 @@ export class Vial extends ShopItem {
 export class Unction extends ShopItem {
     name = "Onction";
     emoji = "🪔";
-    description = "Restaure 1PV à chaque `🟩`";
+    description = "Restaure 1 PV à chaque `🟩`";
     cost = 4;
     uses = 15;
 
@@ -232,7 +240,9 @@ export class Sword extends ShopItem {
     buy(player: BosslePlayer): boolean {
         this.giveTo(player);
         this.on("monsterDamage", (context) => {
-            context.amount++;
+            if (context.player === this.owner && this.use()) {
+                context.amount++;
+            }
         });
         return true;
     }
@@ -243,12 +253,14 @@ export class Bow extends ShopItem {
     emoji = "🏹";
     description = "Si vous terminez avec 3 essais ou moins, doublez vos dégâts";
     cost = 4;
-    uses = 15;
+    uses = 4;
 
     buy(player: BosslePlayer): boolean {
         this.giveTo(player);
         this.on("monsterDamage", (context) => {
-            context.amount *= this.owner!.attempts.length <= 3 ? 2 : 1;
+            if (context.player === this.owner && this.owner!.attempts.length <= 3 && this.use()) {
+                context.amount *= 2;
+            }
         });
         return true;
     }
@@ -264,7 +276,7 @@ export class Scarf extends ShopItem {
     buy(player: BosslePlayer): boolean {
         this.giveTo(player);
         this.on("result", (context) => {
-            if (context.result.every((e) => e === WordleResult.INCORRECT)) {
+            if (context.player === this.owner && context.result.every((e) => e === WordleResult.INCORRECT) && this.use()) {
                 context.result = [];
             }
         });

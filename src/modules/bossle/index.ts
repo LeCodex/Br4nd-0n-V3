@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import GameModule from "../game/base";
 import BossleGame from "./game";
-import { AdminGameCommand, GameCommand } from "../game";
+import { AdminGameCommand, Game, GameCommand } from "../game";
 
 export default class Bossle extends GameModule() {
     cls = BossleGame;
@@ -19,6 +19,11 @@ export default class Bossle extends GameModule() {
 
     protected async instantiate(interaction: ChatInputCommandInteraction): Promise<BossleGame> {
         return new BossleGame(this, interaction.channelId);
+    }
+
+    public async onDeleted(game: BossleGame) {
+        clearTimeout(game.timeout);
+        await game.boardView?.end();
     }
 
     @GameCommand({

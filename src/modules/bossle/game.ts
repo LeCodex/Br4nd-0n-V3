@@ -9,6 +9,7 @@ import ShopItem, * as Items from "./item";
 import BossEffect, * as Effects from "./effects";
 import BossleView from "./view";
 import View from "../../view";
+import { loadItem } from "./utils";
 
 export enum WordleResult {
     CORRECT,
@@ -39,15 +40,15 @@ export default class BossleGame extends Game {
 
     gold = 0;
     xp = 0;
-    level = 1;
-    health = 120;
+    level = 0;
+    health = 0;
     turnHealthChange = 0;
 
     monster = {
-        level: 1,
+        level: 0,
         turnHealthChange: 0,
-        health: 40,
-        maxHealth: 40,
+        health: 0,
+        maxHealth: 0,
     };
     monsterEffects: Array<BossEffect> = [];
     targetWord = "";
@@ -130,8 +131,8 @@ export default class BossleGame extends Game {
         delete this.boardView;
         this.monster = {
             level: 1,
-            health: 40,
-            maxHealth: 40,
+            health: 20,
+            maxHealth: 20,
             turnHealthChange: 0
         };
         this.gold = 0;
@@ -236,12 +237,13 @@ export default class BossleGame extends Game {
         const word = input.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         if (word.length !== this.targetWord.length) {
             return interaction.reply({ content: "Le mot ne fait pas la bonne longueur", flags: MessageFlags.Ephemeral });
-        } else if (!this.module.words.has(word)) {
-            return interaction.reply({ content: "Le mot n'est pas valide", flags: MessageFlags.Ephemeral });
         }
         const knownIncorrectLetters = word.split("").map((e) => player.attemptedLetter(e) && !this.targetWord.includes(e))
         if (knownIncorrectLetters.some((e) => e)) {
             return interaction.reply({ content: `Le mot contient des lettres que vous savez incorrectes (${word.split("").filter((_, i) => knownIncorrectLetters[i]).join(", ")})`, flags: MessageFlags.Ephemeral });
+        }
+        if (!this.module.words.has(word)) {
+            return interaction.reply({ content: "Le mot n'est pas valide", flags: MessageFlags.Ephemeral });
         }
 
         player.attempts.push(word);
@@ -259,7 +261,7 @@ export default class BossleGame extends Game {
             }
         }
         await player.sendAttemptsBoard();
-        await interaction.reply({ content: `\`\`\`\n${word}\n${this.renderAttempt(word)}\`\`\``, flags: MessageFlags.Ephemeral });
+        await interaction.reply({ content: `\`\`\`\n${player.attempts.map((e) => `${this.renderAttempt(e)} ${e}`).join("\n")}\n${player.finished ? "" : `Lettres restantes: ${player.remainingLetters.join("")}\n`}\`\`\``, flags: MessageFlags.Ephemeral });
 
         if (player.finished && this.isMonsterAlive) {
             this.gainXP(this.emit("finished", { player, xpGained: 5 }).xpGained);
@@ -280,15 +282,18 @@ export default class BossleGame extends Game {
         const result: Array<WordleResult> = [];
         const remainingLetters = this.targetWord.split("");
         for (const [i, letter] of attempt.split("").entries()) {
-            if (remainingLetters.includes(letter)) { 
-                if (letter === this.targetWord[i]) {
-                    result.push(WordleResult.CORRECT);
-                } else {
-                    result.push(WordleResult.WRONG_PLACE);
-                }
+            if (letter === this.targetWord[i]) {
+                result[i] = WordleResult.CORRECT;
+                remainingLetters.splice(remainingLetters.indexOf(letter), 1);
+            }
+        }
+        for (const [i, letter] of attempt.split("").entries()) {
+            if (typeof result[i] !== "undefined") continue;
+            if (remainingLetters.includes(letter)) {
+                result[i] = WordleResult.WRONG_PLACE;
                 remainingLetters.splice(remainingLetters.indexOf(letter), 1);
             } else {
-                result.push(WordleResult.INCORRECT);
+                result[i] = WordleResult.INCORRECT;
             }
         }
         return result;
@@ -298,18 +303,22 @@ export default class BossleGame extends Game {
         return this.attemptToResult(attempt).map((e) => e === WordleResult.CORRECT ? '🟩' : e === WordleResult.WRONG_PLACE ? '🟨' : '⬛').join("");
     }
 
+    renderChange(amount: number) {
+        return amount !== 0 ? ` **(${amount > 0 ? "+" : ""}${amount})**` : "";
+    }
+
     async sendBoard(options?: { edit?: boolean, replace?: boolean, showWord?: boolean }) {
         const embed: APIEmbed = {
             title: `[BOSSLE] Résumé de la partie | Tour ${this.turn}`,
             fields: [
                 {
                     name: `🐲 Monstre`,
-                    value: `-# **❤️ Vie:** ${this.monster.health}/${this.monster.maxHealth}${this.monster.turnHealthChange !== 0 ? ` **(${this.monster.turnHealthChange})**` : ""}\n-# **⏫ Niveau:** ${this.monster.level}\n-# **📖 Mot:** \`${options?.showWord ? this.targetWord : '?'.repeat(this.targetWord.length)}\``,
+                    value: `-# **❤️ Vie:** ${this.monster.health}/${this.monster.maxHealth}${this.renderChange(this.monster.turnHealthChange)}\n-# **⏫ Niveau:** ${this.monster.level}\n-# **📖 Mot:** \`${options?.showWord ? this.targetWord : '?'.repeat(this.targetWord.length)}\``,
                     inline: true
                 },
                 {
                     name: `🧮 Stats`,
-                    value: `-# **❤️ Vie:** ${this.health}/${this.maxHealth}${this.turnHealthChange !== 0 ? ` **(${this.turnHealthChange})**` : ""}\n-# **⏫ Niveau:** ${this.level} | **✨ XP:** ${this.xp}/${this.xpForNextLevel}\n-# **:coin: Or:** ${this.gold}/${this.maxGold}`,
+                    value: `-# **❤️ Vie:** ${this.health}/${this.maxHealth}${this.renderChange(this.turnHealthChange)}\n-# **⏫ Niveau:** ${this.level} | **✨ XP:** ${this.xp}/${this.xpForNextLevel}\n-# **:coin: Or:** ${this.gold}/${this.maxGold}`,
                     inline: true
                 },
                 {
@@ -352,7 +361,7 @@ export default class BossleGame extends Game {
             monsterEffects: this.monsterEffects.map((e) => e.constructor.name as keyof ConcreteEffects),
             targetWord: this.targetWord,
             turn: this.turn,
-            shop: this.shop.map((e) => e?.constructor.name as keyof ConcreteItems | undefined),
+            shop: this.shop.map((e) => e?.serialize()),
             bestRun: this.bestRun,
             boardView: this.boardView?.serialize(),
             nextTimestamp: this.nextTimestamp
@@ -371,7 +380,7 @@ export default class BossleGame extends Game {
         instance.monsterEffects = obj.monsterEffects.map((e) => new Effects[e](instance));
         instance.targetWord = obj.targetWord;
         instance.turn = obj.turn;
-        instance.shop = obj.shop.map((e) => e && new Items[e](instance));
+        instance.shop = obj.shop.map((e) => e && loadItem(instance, e));
         instance.bestRun = obj.bestRun;
         if (obj.boardView) instance.boardView = new BossleView(instance, await View.load(obj.boardView));
         instance.nextTimestamp = obj.nextTimestamp;
