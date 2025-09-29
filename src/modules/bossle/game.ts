@@ -94,7 +94,7 @@ export default class BossleGame extends Game {
     get isMonsterAlive() { return this.monster.health > 0; }
     get xpForNextLevel() { return 190 + 10 * this.level; }
     get maxHealth() { return 110 + 10 * this.level; }
-    get maxGold() { return 125 + 25 * this.level; }
+    get maxGold() { return 20 + 5 * this.level; }
 
     emit<K extends keyof BossleEvents>(key: K, context: BossleEvents[K]): BossleEvents[K] {
         if (!this.listeners[key]) return context;
@@ -261,7 +261,7 @@ export default class BossleGame extends Game {
                 player.stats.damageReceived += dmgPerIncorrect;
             }
         }
-        await player.sendAttemptsBoard();
+        await interaction.reply({ content: player.privateAttemptContent, flags: MessageFlags.Ephemeral });
 
         if (player.finished && this.isMonsterAlive) {
             this.gainXP(this.emit("finished", { player, xpGained: 5 }).xpGained);
@@ -269,12 +269,13 @@ export default class BossleGame extends Game {
         }
 
         if (!this.isMonsterAlive) {
+            this.channel?.send("### ⚔️ Le monstre est vaincu!");
             const { regenRatio } = this.emit("defeated", { regenRatio: 1/4 });
             this.gainHealth(Math.floor(this.maxHealth * regenRatio + .5));
         }
 
         await this.sendBoard({ edit: true });
-        await interaction.reply({ content: `\`\`\`\n${player.attempts.map((e) => `${this.renderAttempt(e)} ${e}`).join("\n")}\n${player.finished ? "" : `Lettres restantes: ${player.remainingLetters.join("")}\n`}\`\`\``, flags: MessageFlags.Ephemeral });
+        await player.sendAttemptsBoard();
         await this.checkForNewGame();
         await this.save();
     }

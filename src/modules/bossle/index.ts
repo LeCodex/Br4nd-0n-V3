@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import GameModule from "../game/base";
 import BossleGame from "./game";
-import { AdminGameCommand, Game, GameCommand } from "../game";
+import { GameCommand } from "../game";
 
 export default class Bossle extends GameModule() {
     cls = BossleGame;
@@ -33,5 +33,11 @@ export default class Bossle extends GameModule() {
     })
     public async submit(game: BossleGame, interaction: ChatInputCommandInteraction) {
         await game.sendAttempt(interaction);
+    }
+
+    @GameCommand({ subcommand: "info", description: "Envoie le message d'info privée" })
+    public async info(game: BossleGame, interaction: ChatInputCommandInteraction) {
+        const player = game.getPlayer(interaction.user);
+        await interaction.reply({ content: player.privateAttemptContent, flags: MessageFlags.Ephemeral });
     }
 }

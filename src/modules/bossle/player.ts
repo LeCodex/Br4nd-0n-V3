@@ -1,4 +1,4 @@
-import { Message, SendableChannels, User } from "discord.js";
+import { Message, MessageFlags, SendableChannels, User } from "discord.js";
 import BossleGame, { ConcreteItems, WordleResult } from "./game";
 import ShopItem, * as Items from "./item";
 import { client } from "../../client";
@@ -29,14 +29,19 @@ export default class BosslePlayer {
 
     get remainingLetters() {
         const incorrectLetters = this.attempts.reduce((a, e) => {
-            for (const letter of e) {
-                if (!this.game.targetWord.includes(letter) && !a.includes(letter)) {
-                    a.push(letter);
+            const result = this.game.attemptToResult(e);
+            for (const [i, letter] of Array.from(e).entries()) {
+                if (result[i] === WordleResult.INCORRECT) {
+                    a.add(letter);
                 }
             }
             return a;
-        }, [] as Array<string>);
-        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").filter((e) => !incorrectLetters.includes(e));
+        }, new Set<string>());
+        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").filter((e) => !incorrectLetters.has(e));
+    }
+
+    get privateAttemptContent() {
+        return `\`\`\`\n${this.attempts.map((e) => `${this.game.renderAttempt(e)} ${e}`).join("\n")}\n${this.finished || this.attempts.length >= this.maxAttempts ? "" : `Lettres restantes: ${this.remainingLetters.join("")}\n`}\`\`\``
     }
 
     attemptedLetter(letter: string) {
