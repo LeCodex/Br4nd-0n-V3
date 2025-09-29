@@ -262,7 +262,7 @@ export default class BossleGame extends Game {
                 player.stats.damageReceived += dmgPerIncorrect;
             }
         }
-        await interaction.reply({ content: player.privateAttemptContent, flags: MessageFlags.Ephemeral });
+        await interaction.editReply({ content: player.privateAttemptContent });
 
         if (player.finished && this.isMonsterAlive) {
             this.gainXP(this.emit("finished", { player, xpGained: 5 }).xpGained);
