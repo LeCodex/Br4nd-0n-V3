@@ -223,6 +223,7 @@ export default class BossleGame extends Game {
     }
 
     async sendAttempt(interaction: ChatInputCommandInteraction) {
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         const player = this.getPlayer(interaction.user);
         if (player.finished) {
             return interaction.reply({ content: "Vous avez déjà fini", flags: MessageFlags.Ephemeral });
