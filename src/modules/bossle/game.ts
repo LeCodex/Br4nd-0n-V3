@@ -82,9 +82,11 @@ export default class BossleGame extends Game {
     }
 
     setupTimeout() {
-        let next = DateTime.now().setZone("Europe/Paris");
-        next = next.set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).plus({ day: 1 });
-        this.nextTimestamp = next.toMillis();
+        if (!this.nextTimestamp) {
+            let next = DateTime.now().setZone("Europe/Paris");
+            next = next.set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).plus({ day: 1 });
+            this.nextTimestamp = next.toMillis();
+        }
 
         if (this.timeout) clearTimeout(this.timeout);
         this.timeout = setTimeout(() => this.nextTurn(), this.nextTimestamp - DateTime.now().setZone("Europe/Paris").toMillis());
@@ -192,7 +194,10 @@ export default class BossleGame extends Game {
         this.emit("turnStart", {});
         await this.sendBoard();
         await this.checkForNewGame();
+    
+        delete this.nextTimestamp;
         this.setupTimeout();
+        await this.save();
     }
 
     gainXP(amount: number) {

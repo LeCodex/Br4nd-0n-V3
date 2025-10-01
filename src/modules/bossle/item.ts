@@ -191,7 +191,7 @@ export class Shield extends ShopItem {
 export class MoneyBag extends ShopItem {
     name = "Sac";
     emoji = "💰";
-    description = "Gagnez 1 Or supplémentaire par `🟩`";
+    description = "Gagnez 1 Or supplémentaire par `🟡`";
     cost = 4;
     uses = 5;
 
