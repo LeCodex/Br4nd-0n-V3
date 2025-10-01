@@ -206,7 +206,10 @@ export default class BossleGame extends Game {
     }
 
     gainGold(amount: number) {
-        this.gold = Math.max(0, Math.min(this.gold + this.emit("gainGold", { amount }).amount, this.maxGold));
+        amount = this.emit("gainGold", { amount }).amount;
+        const trueAmount = Math.max(0, Math.min(amount, this.maxGold - this.gold));
+        this.gold += trueAmount;
+        if (amount - trueAmount > 0) this.gainXP(amount - trueAmount);
     }
 
     gainHealth(amount: number) {
