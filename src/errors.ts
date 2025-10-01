@@ -2,6 +2,7 @@ import { Client, EmbedBuilder, Interaction, Message, TextChannel } from "discord
 import DB from "./db";
 import Logger from "./logger";
 import { client } from "client";
+import { replyOrFollowUp } from "./utils";
 
 export default class ErrorHandler {
     private static tempMessages = new Map<Message, number>();
@@ -13,7 +14,7 @@ export default class ErrorHandler {
             if (!(channel instanceof TextChannel)) continue;
             const message = await channel.messages.fetch(messageId);
             if (!message) continue;
-            await this.addTempMessage(message, timestamp);
+            this.addTempMessage(message, timestamp);
         }
         await this.save();
     }
@@ -28,17 +29,17 @@ export default class ErrorHandler {
         const errorChannel = await client.channels.fetch("474301772463341569");
         if (errorChannel?.isSendable()) await errorChannel.send({ embeds: [embed] });
 
-        if (interaction?.isRepliable() && !interaction.replied) {
+        if (interaction?.isRepliable()) {
             embed.setFooter({ text: "This message will be deleted in one minute" });
-            const response = await interaction.reply({
+            const response = await replyOrFollowUp(interaction, {
                 embeds: [embed]
             });
-            await this.addTempMessage(await response.fetch());
+            if (response) this.addTempMessage(await response.fetch());
             await this.save();
         }
     }
 
-    public static async addTempMessage(message: Message, timestamp: number = Date.now() + 60000) {
+    public static addTempMessage(message: Message, timestamp: number = Date.now() + 60000) {
         this.tempMessages.set(message, timestamp);
         setTimeout(async () => {
             this.tempMessages.delete(message);
