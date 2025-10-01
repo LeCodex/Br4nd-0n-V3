@@ -226,26 +226,26 @@ export default class BossleGame extends Game {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
         const player = this.getPlayer(interaction.user);
         if (player.finished) {
-            return interaction.reply({ content: "Vous avez déjà fini", flags: MessageFlags.Ephemeral });
+            return interaction.editReply({ content: "Vous avez déjà fini" });
         } else if (player.attempts.length >= player.maxAttempts) {
-            return interaction.reply({ content: "Vous n'avez plus d'essais", flags: MessageFlags.Ephemeral });
+            return interaction.editReply({ content: "Vous n'avez plus d'essais" });
         }
 
         const input = interaction.options.get("mot")?.value;
         if (!input || typeof input !== "string") {
-            return interaction.reply({ content: "Veuillez renseigner un mot", flags: MessageFlags.Ephemeral });
+            return interaction.editReply({ content: "Veuillez renseigner un mot" });
         }
 
         const word = input.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         if (word.length !== this.targetWord.length) {
-            return interaction.reply({ content: "Le mot ne fait pas la bonne longueur", flags: MessageFlags.Ephemeral });
+            return interaction.editReply({ content: "Le mot ne fait pas la bonne longueur" });
         }
         const knownIncorrectLetters = word.split("").map((e) => player.attemptedLetter(e) && !this.targetWord.includes(e))
         if (knownIncorrectLetters.some((e) => e)) {
-            return interaction.reply({ content: `Le mot contient des lettres que vous savez incorrectes (${word.split("").filter((_, i) => knownIncorrectLetters[i]).join(", ")})`, flags: MessageFlags.Ephemeral });
+            return interaction.editReply({ content: `Le mot contient des lettres que vous savez incorrectes (${word.split("").filter((_, i) => knownIncorrectLetters[i]).join(", ")})`, flags: MessageFlags.Ephemeral });
         }
         if (!this.module.words.has(word)) {
-            return interaction.reply({ content: "Le mot n'est pas valide", flags: MessageFlags.Ephemeral });
+            return interaction.editReply({ content: "Le mot n'est pas valide" });
         }
 
         player.attempts.push(word);
