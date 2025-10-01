@@ -242,7 +242,7 @@ export default class BossleGame extends Game {
         }
         const knownIncorrectLetters = word.split("").map((e) => player.attemptedLetter(e) && !this.targetWord.includes(e))
         if (knownIncorrectLetters.some((e) => e)) {
-            return interaction.editReply({ content: `Le mot contient des lettres que vous savez incorrectes (${word.split("").filter((_, i) => knownIncorrectLetters[i]).join(", ")})`, flags: MessageFlags.Ephemeral });
+            return interaction.editReply({ content: `Le mot contient des lettres que vous savez incorrectes (${word.split("").filter((_, i) => knownIncorrectLetters[i]).join(", ")})` });
         }
         if (!this.module.words.has(word)) {
             return interaction.editReply({ content: "Le mot n'est pas valide" });
