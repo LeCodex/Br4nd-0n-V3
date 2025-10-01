@@ -1,6 +1,6 @@
-import { Message, MessageFlags, SendableChannels, User } from "discord.js";
-import BossleGame, { ConcreteItems, WordleResult } from "./game";
-import ShopItem, * as Items from "./item";
+import { Message, SendableChannels, User } from "discord.js";
+import BossleGame, { WordleResult } from "./game";
+import ShopItem from "./item";
 import { client } from "../../client";
 import { loadItem } from "./utils";
 

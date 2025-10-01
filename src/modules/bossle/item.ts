@@ -171,7 +171,7 @@ export class Shield extends ShopItem {
 export class MoneyBag extends ShopItem {
     name = "Sac";
     emoji = "💰";
-    description = "Gagnez 1 Or supplémentaire par `🟨`";
+    description = "Gagnez 1 Or supplémentaire par `🟧`";
     cost = 4;
     uses = 5;
 
@@ -193,7 +193,7 @@ export class MoneyBag extends ShopItem {
 export class Vial extends ShopItem {
     name = "Fiole";
     emoji = "🧪";
-    description = "Gagnez 1 XP supplémentaire par `🟩`";
+    description = "Gagnez 1 XP supplémentaire par `🟦`";
     cost = 4;
     uses = 5;
 
@@ -215,7 +215,7 @@ export class Vial extends ShopItem {
 export class Unction extends ShopItem {
     name = "Onction";
     emoji = "🪔";
-    description = "Restaure 1 PV à chaque `🟩`";
+    description = "Restaure 1 PV à chaque `🟦`";
     cost = 4;
     uses = 15;
 

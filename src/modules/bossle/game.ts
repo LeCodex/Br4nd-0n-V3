@@ -1,4 +1,4 @@
-import { APIEmbed, ChatInputCommandInteraction, Message, MessageFlags, User } from "discord.js";
+import { APIEmbed, ChatInputCommandInteraction, MessageFlags, User } from "discord.js";
 import Bossle from ".";
 import { Game } from "../game";
 import BosslePlayer from "./player";
@@ -316,7 +316,7 @@ export default class BossleGame extends Game {
     }
 
     renderAttempt(attempt: string) {
-        return this.attemptToResult(attempt).map((e) => e === WordleResult.CORRECT ? '🟩' : e === WordleResult.WRONG_PLACE ? '🟨' : '⬛').join("");
+        return this.attemptToResult(attempt).map((e) => e === WordleResult.CORRECT ? '🟦' : e === WordleResult.WRONG_PLACE ? '🟧' : '⬛').join("");
     }
 
     renderChange(amount: number) {
