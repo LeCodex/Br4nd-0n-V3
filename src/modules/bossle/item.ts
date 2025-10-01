@@ -128,7 +128,7 @@ export class CriticalPotion extends ShopItem {
 export class NeutralizingPotion extends ShopItem {
     name = "Potion neutralisante";
     emoji = "🧬";
-    description = "Annule un des effets du monstre";
+    description = "Annule 1 des effets du monstre";
     cost = 8;
 
     buy(player: BosslePlayer): boolean {
@@ -137,6 +137,7 @@ export class NeutralizingPotion extends ShopItem {
             return false;
         }
         this.game.monsterEffects.splice(this.game.monsterEffects.indexOf(effect), 1);
+        effect.destroy();
         this.game.channel?.send(`### 🧬 L'effet ${effect.name} a été neutralisé!`);
         return true;
     }

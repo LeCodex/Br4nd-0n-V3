@@ -147,9 +147,6 @@ export default class BossleGame extends Game {
     }
 
     async nextTurn() {
-        this.emit("turnEnd", {});
-        this.turn++;
-
         for (const player of Object.values(this.players)) {
             if (player.lastAttempt && !player.finished && this.isMonsterAlive) {
                 this.health -= 5 * (player.maxAttempts - player.attempts.length);
@@ -161,11 +158,8 @@ export default class BossleGame extends Game {
             await this.boardView?.end();
         }
 
-        for (const player of Object.values(this.players)) {
-            player.attempts.length = 0;
-            player.maxAttempts = 6;
-            delete player.attemptsBoard;
-        }
+        this.emit("turnEnd", {});
+        this.turn++;
 
         if (!this.isMonsterAlive) {
             const healthGain = random(1, 10);
@@ -182,7 +176,12 @@ export default class BossleGame extends Game {
                 this.monsterEffects.push(new cls(this));
             }
         }
-        this.emit("turnStart", {});
+
+        for (const player of Object.values(this.players)) {
+            player.attempts.length = 0;
+            player.maxAttempts = 6;
+            delete player.attemptsBoard;
+        }
 
         this.turnHealthChange = 0;
         this.monster.turnHealthChange = 0;
@@ -190,6 +189,7 @@ export default class BossleGame extends Game {
         this.targetWord = randomlyPick(this.module.targetWords.filter((e) => e.length === targetLength)).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         this.shop = range(5).map(() => new (randomlyPick(ALL_ITEMS))(this));
 
+        this.emit("turnStart", {});
         await this.sendBoard();
         await this.checkForNewGame();
         this.setupTimeout();

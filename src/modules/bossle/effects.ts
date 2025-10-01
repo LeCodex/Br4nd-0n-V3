@@ -153,6 +153,13 @@ export class Fast extends BossEffect {
     emoji = ":shaking_head:";
     description = "Les joueurs ont 1 essai de moins";
 
+    destroy(): void {
+        super.destroy();
+        for (const player of Object.values(this.game.players)) {
+            player.maxAttempts++;
+        }
+    }
+
     setupListeners(): void {
         this.on("turnStart", (context) => {
             for (const player of Object.values(this.game.players)) {
