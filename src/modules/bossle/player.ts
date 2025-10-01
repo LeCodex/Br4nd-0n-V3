@@ -16,6 +16,7 @@ export default class BosslePlayer {
     }
     maxAttempts = 6;
     items = new Set<ShopItem>();
+    summary: Array<string> = [];
 
     constructor(public game: BossleGame, public user: User) { }
 
@@ -41,7 +42,7 @@ export default class BosslePlayer {
     }
 
     get privateAttemptContent() {
-        return `\`\`\`\n${this.attempts.map((e) => `${this.game.renderAttempt(e)} ${e}`).join("\n")}\n${this.finished || this.attempts.length >= this.maxAttempts ? "" : `Lettres restantes: ${this.remainingLetters.join("")}\n`}\`\`\``
+        return `\`\`\`\n${this.attempts.map((e) => `${this.game.renderAttempt(e)} ${e}`).join("\n")}\n${this.finished || this.attempts.length >= this.maxAttempts ? "" : `Lettres restantes: ${this.remainingLetters.join("")}\n`}\n${this.summary.join("\n")}\`\`\``
     }
 
     attemptedLetter(letter: string) {
@@ -76,6 +77,7 @@ export default class BosslePlayer {
             stats: this.stats,
             maxAttempts: this.maxAttempts,
             items: [...this.items].map((e) => e.serialize()),
+            summary: this.summary
         }
     }
 
@@ -86,6 +88,9 @@ export default class BosslePlayer {
         instance.maxAttempts = obj.maxAttempts;
         instance.items = new Set(obj.items.map((e) => loadItem(game, e)));
         instance.items.forEach((e) => e.buy(instance));
+        if (obj.summary) {
+            instance.summary = obj.summary;
+        }
         if (obj.attemptsBoard) {
             instance.attemptsBoard = await (await client.channels.fetch(game.channelId) as SendableChannels).messages.fetch(obj.attemptsBoard);
         }

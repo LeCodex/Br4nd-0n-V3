@@ -74,7 +74,7 @@ export class Ferocious extends BossEffect {
 export class Greedy extends BossEffect {
     name = "Avare";
     emoji = "🤑";
-    description = "Les `🟧` font perdre 1 PV en plus du gain d'Or";
+    description = "Les `🟡` font perdre 1 PV en plus du gain d'Or";
 
     setupListeners(): void {
         this.on("result", (context) => {
@@ -184,7 +184,7 @@ export class Patient extends BossEffect {
 export class Unusual extends BossEffect {
     name = "Atypique";
     emoji = "😵";
-    description = "Inverse les effets des `🟦` et des `⬛`";
+    description = "Inverse les effets des `🟩` et des `⬛`";
 
     setupListeners(): void {
         this.on("result", (context) => {
