@@ -24,6 +24,9 @@ export default class BossleView extends GameView<BossleGame> {
             return interaction.reply({ content: "Vous n'avez pas assez d':coin: Or", flags: MessageFlags.Ephemeral });
         }
         const player = this.game.getPlayer(interaction.user);
+        if (player.items.size >= 3) {
+            return interaction.reply({ content: "Vous avez déjà 3 objets", flags: MessageFlags.Ephemeral });
+        }
         const successful = item.buy(player);
         if (successful) {
             this.game.gold -= item.cost;
