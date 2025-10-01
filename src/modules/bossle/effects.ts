@@ -50,8 +50,8 @@ export class Sick extends BossEffect {
     description = "Un mot trouvé ne rapporte pas les 5 XP qu'il devrait";
 
     setupListeners(): void {
-        this.on("finished", (context) => {
-            context.xpGained = 0;
+        this.on("finished", () => {
+            this.game.gainXP(-5);
         });
     }
 }
@@ -63,7 +63,8 @@ export class Ferocious extends BossEffect {
 
     setupListeners(): void {
         this.on("result", (context) => {
-            if (context.result.filter((e) => e === WordleResult.INCORRECT).length >= 4) {
+            const result = this.game.attemptToResult(context.attempt);
+            if (result.filter((e) => e === WordleResult.INCORRECT).length >= 4) {
                 context.dmgPerIncorrect *= 2;
             }
         })
@@ -73,11 +74,11 @@ export class Ferocious extends BossEffect {
 export class Greedy extends BossEffect {
     name = "Avare";
     emoji = "🤑";
-    description = "Les `🟨` font perdre un PV en plus du gain d'Or";
+    description = "Les `🟨` font perdre 1 PV en plus du gain d'Or";
 
     setupListeners(): void {
         this.on("result", (context) => {
-            context.result.forEach((e) => {
+            this.game.attemptToResult(context.attempt).forEach((e) => {
                 if (e === WordleResult.WRONG_PLACE) {
                     this.game.gainHealth(-1);
                 }
@@ -89,19 +90,98 @@ export class Greedy extends BossEffect {
 export class Furtive extends BossEffect {
     name = "Furtif";
     emoji = "😶‍🌫️";
-    description = "Prend la moitié des dégâts (arrondi au supérieur)";
-    preventedDamage = true;
+    description = "Prend 1 dégât de moins à chaque attaque";
 
     setupListeners(): void {
         this.on("monsterDamage", (context) => {
-            let realAmount = 0;
-            for (let i = 0; i < context.amount; i++) {
-                this.preventedDamage = !this.preventedDamage;
-                if (!this.preventedDamage) {
-                    realAmount++;
+            context.amount--;
+        })
+    }
+}
+
+export class Sophisticated extends BossEffect {
+    name = "Sophistiqué";
+    emoji = "🧐";
+    description = "Les joueurs doivent utiliser les indices qu'ils ont reçus";
+
+    setupListeners(): void {
+        this.on("attempt", (context) => {
+            const wrongPlaceClues = new Set<string>();
+            const correctClues = new Map<number, string>();
+            for (const attempt of context.player.attempts) {
+                for (const [i, result] of this.game.attemptToResult(attempt).entries()) {
+                    const letter = attempt[i]!;
+                    if (result === WordleResult.WRONG_PLACE) {
+                        wrongPlaceClues.add(letter);
+                    } else if (result === WordleResult.CORRECT) {
+                        correctClues.set(i, letter);
+                    }
                 }
             }
-            context.amount = realAmount;
+
+            for (const letter of wrongPlaceClues) {
+                if (!context.attempt.includes(letter)) {
+                    context.valid = false;
+                    return;
+                }
+            }
+
+            for (const [position, letter] of correctClues.entries()) {
+                if (context.attempt[position] !== letter) {
+                    context.valid = false;
+                    return;
+                }
+            }
+        });
+    }
+}
+
+export class Tough extends BossEffect {
+    name = "Coriace";
+    emoji = "🤖";
+    description = "Le mot a 1 lettre supplémentaire";
+
+    setupListeners(): void {
+        this.on("newWord", (context) => {
+            context.length++;
         })
+    }
+}
+
+export class Fast extends BossEffect {
+    name = "Rapide";
+    emoji = ":shaking_head:";
+    description = "Les joueurs ont 1 essai de moins";
+
+    setupListeners(): void {
+        this.on("turnStart", (context) => {
+            for (const player of Object.values(this.game.players)) {
+                player.maxAttempts--;
+            }
+        })
+    }
+}
+
+export class Patient extends BossEffect {
+    name = "Patient";
+    emoji = "😴";
+    description = "A la fin du tour, fais 10 dégâts s'il est en vie";
+
+    setupListeners(): void {
+        this.on("turnEnd", (context) => {
+            this.game.gainHealth(-10);
+        })
+    }
+}
+
+export class Unusual extends BossEffect {
+    name = "Atypique";
+    emoji = "😵";
+    description = "Inverse les effets des `🟩` et des `⬛`";
+
+    setupListeners(): void {
+        this.on("result", (context) => {
+            context.result = context.result.map((e) => e === WordleResult.CORRECT ? WordleResult.INCORRECT : e === WordleResult.INCORRECT ? WordleResult.CORRECT : e)
+        });
     }
 }

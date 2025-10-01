@@ -22,14 +22,16 @@ export type ConcreteEffects = Omit<typeof Effects, "default">;
 const ALL_EFFECTS = Object.entries(Effects).filter(([k]) => k !== "default").map(([_, v]) => v) as Array<ConcreteEffects[keyof ConcreteEffects]>;
 
 export interface BossleEvents {
-    attempt: { readonly player: BosslePlayer, attempt: string }
-    result: { readonly player: BosslePlayer, result: Array<WordleResult>, dmgPerIncorrect: number, xpPerCorrect: number, goldPerMisplaced: number }
-    finished: { readonly player: BosslePlayer, xpGained: number }
+    attempt: { readonly player: BosslePlayer, attempt: string, valid: boolean }
+    result: { readonly player: BosslePlayer, attempt: string,  result: Array<WordleResult>, dmgPerIncorrect: number, xpPerCorrect: number, goldPerMisplaced: number }
+    finished: { readonly player: BosslePlayer }
     gainXP: { amount: number }
     gainGold: { amount: number }
     gainHealth: { amount: number }
     monsterDamage: { readonly player: BosslePlayer, amount: number }
     turnEnd: {}
+    turnStart: {}
+    newWord: { length: number }
     defeated: { regenRatio: number }
 }
 export type BossleEventHandler<K extends keyof BossleEvents = keyof BossleEvents> = (context: BossleEvents[K]) => void;
@@ -52,6 +54,7 @@ export default class BossleGame extends Game {
     };
     monsterEffects: Array<BossEffect> = [];
     targetWord = "";
+    targetLength = 5;
 
     listeners: { [K in keyof BossleEvents]?: Set<BossleEventHandler<K>> } = {};
     onceListeners = new Set<BossleEventHandler>();
@@ -145,6 +148,7 @@ export default class BossleGame extends Game {
 
     async nextTurn() {
         this.emit("turnEnd", {});
+        this.turn++;
 
         for (const player of Object.values(this.players)) {
             if (player.lastAttempt && !player.finished && this.isMonsterAlive) {
@@ -157,13 +161,9 @@ export default class BossleGame extends Game {
             await this.boardView?.end();
         }
 
-        this.turnHealthChange = 0;
-        this.monster.turnHealthChange = 0;
-        this.turn++;
-        this.targetWord = randomlyPick(this.module.targetWords).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-
         for (const player of Object.values(this.players)) {
             player.attempts.length = 0;
+            player.maxAttempts = 6;
             delete player.attemptsBoard;
         }
 
@@ -178,11 +178,16 @@ export default class BossleGame extends Game {
                 let cls: ConcreteEffects[keyof ConcreteEffects];
                 do {
                     cls = randomlyPick(ALL_EFFECTS);
-                } while (this.monsterEffects.filter((e) => e.constructor === cls).length)
+                } while (this.monsterEffects.find((e) => e.constructor === cls))
                 this.monsterEffects.push(new cls(this));
             }
         }
+        this.emit("turnStart", {});
 
+        this.turnHealthChange = 0;
+        this.monster.turnHealthChange = 0;
+        const targetLength = this.emit("newWord", { length: 5 }).length
+        this.targetWord = randomlyPick(this.module.targetWords.filter((e) => e.length === targetLength)).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         this.shop = range(5).map(() => new (randomlyPick(ALL_ITEMS))(this));
 
         await this.sendBoard();
@@ -248,8 +253,13 @@ export default class BossleGame extends Game {
             return interaction.editReply({ content: "Le mot n'est pas valide" });
         }
 
+        const valid = this.emit("attempt", { player, attempt: word, valid: true }).valid;
+        if (!valid) {
+            return interaction.editReply({ content: "Un effet vous empêche de jouer ce mot" });
+        }
+
         player.attempts.push(word);
-        const { result, xpPerCorrect, goldPerMisplaced, dmgPerIncorrect } = this.emit("result", { player, result: this.attemptToResult(word), dmgPerIncorrect: 1, xpPerCorrect: 1, goldPerMisplaced: 1 });
+        const { result, xpPerCorrect, goldPerMisplaced, dmgPerIncorrect } = this.emit("result", { player, attempt: word, result: this.attemptToResult(word), dmgPerIncorrect: 1, xpPerCorrect: 1, goldPerMisplaced: 1 });
         for (const tile of result) {
             if (tile === WordleResult.CORRECT) {
                 this.gainXP(xpPerCorrect);
@@ -265,7 +275,7 @@ export default class BossleGame extends Game {
         await interaction.editReply({ content: player.privateAttemptContent });
 
         if (player.finished && this.isMonsterAlive) {
-            this.gainXP(this.emit("finished", { player, xpGained: 5 }).xpGained);
+            this.emit("finished", { player });
             player.damageMonster();
         }
 
@@ -338,7 +348,7 @@ export default class BossleGame extends Game {
         if (this.monsterEffects.length) {
             embed.fields?.splice(2, 0, {
                 name: `❗ Effets du monstre`,
-                value: this.monsterEffects.map((e) => e.toString()).join("\n")
+                value: `-# ${this.monsterEffects.map((e) => e.toString()).join("\n-# ")}`
             });
         }
 
