@@ -1,3 +1,4 @@
+import { random } from "lodash";
 import { randomlyPick } from "../../utils";
 import BossleGame, { BossleEventHandler, BossleEvents, ConcreteItems, WordleResult } from "./game";
 import BosslePlayer from "./player";
@@ -60,12 +61,13 @@ export default abstract class ShopItem {
 export class HealthPotion extends ShopItem {
     name = "Potion de soin";
     emoji = "💖";
-    description = "Restaure 10 points de vie";
+    description = "Restaure 10% de vos PV max";
     cost = 3;
 
     buy(player: BosslePlayer): boolean {
-        this.game.channel?.send(`### 💖 Vous avez regagné 10 PV!`);
-        this.game.gainHealth(10);
+        const amount = Math.floor(this.game.maxHealth / 10);
+        this.game.channel?.send(`### 💖 Vous avez regagné ${amount} PV!`);
+        this.game.gainHealth(amount);
         return true;
     }
 }
@@ -96,7 +98,7 @@ export class FirePotion extends ShopItem {
     }
 }
 
-export class LookingGlass extends ShopItem {
+export class MagnifyingGlass extends ShopItem {
     name = "Loupe";
     emoji = "🔎";
     description = "Révèle une lettre du mot du monstre";
@@ -119,6 +121,23 @@ export class CriticalPotion extends ShopItem {
         this.game.untilEndOfTurn("monsterDamage", (context) => {
             context.amount *= 2;
         })
+        return true;
+    }
+}
+
+export class NeutralizingPotion extends ShopItem {
+    name = "Potion neutralisante";
+    emoji = "🧬";
+    description = "Annule un des effets du monstre";
+    cost = 8;
+
+    buy(player: BosslePlayer): boolean {
+        const effect = randomlyPick(this.game.monsterEffects);
+        if (!effect) {
+            return false;
+        }
+        this.game.monsterEffects.splice(this.game.monsterEffects.indexOf(effect), 1);
+        this.game.channel?.send(`### 🧬 L'effet ${effect.name} a été neutralisé!`);
         return true;
     }
 }
