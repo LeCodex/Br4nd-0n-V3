@@ -13,8 +13,12 @@ export default abstract class BossEffect {
     setupListeners() { }
 
     on<K extends keyof BossleEvents>(key: K, listener: BossleEventHandler<K>) {
-        this.game.on(key, listener);
-        this.listeners.add([key, listener as BossleEventHandler]);
+        const wrappedListener: BossleEventHandler<K> = (context) => {
+            if (!this.game.isMonsterAlive) return;
+            return listener(context);
+        }
+        this.game.on(key, wrappedListener);
+        this.listeners.add([key, wrappedListener as BossleEventHandler]);
     }
 
     destroy() {
