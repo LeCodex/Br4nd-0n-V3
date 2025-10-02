@@ -89,7 +89,7 @@ export default class BossleGame extends Game {
         }
 
         if (this.timeout) clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => this.nextTurn(), this.nextTimestamp - DateTime.now().setZone("Europe/Paris").toMillis());
+        this.timeout = setTimeout(() => this.nextTurn(), this.nextTimestamp - Date.now());
     }
 
     getPlayer(user: User) {
@@ -266,6 +266,7 @@ export default class BossleGame extends Game {
             return interaction.editReply({ content: "Un effet vous empêche de jouer ce mot" });
         }
 
+        const wasAlive = this.isMonsterAlive;
         player.attempts.push(word);
         const { result, xpPerCorrect, goldPerMisplaced, dmgPerIncorrect } = this.emit("result", { player, attempt: word, result: this.attemptToResult(word), dmgPerIncorrect: 1, xpPerCorrect: 1, goldPerMisplaced: 1 });
         for (const tile of result) {
@@ -282,7 +283,6 @@ export default class BossleGame extends Game {
         }
         await interaction.editReply({ content: player.privateAttemptContent });
 
-        const wasAlive = this.isMonsterAlive;
         if (player.finished && wasAlive) {
             this.emit("finished", { player });
             player.damageMonster();

@@ -63,7 +63,7 @@ export class Sick extends BossEffect {
 export class Ferocious extends BossEffect {
     name = "Féroce";
     emoji = "😡";
-    description = "Chaque essai avec 4 ou 5 `⬛` fait perdre le double de PV";
+    description = "Chaque essai avec 4 `⬛` ou plus fait perdre le double de PV";
 
     setupListeners(): void {
         this.on("result", (context) => {

@@ -17,9 +17,13 @@ export default abstract class ShopItem {
     abstract buy(player: BosslePlayer): boolean;
 
     giveTo(player: BosslePlayer) {
+        if (player.items.size >= 3) {
+            return false;
+        }
         this.owner?.items.delete(this);
         this.owner = player;
         player.items.add(this);
+        return true;
     }
 
     on<K extends keyof BossleEvents>(key: K, listener: BossleEventHandler<K>) {
@@ -62,7 +66,7 @@ export class HealthPotion extends ShopItem {
     name = "Potion de soin";
     emoji = "💖";
     description = "Restaure 10% de vos PV max";
-    cost = 3;
+    cost = 6;
 
     buy(player: BosslePlayer): boolean {
         const amount = Math.floor(this.game.maxHealth / 10);
@@ -76,7 +80,7 @@ export class XpPotion extends ShopItem {
     name = "Potion d'expérience";
     emoji = "🎉";
     description = "Donne 10 points d'expérience";
-    cost = 3;
+    cost = 6;
 
     buy(player: BosslePlayer): boolean {
         this.game.channel?.send(`### 🎉 Vous avez gagné 10 XP!`);
@@ -89,7 +93,7 @@ export class FirePotion extends ShopItem {
     name = "Potion de feu";
     emoji = "🔥";
     description = "Fais 3 dégâts au monstre";
-    cost = 3;
+    cost = 6;
 
     buy(player: BosslePlayer): boolean {
         this.game.channel?.send(`### 🔥 Le monstre a pris 3 dégâts!`);
@@ -102,7 +106,7 @@ export class MagnifyingGlass extends ShopItem {
     name = "Loupe";
     emoji = "🔎";
     description = "Révèle une lettre du mot du monstre";
-    cost = 5;
+    cost = 8;
 
     buy(player: BosslePlayer): boolean {
         this.game.channel?.send(`### 🔎 Le mot contient un \`${randomlyPick(this.game.targetWord)}\`!`);
@@ -114,7 +118,7 @@ export class CriticalPotion extends ShopItem {
     name = "Potion de criticité";
     emoji = "💥";
     description = "Double les dégâts au monstre ce tour-ci";
-    cost = 6;
+    cost = 10;
 
     buy(player: BosslePlayer): boolean {
         this.game.channel?.send(`### 💥 Les dégâts sont doublés ce tour-ci!`);
@@ -129,7 +133,7 @@ export class NeutralizingPotion extends ShopItem {
     name = "Potion neutralisante";
     emoji = "🧬";
     description = "Annule 1 des effets du monstre";
-    cost = 8;
+    cost = 14;
 
     buy(player: BosslePlayer): boolean {
         const effect = randomlyPick(this.game.monsterEffects);
@@ -148,7 +152,7 @@ export class Medkit extends ShopItem {
     name = "Médikit";
     emoji = "🩹";
     description = "Lorsque vous tuez un monstre, restaure 25% de votre vie max";
-    cost = 4;
+    cost = 8;
     uses = 3;
 
     constructor(game: BossleGame) {
@@ -156,7 +160,7 @@ export class Medkit extends ShopItem {
     }
 
     buy(player: BosslePlayer): boolean {
-        this.giveTo(player);
+        if (!this.giveTo(player)) return false;
         this.on("defeated", (context) => {
             if (this.use()) {
                 context.regenRatio += 1 / 4;
@@ -170,7 +174,7 @@ export class Shield extends ShopItem {
     name = "Bouclier";
     emoji = "🛡️";
     description = "Ignorez les `⬛` de votre premier mot";
-    cost = 4;
+    cost = 8;
     uses = 3;
 
     constructor(game: BossleGame) {
@@ -178,7 +182,7 @@ export class Shield extends ShopItem {
     }
 
     buy(player: BosslePlayer): boolean {
-        this.giveTo(player);
+        if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
             if (context.player === this.owner && context.player.attempts.length === 1 && this.use()) {
                 context.result = context.result.filter((e) => e !== WordleResult.INCORRECT);
@@ -192,7 +196,7 @@ export class MoneyBag extends ShopItem {
     name = "Sac";
     emoji = "💰";
     description = "Gagnez 1 Or supplémentaire par `🟡`";
-    cost = 4;
+    cost = 6;
     uses = 5;
 
     constructor(game: BossleGame) {
@@ -200,7 +204,7 @@ export class MoneyBag extends ShopItem {
     }
 
     buy(player: BosslePlayer): boolean {
-        this.giveTo(player);
+        if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
             if (context.player === this.owner && context.result.some((e) => e === WordleResult.WRONG_PLACE) && this.use()) {
                 context.goldPerMisplaced++;
@@ -214,7 +218,7 @@ export class Vial extends ShopItem {
     name = "Fiole";
     emoji = "🧪";
     description = "Gagnez 1 XP supplémentaire par `🟩`";
-    cost = 4;
+    cost = 6;
     uses = 5;
 
     constructor(game: BossleGame) {
@@ -222,7 +226,7 @@ export class Vial extends ShopItem {
     }
 
     buy(player: BosslePlayer): boolean {
-        this.giveTo(player);
+        if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
             if (context.player === this.owner && context.result.some((e) => e === WordleResult.CORRECT) && this.use()) {
                 context.xpPerCorrect++;
@@ -236,11 +240,11 @@ export class Unction extends ShopItem {
     name = "Onction";
     emoji = "🪔";
     description = "Restaure 1 PV à chaque `🟩`";
-    cost = 4;
+    cost = 6;
     uses = 15;
 
     buy(player: BosslePlayer): boolean {
-        this.giveTo(player);
+        if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
             if (context.player === this.owner) {
                 context.result.forEach((e) => {
@@ -258,11 +262,11 @@ export class Sword extends ShopItem {
     name = "Epée";
     emoji = "⚔️";
     description = "Augmente de 1 vos dégâts au monstre";
-    cost = 4;
+    cost = 6;
     uses = 3;
 
     buy(player: BosslePlayer): boolean {
-        this.giveTo(player);
+        if (!this.giveTo(player)) return false;
         this.on("monsterDamage", (context) => {
             if (context.player === this.owner && this.use()) {
                 context.amount++;
@@ -276,11 +280,11 @@ export class Bow extends ShopItem {
     name = "Arc";
     emoji = "🏹";
     description = "Si vous terminez avec 3 essais ou moins, doublez vos dégâts";
-    cost = 4;
-    uses = 4;
+    cost = 6;
+    uses = 2;
 
     buy(player: BosslePlayer): boolean {
-        this.giveTo(player);
+        if (!this.giveTo(player)) return false;
         this.on("monsterDamage", (context) => {
             if (context.player === this.owner && this.owner!.attempts.length <= 3 && this.use()) {
                 context.amount *= 2;
@@ -294,14 +298,33 @@ export class Scarf extends ShopItem {
     name = "Echarpe";
     emoji = "🧣";
     description = "Ignorez les mots avec uniquement des `⬛`";
-    cost = 4;
+    cost = 6;
     uses = 3;
 
     buy(player: BosslePlayer): boolean {
-        this.giveTo(player);
+        if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
             if (context.player === this.owner && context.result.every((e) => e === WordleResult.INCORRECT) && this.use()) {
                 context.result = [];
+            }
+        });
+        return true;
+    }
+}
+
+export class MagicWand extends ShopItem {
+    name = "Baguette magique";
+    emoji = ":magic_wand:";
+    description = "Fait 1 dégât au monstre si vous trouvez un mot avec 3 ou 4 `🟩`";
+    cost = 8;
+    uses = 5;
+
+    buy(player: BosslePlayer): boolean {
+        if (!this.giveTo(player)) return false;
+        this.on("result", (context) => {
+            const corrects = context.result.filter((e) => e === WordleResult.CORRECT).length;
+            if (context.player === this.owner && (corrects === 3 || corrects === 4) && this.use()) {
+                player.damageMonster(1);
             }
         });
         return true;
