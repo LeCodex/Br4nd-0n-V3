@@ -282,12 +282,13 @@ export default class BossleGame extends Game {
         }
         await interaction.editReply({ content: player.privateAttemptContent });
 
-        if (player.finished && this.isMonsterAlive) {
+        const wasAlive = this.isMonsterAlive;
+        if (player.finished && wasAlive) {
             this.emit("finished", { player });
             player.damageMonster();
         }
 
-        if (!this.isMonsterAlive) {
+        if (!this.isMonsterAlive && wasAlive) {
             this.channel?.send("### ⚔️ Le monstre est vaincu!");
             const { regenRatio } = this.emit("defeated", { regenRatio: 1/4 });
             this.gainHealth(Math.floor(this.maxHealth * regenRatio + .5));
