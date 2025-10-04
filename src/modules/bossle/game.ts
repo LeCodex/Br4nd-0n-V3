@@ -167,13 +167,13 @@ export default class BossleGame extends Game {
         this.turn++;
 
         if (!this.isMonsterAlive) {
-            const healthGain = random(1, 10);
+            const healthGain = random(1, 20);
             this.monster.maxHealth += healthGain;
             this.monster.health = this.monster.maxHealth;
             this.monster.level++;
             this.monsterEffects.forEach((e) => e.destroy());
             this.monsterEffects.length = 0;
-            for (let i = 0; i < Math.ceil((10 - healthGain) / 3); i++) {
+            for (let i = 0; i < Math.floor((24 - healthGain) / 6); i++) {
                 let cls: ConcreteEffects[keyof ConcreteEffects];
                 do {
                     cls = randomlyPick(ALL_EFFECTS);
