@@ -297,7 +297,9 @@ export default class BossleGame extends Game {
                 this.gainGold(goldPerMisplaced);
                 player.stats.goldGained += goldPerMisplaced;
             } else {
-                player.incorrectLetters.add(word[i]!);
+                if (!this.targetWord.includes(word[i]!)) {
+                    player.incorrectLetters.add(word[i]!);
+                }
                 if (this.isMonsterAlive) {
                     this.gainHealth(-dmgPerIncorrect);
                     player.stats.damageReceived += dmgPerIncorrect;
