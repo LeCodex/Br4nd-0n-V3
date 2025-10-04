@@ -102,7 +102,7 @@ export default class BossleGame extends Game {
     get maxHealth() { return 110 + 10 * this.level; }
     get maxGold() { return 20 + 5 * this.level; }
     get emptyShopSlots() { return this.shop.filter((e) => !e).length; }
-    get refreshCost() { return this.refreshes + this.emptyShopSlots * (this.emptyShopSlots + 1) / 2; }
+    get refreshCost() { return this.emptyShopSlots; }
 
     emit<K extends keyof BossleEvents>(key: K, context: BossleEvents[K]): BossleEvents[K] {
         if (!this.listeners[key]) return context;
@@ -367,8 +367,8 @@ export default class BossleGame extends Game {
                     inline: true
                 },
                 {
-                    name: `💰 Magasin${this.shop.some((e) => !e) ? ` - 🔁 Refraîchissement: ${this.refreshCost} :coin:` : ''}`,
-                    value: `-# ${this.shop.length ? this.shop.map((e) => e ? e.toString() : "🚫 Epuisé, revenez demain!").join("\n-# ") : "🚫 Stock épuisé! Revenez demain!"}`
+                    name: `💰 Magasin${this.shop.some((e) => !e) ? ` - 🔁 Rafraîchissement: ${this.refreshCost} :coin:` : ''}`,
+                    value: `-# ${this.shop.length ? this.shop.map((e) => e ? e.toString() : "🚫 Epuisé").join("\n-# ") : "🚫 Stock épuisé"}`
                 },
                 {
                     name: `🛡️ Aventuriers`,
