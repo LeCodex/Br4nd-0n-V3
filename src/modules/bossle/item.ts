@@ -92,7 +92,7 @@ export class XpPotion extends ShopItem {
 export class FirePotion extends ShopItem {
     name = "Potion de feu";
     emoji = "🔥";
-    description = "Fais 3 dégâts au monstre";
+    description = "Fait 3 dégâts au monstre";
     cost = 6;
 
     buy(player: BosslePlayer): boolean {
@@ -151,7 +151,7 @@ export class NeutralizingPotion extends ShopItem {
 export class Medkit extends ShopItem {
     name = "Médikit";
     emoji = "🩹";
-    description = "Lorsque vous tuez un monstre, restaure 25% de votre vie max";
+    description = "Lorsque le monstre est vaincu, restaure 10% de votre vie max";
     cost = 8;
     uses = 3;
 
@@ -163,7 +163,7 @@ export class Medkit extends ShopItem {
         if (!this.giveTo(player)) return false;
         this.on("defeated", (context) => {
             if (this.use()) {
-                context.regenRatio += 1 / 4;
+                context.regenRatio += 1 / 10;
             }
         });
         return true;
