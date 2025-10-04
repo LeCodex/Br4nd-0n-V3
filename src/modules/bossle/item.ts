@@ -136,7 +136,7 @@ export class NeutralizingPotion extends ShopItem {
     cost = 14;
 
     buy(player: BosslePlayer): boolean {
-        const effect = randomlyPick(this.game.monsterEffects);
+        const effect = randomlyPick(this.game.monsterEffects.filter((e) => e.disablable));
         if (!effect) {
             return false;
         }
@@ -174,8 +174,8 @@ export class Shield extends ShopItem {
     name = "Bouclier";
     emoji = "🛡️";
     description = "Ignorez les `⬛` de votre premier mot";
-    cost = 8;
-    uses = 3;
+    cost = 6;
+    uses = 4;
 
     constructor(game: BossleGame) {
         super(game);
@@ -314,7 +314,7 @@ export class Scarf extends ShopItem {
 
 export class MagicWand extends ShopItem {
     name = "Baguette magique";
-    emoji = ":magic_wand:";
+    emoji = "🪄"; // :magic_wand:
     description = "Fait 1 dégât au monstre si vous trouvez un mot avec 3 ou 4 `🟩`";
     cost = 8;
     uses = 5;
@@ -325,6 +325,29 @@ export class MagicWand extends ShopItem {
             const corrects = context.result.filter((e) => e === WordleResult.CORRECT).length;
             if (context.player === this.owner && (corrects === 3 || corrects === 4) && this.use()) {
                 player.damageMonster(1);
+            }
+        });
+        return true;
+    }
+}
+
+export class CrystalBall extends ShopItem {
+    name = "Boule de cristal";
+    emoji = "🔮";
+    description = "Révèle une lettre `⬛` après chaque essai";
+    cost = 8;
+    uses = 10;
+
+    buy(player: BosslePlayer): boolean {
+        if (!this.giveTo(player)) return false;
+        this.on("result", (context) => {
+            if (context.player === this.owner && this.use()) {
+                let letter: string;
+                do {
+                    letter = randomlyPick("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+                } while (this.game.targetWord.includes(letter) || this.owner.incorrectLetters.has(letter));
+                this.owner.summary.push(`🔮 Le \`${letter}\` n'est pas dans le mot`);
+                this.owner.incorrectLetters.add(letter);
             }
         });
         return true;

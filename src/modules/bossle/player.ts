@@ -17,6 +17,7 @@ export default class BosslePlayer {
     maxAttempts = 6;
     items = new Set<ShopItem>();
     summary: Array<string> = [];
+    incorrectLetters = new Set<string>();
 
     constructor(public game: BossleGame, public user: User) { }
 
@@ -29,16 +30,7 @@ export default class BosslePlayer {
     }
 
     get remainingLetters() {
-        const incorrectLetters = this.attempts.reduce((a, e) => {
-            const result = this.game.attemptToResult(e);
-            for (const [i, letter] of Array.from(e).entries()) {
-                if (result[i] === WordleResult.INCORRECT) {
-                    a.add(letter);
-                }
-            }
-            return a;
-        }, new Set<string>());
-        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").filter((e) => !incorrectLetters.has(e));
+        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").filter((e) => !this.incorrectLetters.has(e));
     }
 
     get privateAttemptContent() {
@@ -77,7 +69,8 @@ export default class BosslePlayer {
             stats: this.stats,
             maxAttempts: this.maxAttempts,
             items: [...this.items].map((e) => e.serialize()),
-            summary: this.summary
+            summary: this.summary,
+            incorrectLetters: [...this.incorrectLetters]
         }
     }
 
@@ -88,9 +81,8 @@ export default class BosslePlayer {
         instance.maxAttempts = obj.maxAttempts;
         instance.items = new Set(obj.items.map((e) => loadItem(game, e)));
         instance.items.forEach((e) => e.buy(instance));
-        if (obj.summary) {
-            instance.summary = obj.summary;
-        }
+        instance.summary = obj.summary;
+        instance.incorrectLetters = new Set(obj.incorrectLetters);
         if (obj.attemptsBoard) {
             instance.attemptsBoard = await (await client.channels.fetch(game.channelId) as SendableChannels).messages.fetch(obj.attemptsBoard);
         }

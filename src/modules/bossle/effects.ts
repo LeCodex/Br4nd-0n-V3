@@ -5,6 +5,7 @@ export default abstract class BossEffect {
     abstract emoji: string;
     abstract description: string;
     listeners = new Set<[keyof BossleEvents, BossleEventHandler]>();
+    disablable = true;
 
     constructor(public game: BossleGame) {
         this.setupListeners();
@@ -67,8 +68,7 @@ export class Ferocious extends BossEffect {
 
     setupListeners(): void {
         this.on("result", (context) => {
-            const result = this.game.attemptToResult(context.attempt);
-            if (result.filter((e) => e === WordleResult.INCORRECT).length >= 4) {
+            if (context.constResult.filter((e) => e === WordleResult.INCORRECT).length >= 4) {
                 context.dmgPerIncorrect *= 2;
             }
         })
@@ -82,7 +82,7 @@ export class Greedy extends BossEffect {
 
     setupListeners(): void {
         this.on("result", (context) => {
-            this.game.attemptToResult(context.attempt).forEach((e) => {
+            context.constResult.forEach((e) => {
                 if (e === WordleResult.WRONG_PLACE) {
                     this.game.gainHealth(-1);
                 }
@@ -144,6 +144,7 @@ export class Tough extends BossEffect {
     name = "Coriace";
     emoji = "🤖";
     description = "Le mot a 1 lettre supplémentaire";
+    disablable = false;  // Can't change the word mid turn
 
     setupListeners(): void {
         this.on("newWord", (context) => {
@@ -154,7 +155,7 @@ export class Tough extends BossEffect {
 
 export class Fast extends BossEffect {
     name = "Rapide";
-    emoji = ":shaking_head:";
+    emoji = "🫨"; // :shaking_head:
     description = "Les joueurs ont 1 essai de moins";
 
     destroy(): void {
