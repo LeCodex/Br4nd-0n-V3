@@ -79,8 +79,7 @@ export default class BosslePlayer {
         instance.attempts = obj.attempts;
         instance.stats = obj.stats;
         instance.maxAttempts = obj.maxAttempts;
-        instance.items = new Set(obj.items.map((e) => loadItem(game, e)));
-        instance.items.forEach((e) => e.buy(instance));
+        obj.items.map((e) => loadItem(game, e)).forEach((e) => e.buy(instance));
         instance.summary = obj.summary;
         instance.incorrectLetters = new Set(obj.incorrectLetters);
         if (obj.attemptsBoard) {

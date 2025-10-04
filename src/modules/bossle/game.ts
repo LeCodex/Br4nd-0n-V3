@@ -168,7 +168,7 @@ export default class BossleGame extends Game {
 
         if (!this.isMonsterAlive) {
             const healthGain = random(1, 10);
-            this.monster.maxHealth += healthGain
+            this.monster.maxHealth += healthGain;
             this.monster.health = this.monster.maxHealth;
             this.monster.level++;
             this.monsterEffects.forEach((e) => e.destroy());
