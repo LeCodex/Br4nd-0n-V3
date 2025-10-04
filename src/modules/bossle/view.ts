@@ -2,7 +2,6 @@ import { ButtonStyle, Message, MessageComponentInteraction, MessageFlags } from 
 import GameView from "../game/view";
 import BossleGame, { ALL_ITEMS } from "./game";
 import ShopItem from "./item";
-import { Button } from "../../view";
 import { randomlyPick } from "../../utils";
 
 export default class BossleView extends GameView<BossleGame> {
@@ -20,7 +19,7 @@ export default class BossleView extends GameView<BossleGame> {
         this.setButton({
             style: ButtonStyle.Success,
             label: "Rafraîchir le magasin",
-            row: 2,
+            row: 1,
             disabled: this.game.shop.every((e) => !!e),
             callback: async (interaction) => { await this.refresh(interaction); }
         });
