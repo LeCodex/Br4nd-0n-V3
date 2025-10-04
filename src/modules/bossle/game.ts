@@ -24,7 +24,7 @@ export const ALL_EFFECTS = Object.entries(Effects).filter(([k]) => k !== "defaul
 export interface BossleEvents {
     attempt: { readonly player: BosslePlayer, attempt: string, valid: boolean }
     result: { readonly player: BosslePlayer, attempt: string,  result: Array<WordleResult>, readonly constResult: readonly WordleResult[], dmgPerIncorrect: number, xpPerCorrect: number, goldPerMisplaced: number }
-    finished: { readonly player: BosslePlayer }
+    finished: { readonly player: BosslePlayer, damage: number }
     gainXP: { amount: number }
     gainGold: { amount: number }
     gainHealth: { amount: number }
@@ -309,8 +309,8 @@ export default class BossleGame extends Game {
         await interaction.editReply({ content: player.privateAttemptContent });
 
         if (player.finished && wasAlive) {
-            this.emit("finished", { player });
-            player.damageMonster();
+            const damage = this.emit("finished", { player, damage: player.maxAttempts - player.attempts.length + this.level }).damage;
+            player.damageMonster(damage);
         }
 
         if (!this.isMonsterAlive && wasAlive) {

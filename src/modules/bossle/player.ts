@@ -41,7 +41,7 @@ export default class BosslePlayer {
         return this.attempts.some((e) => e.includes(letter));
     }
 
-    damageMonster(amount: number = this.maxAttempts - this.attempts.length + this.game.level) {
+    damageMonster(amount: number) {
         amount = this.game.emit("monsterDamage", { player: this, amount }).amount;
         this.game.monster.health = Math.max(0, this.game.monster.health - amount);
         this.game.monster.turnHealthChange -= amount;

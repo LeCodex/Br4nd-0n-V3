@@ -261,9 +261,9 @@ export class Unction extends ShopItem {
 export class Sword extends ShopItem {
     name = "Epée";
     emoji = "⚔️";
-    description = "Augmente de 1 vos dégâts au monstre";
+    description = "Augmente de 1 tous vos dégâts au monstre";
     cost = 6;
-    uses = 3;
+    uses = 5;
 
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
@@ -285,9 +285,9 @@ export class Bow extends ShopItem {
 
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
-        this.on("monsterDamage", (context) => {
+        this.on("finished", (context) => {
             if (context.player === this.owner && this.owner!.attempts.length <= 3 && this.use()) {
-                context.amount *= 2;
+                context.damage *= 2;
             }
         });
         return true;
@@ -297,14 +297,14 @@ export class Bow extends ShopItem {
 export class Scarf extends ShopItem {
     name = "Echarpe";
     emoji = "🧣";
-    description = "Ignorez les mots avec uniquement des `⬛`";
+    description = "Ignorez les mots avec 4 `⬛` ou plus";
     cost = 6;
     uses = 3;
 
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
-            if (context.player === this.owner && context.result.every((e) => e === WordleResult.INCORRECT) && this.use()) {
+            if (context.player === this.owner && context.result.filter((e) => e === WordleResult.INCORRECT).length >= 4 && this.use()) {
                 context.result = [];
             }
         });
