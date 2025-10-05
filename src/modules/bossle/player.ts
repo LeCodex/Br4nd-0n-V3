@@ -34,7 +34,7 @@ export default class BosslePlayer {
     }
 
     get privateAttemptContent() {
-        return `\`\`\`\n${this.attempts.map((e) => `${this.game.renderAttempt(e)} ${e}`).join("\n")}\n${this.finished || this.attempts.length >= this.maxAttempts ? "" : `Lettres restantes: ${this.remainingLetters.join("")}\n`}\n${this.summary.join("\n")}\`\`\``
+        return `\`\`\`\nEssai ${this.attempts.length}/${this.maxAttempts}\n${this.attempts.map((e) => `${this.game.renderAttempt(e)} ${e}`).join("\n")}\n${this.finished || this.attempts.length >= this.maxAttempts ? "" : `Lettres restantes: ${this.remainingLetters.join("")}\n`}\n${this.summary.join("\n")}\`\`\``
     }
 
     attemptedLetter(letter: string) {

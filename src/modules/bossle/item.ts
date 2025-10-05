@@ -1,4 +1,3 @@
-import { random } from "lodash";
 import { randomlyPick } from "../../utils";
 import BossleGame, { BossleEventHandler, BossleEvents, ConcreteItems, WordleResult } from "./game";
 import BosslePlayer from "./player";
