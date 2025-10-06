@@ -420,6 +420,7 @@ export default class BossleGame extends Game {
             targetWord: this.targetWord,
             turn: this.turn,
             shop: this.shop.map((e) => e?.serialize()),
+            refreshes: this.refreshes,
             bestRun: this.bestRun,
             boardView: this.boardView?.serialize(),
             nextTimestamp: this.nextTimestamp
@@ -439,6 +440,7 @@ export default class BossleGame extends Game {
         instance.targetWord = obj.targetWord;
         instance.turn = obj.turn;
         instance.shop = obj.shop.map((e) => e && loadItem(instance, e));
+        instance.refreshes = obj.refreshes ?? 0;
         instance.bestRun = obj.bestRun;
         if (obj.boardView) instance.boardView = new BossleView(instance, await View.load(obj.boardView));
         instance.nextTimestamp = obj.nextTimestamp;

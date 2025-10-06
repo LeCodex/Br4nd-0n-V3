@@ -63,8 +63,8 @@ export const effectAttributesRepository = buildEffectDataAttributes({
         emoji: "🤢",
         description: "Fait perdre 1 PV à chaque essai",
     },
-    blind: {
-        name: "Aveugle",
+    oneEyed: {
+        name: "Borgne",
         emoji: "😎",
         description: "Seules les lettres de la première moitié du mot ont leurs effets",
     }
@@ -228,10 +228,8 @@ export class Patient extends BossEffect {
 
 export class Unusual extends BossEffect {
     setupListeners(): void {
-        this.on("result", (context) => {
-            const difference = context.result.filter((e) => e === WordleResult.CORRECT).length - context.result.filter((e) => e === WordleResult.INCORRECT).length;
-            context.totalDmg += difference;
-            context.totalXp -= difference;
+        this.on("editResult", (context) => {
+            context.result = context.result.map((e) => e === WordleResult.CORRECT ? WordleResult.INCORRECT : e === WordleResult.INCORRECT ? WordleResult.CORRECT : WordleResult.WRONG_PLACE);
         });
     }
 }
@@ -254,7 +252,7 @@ export class Venomous extends BossEffect {
     }
 }
 
-export class Blind extends BossEffect {
+export class OneEyed extends BossEffect {
     setupListeners(): void {
         this.on("editResult", (context) => {
             context.result.splice(Math.ceil(context.result.length / 2), context.result.length);
