@@ -1,4 +1,4 @@
-import { APIEmbed, ChatInputCommandInteraction, MessageFlags, User } from "discord.js";
+import { APIEmbed, ChatInputCommandInteraction, MessageFlags, RepliableInteraction, User } from "discord.js";
 import Bossle from ".";
 import { Game } from "../game";
 import BosslePlayer from "./player";
@@ -361,7 +361,7 @@ export default class BossleGame extends Game {
         return amount !== 0 ? ` **(${amount > 0 ? "+" : ""}${amount})**` : "";
     }
 
-    async sendBoard(options?: { edit?: boolean, replace?: boolean, showWord?: boolean }) {
+    async sendBoard(options?: { edit?: boolean, replace?: boolean, showWord?: boolean, ephemeralReplyTo?: RepliableInteraction }) {
         const embed: APIEmbed = {
             title: `[BOSSLE] Résumé de la partie | Tour ${this.turn}`,
             fields: [
@@ -393,12 +393,20 @@ export default class BossleGame extends Game {
             });
         }
 
-        if (this.boardView && options?.edit) {
+        if (options?.ephemeralReplyTo) {
+            await options.ephemeralReplyTo.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+        } else if (this.boardView && options?.edit) {
             this.boardView = await new BossleView(this, this.boardView.message).edit({ embeds: [embed] });
             await this.boardView.edit({ embeds: [embed] });
         } else if (this.channel) {
-            if (options?.replace) await this.boardView?.delete();
+            if (this.boardView) {
+                if (options?.replace) {
+                    await this.boardView.delete();
+                }
+                try { await this.boardView.message?.unpin(); } catch { }
+            }
             this.boardView = await new BossleView(this).send(this.channel, { embeds: [embed] });
+            try { await this.boardView.message?.pin(); } catch { }
         }
     }
 
