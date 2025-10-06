@@ -101,8 +101,7 @@ export default class BossleGame extends Game {
     get xpForNextLevel() { return 190 + 10 * this.level; }
     get maxHealth() { return 110 + 10 * this.level; }
     get maxGold() { return 20 + 5 * this.level; }
-    get emptyShopSlots() { return this.shop.filter((e) => !e).length; }
-    get refreshCost() { return this.emptyShopSlots; }
+    get refreshCost() { return this.refreshes + 1; }
 
     emit<K extends keyof BossleEvents>(key: K, context: BossleEvents[K]): BossleEvents[K] {
         if (!this.listeners[key]) return context;
@@ -193,7 +192,7 @@ export default class BossleGame extends Game {
         this.monster.turnHealthChange = 0;
         const targetLength = this.emit("newWord", { length: 5 }).length
         this.targetWord = randomlyPick(this.module.targetWords.filter((e) => e.length === targetLength)).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-        this.shop = range(5).map(() => new (randomlyPick(ALL_ITEMS))(this));
+        this.shop = range(5).map(() => this.pickRandomUniqueItem());
 
         this.emit("turnStart", {});
         await this.sendBoard();
@@ -202,6 +201,14 @@ export default class BossleGame extends Game {
         delete this.nextTimestamp;
         this.setupTimeout();
         await this.save();
+    }
+
+    pickRandomUniqueItem() {
+        let item: ConcreteItems[keyof ConcreteItems];
+        do {
+            item = randomlyPick(ALL_ITEMS);
+        } while (this.shop.find((e) => e?.constructor === item));
+        return new item(this);
     }
 
     gainXP(amount: number) {
@@ -369,7 +376,7 @@ export default class BossleGame extends Game {
                     inline: true
                 },
                 {
-                    name: `💰 Magasin${this.shop.some((e) => !e) ? ` - 🔁 Rafraîchissement: ${this.refreshCost} :coin:` : ''}`,
+                    name: `💰 Magasin - 🔁 Rafraîchissement: ${this.refreshCost} :coin:`,
                     value: `-# ${this.shop.length ? this.shop.map((e) => e ? e.toString() : "🚫 Epuisé").join("\n-# ") : "🚫 Stock épuisé"}`
                 },
                 {
