@@ -193,6 +193,7 @@ export default class BossleGame extends Game {
         const targetLength = this.emit("newWord", { length: random(4, 7) }).length
         this.targetWord = randomlyPick(this.module.targetWords.filter((e) => e.length === targetLength)).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         this.shop = range(5).map(() => this.pickRandomUniqueItem());
+        this.refreshes = 0;
 
         this.emit("turnStart", {});
         await this.sendBoard();
