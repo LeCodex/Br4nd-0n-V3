@@ -59,7 +59,7 @@ client.on("ready", async () => {
                     type: ApplicationCommandType.ChatInput,
                     options: [...groupsWithSubcommands.entries()].flatMap<ApplicationCommandOptionData>(([subcommandGroup, subcommands]) => subcommandGroup ? {
                         name: subcommandGroup,
-                        description: "",
+                        description: "Automatically generated group",
                         type: ApplicationCommandOptionType.SubcommandGroup,
                         options: subcommands.map((e) => ({
                             name: e.subcommand!,

@@ -1,13 +1,90 @@
 import BossleGame, { BossleEvents, BossleEventHandler, WordleResult } from "./game";
 
+interface EffectData {
+    name: string;
+    emoji: string;
+    description: string;
+    disablable?: boolean;
+}
+const buildEffectDataAttributes = <K extends string>(attributes: Record<K, EffectData>) => attributes;
+export const effectAttributesRepository = buildEffectDataAttributes({
+    stingy: {
+        name: "Radin",
+        emoji: "🤐",
+        description: "Divise par deux l'Or gagné (arrondi à l'inférieur)",
+    },
+    sick: {
+        name: "Malade",
+        emoji: "🤒",
+        description: "Un mot trouvé ne rapporte pas les 5 XP qu'il devrait",
+    },
+    ferocious: {
+        name: "Féroce",
+        emoji: "😡",
+        description: "Chaque `⬛` au delà de la moitié de la longueur du mot fait perdre 1 PV supplémentaire",
+    },
+    greedy: {
+        name: "Avare",
+        emoji: "🤑",
+        description: "Les `🟡` font perdre 1 PV en plus du gain d'Or",
+    },
+    furtive: {
+        name: "Furtif",
+        emoji: "😶‍🌫️",
+        description: "Prend 1 dégât de moins à chaque attaque",
+    },
+    sophisticated: {
+        name: "Sophistiqué",
+        emoji: "🧐",
+        description: "Les joueurs doivent utiliser les indices qu'ils ont reçus",
+    },
+    quick: {
+        name: "Rapide",
+        emoji: "🫨", // :shaking_head:
+        description: "Les joueurs ont 1 essai de moins",
+    },
+    patient: {
+        name: "Patient",
+        emoji: "😴",
+        description: "A la fin du tour, fait perdre 10 PV s'il est en vie",
+    },
+    unusual: {
+        name: "Atypique",
+        emoji: "😵",
+        description: "Inverse les effets des `🟩` et des `⬛`",
+    },
+    cruel: {
+        name: "Cruel",
+        emoji: "😈",
+        description: "Double la perte de PV des `⬛` à partir du 4e essai",
+    },
+    venomous: {
+        name: "Venimeux",
+        emoji: "🤢",
+        description: "Fait perdre 1 PV à chaque essai",
+    },
+    blind: {
+        name: "Aveugle",
+        emoji: "😎",
+        description: "Seules les lettres de la première moitié du mot ont leurs effets",
+    }
+});
+type EffectKey = keyof typeof effectAttributesRepository;
+
 export default abstract class BossEffect {
-    abstract name: string;
-    abstract emoji: string;
-    abstract description: string;
+    name: string;
+    emoji: string;
+    description: string;
+    disablable: boolean;
     listeners = new Set<[keyof BossleEvents, BossleEventHandler]>();
-    disablable = true;
 
     constructor(public game: BossleGame) {
+        const key = this.constructor.name.slice(0, 1).toLowerCase() + this.constructor.name.slice(1) as EffectKey;
+        const data = effectAttributesRepository[key];
+        this.name = data.name,
+        this.emoji = data.emoji,
+        this.description = data.description,
+        this.disablable = data.disablable ?? true;
         this.setupListeners();
     }
 
@@ -34,9 +111,6 @@ export default abstract class BossEffect {
 }
 
 export class Stingy extends BossEffect {
-    name = "Radin";
-    emoji = "🤐";
-    description = "Divise par deux l'Or gagné (arrondi à l'inférieur)";
     preventGold = false;
 
     setupListeners(): void {
@@ -50,10 +124,6 @@ export class Stingy extends BossEffect {
 }
 
 export class Sick extends BossEffect {
-    name = "Malade";
-    emoji = "🤒";
-    description = "Un mot trouvé ne rapporte pas les 5 XP qu'il devrait";
-
     setupListeners(): void {
         this.on("finished", () => {
             this.game.gainXP(-5);
@@ -62,10 +132,6 @@ export class Sick extends BossEffect {
 }
 
 export class Ferocious extends BossEffect {
-    name = "Féroce";
-    emoji = "😡";
-    description = "Chaque `⬛` au delà de la moitié de la longueur du mot fait perdre 1 PV supplémentaire";
-
     setupListeners(): void {
         this.on("result", (context) => {
             const cutoff = this.game.targetWord.length / 2;
@@ -83,10 +149,6 @@ export class Ferocious extends BossEffect {
 }
 
 export class Greedy extends BossEffect {
-    name = "Avare";
-    emoji = "🤑";
-    description = "Les `🟡` font perdre 1 PV en plus du gain d'Or";
-
     setupListeners(): void {
         this.on("result", (context) => {
             context.result.forEach((e) => {
@@ -99,10 +161,6 @@ export class Greedy extends BossEffect {
 }
 
 export class Furtive extends BossEffect {
-    name = "Furtif";
-    emoji = "😶‍🌫️";
-    description = "Prend 1 dégât de moins à chaque attaque";
-
     setupListeners(): void {
         this.on("monsterDamage", (context) => {
             context.amount--;
@@ -111,10 +169,6 @@ export class Furtive extends BossEffect {
 }
 
 export class Sophisticated extends BossEffect {
-    name = "Sophistiqué";
-    emoji = "🧐";
-    description = "Les joueurs doivent utiliser les indices qu'ils ont reçus";
-
     setupListeners(): void {
         this.on("attempt", (context) => {
             const wrongPlaceClues = new Set<string>();
@@ -148,10 +202,6 @@ export class Sophisticated extends BossEffect {
 }
 
 export class Fast extends BossEffect {
-    name = "Rapide";
-    emoji = "🫨"; // :shaking_head:
-    description = "Les joueurs ont 1 essai de moins";
-
     destroy(): void {
         super.destroy();
         for (const player of Object.values(this.game.players)) {
@@ -169,10 +219,6 @@ export class Fast extends BossEffect {
 }
 
 export class Patient extends BossEffect {
-    name = "Patient";
-    emoji = "😴";
-    description = "A la fin du tour, fait perdre 10 PV s'il est en vie";
-
     setupListeners(): void {
         this.on("turnEnd", (context) => {
             this.game.gainHealth(-10);
@@ -181,10 +227,6 @@ export class Patient extends BossEffect {
 }
 
 export class Unusual extends BossEffect {
-    name = "Atypique";
-    emoji = "😵";
-    description = "Inverse les effets des `🟩` et des `⬛`";
-
     setupListeners(): void {
         this.on("result", (context) => {
             const difference = context.result.filter((e) => e === WordleResult.CORRECT).length - context.result.filter((e) => e === WordleResult.INCORRECT).length;
@@ -195,10 +237,6 @@ export class Unusual extends BossEffect {
 }
 
 export class Cruel extends BossEffect {
-    name = "Cruel";
-    emoji = "😈";
-    description = "Double la perte de PV des `⬛` à partir du 4e essai";
-
     setupListeners(): void {
         this.on("result", (context) => {
             if (context.player.attempts.length >= 4) {
@@ -209,10 +247,6 @@ export class Cruel extends BossEffect {
 }
 
 export class Venomous extends BossEffect {
-    name = "Venimeux";
-    emoji = "🤢";
-    description = "Fait perdre 1 PV à chaque essai";
-
     setupListeners(): void {
         this.on("result", (context) => {
             context.totalDmg += 1;
@@ -221,10 +255,6 @@ export class Venomous extends BossEffect {
 }
 
 export class Blind extends BossEffect {
-    name = "Aveugle";
-    emoji = "😎";
-    description = "Seules les lettres de la première moitié du mot ont leurs effets";
-
     setupListeners(): void {
         this.on("editResult", (context) => {
             context.result.splice(Math.ceil(context.result.length / 2), context.result.length);

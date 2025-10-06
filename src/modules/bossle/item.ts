@@ -2,16 +2,142 @@ import { randomlyPick } from "../../utils";
 import BossleGame, { BossleEventHandler, BossleEvents, ConcreteItems, WordleResult } from "./game";
 import BosslePlayer from "./player";
 
-export default abstract class ShopItem {
-    abstract name: string;
-    abstract emoji: string;
-    abstract description: string;
-    abstract cost: number;
-    uses = 0;
+interface ItemData {
+    name: string;
+    emoji: string;
+    description: string;
+    cost: number;
+    uses?: number;
+}
+const buildItemAttributes = <K extends string>(attributes: Record<K, ItemData>) => attributes;
+export const itemAttributesRepository = buildItemAttributes({
+    healthPotion: {
+        name: "Potion de soin",
+        emoji: "💖",
+        description: "Restaure 10% de vos PV max",
+        cost: 6
+    },
+    xpPotion: {
+        name: "Potion d'expérience",
+        emoji: "🎉",
+        description: "Donne 10 points d'expérience",
+        cost: 6,
+    },
+    firePotion: {
+        name: "Potion de feu",
+        emoji: "🔥",
+        description: "Fait 3 dégâts au monstre",
+        cost: 6,
+    },
+    magnifyingGlass: {
+        name: "Loupe",
+        emoji: "🔎",
+        description: "Révèle une lettre du mot du monstre",
+        cost: 8,
+    },
+    criticalPotion: {
+        name: "Potion de criticité",
+        emoji: "💥",
+        description: "Double les dégâts au monstre ce tour-ci",
+        cost: 10,
+    },
+    neutralizingPotion: {
+        name: "Potion neutralisante",
+        emoji: "🧬",
+        description: "Annule 1 des effets du monstre",
+        cost: 14,
+    },
+    medkit: {
+        name: "Médikit",
+        emoji: "🩹",
+        description: "Lorsque le monstre est vaincu, restaure 10% de votre vie max",
+        cost: 8,
+        uses: 3,
+    },
+    shield: {
+        name: "Bouclier",
+        emoji: "🛡️",
+        description: "Ignorez la perte de PV de votre premier mot",
+        cost: 6,
+        uses: 4,
+    },
+    moneyBag: {
+        name: "Sac",
+        emoji: "💰",
+        description: "Gagnez 1 Or supplémentaire par `🟡`",
+        cost: 6,
+        uses: 5,
+    },
+    vial: {
+        name: "Fiole",
+        emoji: "🧪",
+        description: "Gagnez 1 XP supplémentaire par `🟩`",
+        cost: 6,
+        uses: 5,
+    },
+    unction: {
+        name: "Onction",
+        emoji: "🪔",
+        description: "Restaure 1 PV à chaque `🟩`",
+        cost: 6,
+        uses: 15,
+    },
+    sword: {
+        name: "Epée",
+        emoji: "⚔️",
+        description: "Augmente de 1 tous vos dégâts au monstre",
+        cost: 6,
+        uses: 5,
+    },
+    bow: {
+        name: "Arc",
+        emoji: "🏹",
+        description: "Si vous terminez avec 3 essais ou moins, doublez vos dégâts",
+        cost: 6,
+        uses: 2,
+    },
+    scarf: {
+        name: "Echarpe",
+        emoji: "🧣",
+        description: "Ignorez les mots avec 4 `⬛` ou plus",
+        cost: 6,
+        uses: 3,
+    },
+    magicWand: {
+        name: "Baguette magique",
+        emoji: "🪄", // :magic_wand:
+        description: "Fait 1 dégât au monstre si vous trouvez un mot avec 3 ou 4 `🟩`",
+        cost: 8,
+        uses: 5,
+    },
+    crystalBall: {
+        name: "Boule de cristal",
+        emoji: "🔮",
+        description: "Révèle une lettre `⬛` après chaque essai",
+        cost: 8,
+        uses: 10,
+    }
+});
+type ItemKey = keyof typeof itemAttributesRepository;
+
+export default abstract class ShopItem implements ItemData {
+    name: string;
+    emoji: string;
+    description: string;
+    cost: number
+    uses: number;
     listeners = new Set<[keyof BossleEvents, BossleEventHandler]>();
     owner?: BosslePlayer;
 
-    constructor(public game: BossleGame) { }
+    constructor(public game: BossleGame) {
+        const key = this.constructor.name.slice(0, 1).toLowerCase() + this.constructor.name.slice(1) as ItemKey;
+        const data = itemAttributesRepository[key];
+        this.name = data.name;
+        this.emoji = data.emoji;
+        this.description = data.description;
+        this.cost = data.cost;
+        this.uses = data.uses ?? 0;
+    }
 
     abstract buy(player: BosslePlayer): boolean;
 
@@ -62,11 +188,6 @@ export default abstract class ShopItem {
 
 // =================== ONE-SHOT ITEMS ===================
 export class HealthPotion extends ShopItem {
-    name = "Potion de soin";
-    emoji = "💖";
-    description = "Restaure 10% de vos PV max";
-    cost = 6;
-
     buy(player: BosslePlayer): boolean {
         const amount = Math.floor(this.game.maxHealth / 10);
         this.game.channel?.send(`### 💖 Vous avez regagné ${amount} PV!`);
@@ -76,11 +197,6 @@ export class HealthPotion extends ShopItem {
 }
 
 export class XpPotion extends ShopItem {
-    name = "Potion d'expérience";
-    emoji = "🎉";
-    description = "Donne 10 points d'expérience";
-    cost = 6;
-
     buy(player: BosslePlayer): boolean {
         this.game.channel?.send(`### 🎉 Vous avez gagné 10 XP!`);
         this.game.gainXP(10);
@@ -89,11 +205,6 @@ export class XpPotion extends ShopItem {
 }
 
 export class FirePotion extends ShopItem {
-    name = "Potion de feu";
-    emoji = "🔥";
-    description = "Fait 3 dégâts au monstre";
-    cost = 6;
-
     buy(player: BosslePlayer): boolean {
         this.game.channel?.send(`### 🔥 Le monstre a pris 3 dégâts!`);
         player.damageMonster(3);
@@ -102,11 +213,6 @@ export class FirePotion extends ShopItem {
 }
 
 export class MagnifyingGlass extends ShopItem {
-    name = "Loupe";
-    emoji = "🔎";
-    description = "Révèle une lettre du mot du monstre";
-    cost = 8;
-
     buy(player: BosslePlayer): boolean {
         this.game.channel?.send(`### 🔎 Le mot contient un \`${randomlyPick(this.game.targetWord)}\`!`);
         return true;
@@ -114,11 +220,6 @@ export class MagnifyingGlass extends ShopItem {
 }
 
 export class CriticalPotion extends ShopItem {
-    name = "Potion de criticité";
-    emoji = "💥";
-    description = "Double les dégâts au monstre ce tour-ci";
-    cost = 10;
-
     buy(player: BosslePlayer): boolean {
         this.game.channel?.send(`### 💥 Les dégâts sont doublés ce tour-ci!`);
         this.game.untilEndOfTurn("monsterDamage", (context) => {
@@ -129,11 +230,6 @@ export class CriticalPotion extends ShopItem {
 }
 
 export class NeutralizingPotion extends ShopItem {
-    name = "Potion neutralisante";
-    emoji = "🧬";
-    description = "Annule 1 des effets du monstre";
-    cost = 14;
-
     buy(player: BosslePlayer): boolean {
         const effect = randomlyPick(this.game.monsterEffects.filter((e) => e.disablable));
         if (!effect) {
@@ -148,16 +244,6 @@ export class NeutralizingPotion extends ShopItem {
 
 // =================== HELD ITEMS ===================
 export class Medkit extends ShopItem {
-    name = "Médikit";
-    emoji = "🩹";
-    description = "Lorsque le monstre est vaincu, restaure 10% de votre vie max";
-    cost = 8;
-    uses = 3;
-
-    constructor(game: BossleGame) {
-        super(game);
-    }
-
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("defeated", (context) => {
@@ -170,16 +256,6 @@ export class Medkit extends ShopItem {
 }
 
 export class Shield extends ShopItem {
-    name = "Bouclier";
-    emoji = "🛡️";
-    description = "Ignorez la perte de PV de votre premier mot";
-    cost = 6;
-    uses = 4;
-
-    constructor(game: BossleGame) {
-        super(game);
-    }
-
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
@@ -192,16 +268,6 @@ export class Shield extends ShopItem {
 }
 
 export class MoneyBag extends ShopItem {
-    name = "Sac";
-    emoji = "💰";
-    description = "Gagnez 1 Or supplémentaire par `🟡`";
-    cost = 6;
-    uses = 5;
-
-    constructor(game: BossleGame) {
-        super(game);
-    }
-
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
@@ -215,16 +281,6 @@ export class MoneyBag extends ShopItem {
 }
 
 export class Vial extends ShopItem {
-    name = "Fiole";
-    emoji = "🧪";
-    description = "Gagnez 1 XP supplémentaire par `🟩`";
-    cost = 6;
-    uses = 5;
-
-    constructor(game: BossleGame) {
-        super(game);
-    }
-
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
@@ -238,12 +294,6 @@ export class Vial extends ShopItem {
 }
 
 export class Unction extends ShopItem {
-    name = "Onction";
-    emoji = "🪔";
-    description = "Restaure 1 PV à chaque `🟩`";
-    cost = 6;
-    uses = 15;
-
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
@@ -260,12 +310,6 @@ export class Unction extends ShopItem {
 }
 
 export class Sword extends ShopItem {
-    name = "Epée";
-    emoji = "⚔️";
-    description = "Augmente de 1 tous vos dégâts au monstre";
-    cost = 6;
-    uses = 5;
-
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("monsterDamage", (context) => {
@@ -278,12 +322,6 @@ export class Sword extends ShopItem {
 }
 
 export class Bow extends ShopItem {
-    name = "Arc";
-    emoji = "🏹";
-    description = "Si vous terminez avec 3 essais ou moins, doublez vos dégâts";
-    cost = 6;
-    uses = 2;
-
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("finished", (context) => {
@@ -296,12 +334,6 @@ export class Bow extends ShopItem {
 }
 
 export class Scarf extends ShopItem {
-    name = "Echarpe";
-    emoji = "🧣";
-    description = "Ignorez les mots avec 4 `⬛` ou plus";
-    cost = 6;
-    uses = 3;
-
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
@@ -314,12 +346,6 @@ export class Scarf extends ShopItem {
 }
 
 export class MagicWand extends ShopItem {
-    name = "Baguette magique";
-    emoji = "🪄"; // :magic_wand:
-    description = "Fait 1 dégât au monstre si vous trouvez un mot avec 3 ou 4 `🟩`";
-    cost = 8;
-    uses = 5;
-
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
@@ -333,12 +359,6 @@ export class MagicWand extends ShopItem {
 }
 
 export class CrystalBall extends ShopItem {
-    name = "Boule de cristal";
-    emoji = "🔮";
-    description = "Révèle une lettre `⬛` après chaque essai";
-    cost = 8;
-    uses = 10;
-
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {

@@ -2,6 +2,9 @@ import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags
 import GameModule from "../game/base";
 import BossleGame from "./game";
 import { GameCommand } from "../game";
+import { BotCommand } from "../base";
+import { itemAttributesRepository } from "./item";
+import { effectAttributesRepository } from "./effects";
 
 export default class Bossle extends GameModule() {
     cls = BossleGame;
@@ -46,5 +49,21 @@ export default class Bossle extends GameModule() {
     public async show(game: BossleGame, interaction: ChatInputCommandInteraction) {
         const player = game.getPlayer(interaction.user);
         await game.sendBoard({ ephemeralReplyTo: interaction });
+    }
+
+    @BotCommand({ subcommandGroup: "wiki", subcommand: "items", description: "Envoie un récapitulatif des objets" })
+    public async items(interaction: ChatInputCommandInteraction) {
+        await interaction.reply({
+            content: `## Wiki des objets:\n${Object.values(itemAttributesRepository).map((e) => `${e.emoji} **${e.name}** (${e.cost} :coin:): ${e.description}${e.uses ? ` (${e.uses} utilisations)` : ''}`).join('\n')}`,
+            flags: MessageFlags.Ephemeral
+        });
+    }
+
+    @BotCommand({ subcommandGroup: "wiki", subcommand: "effects", description: "Envoie un récapitulatif des effets de monstre" })
+    public async effects(interaction: ChatInputCommandInteraction) {
+        await interaction.reply({
+            content: `## Wiki des effets:\n${Object.values(effectAttributesRepository).map((e) => `${e.emoji} **${e.name}**: ${e.description}`).join('\n')}`,
+            flags: MessageFlags.Ephemeral
+        });
     }
 }

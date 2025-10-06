@@ -16,10 +16,10 @@ export enum WordleResult {
     WRONG_PLACE,
     INCORRECT
 }
-export type ConcreteItems = Omit<typeof Items, "default">;
-export const ALL_ITEMS = Object.entries(Items).filter(([k]) => k !== "default").map(([_, v]) => v) as Array<ConcreteItems[keyof ConcreteItems]>;
-export type ConcreteEffects = Omit<typeof Effects, "default">;
-export const ALL_EFFECTS = Object.entries(Effects).filter(([k]) => k !== "default").map(([_, v]) => v) as Array<ConcreteEffects[keyof ConcreteEffects]>;
+export type ConcreteItems = Omit<typeof Items, "default" | "itemAttributesRepository">;
+export const ALL_ITEMS = Object.entries(Items).filter(([k]) => k !== "default" && k !== "itemAttributesRepository").map(([_, v]) => v) as Array<ConcreteItems[keyof ConcreteItems]>;
+export type ConcreteEffects = Omit<typeof Effects, "default" | "effectAttributesRepository">;
+export const ALL_EFFECTS = Object.entries(Effects).filter(([k]) => k !== "default" && k !== "effectAttributesRepository").map(([_, v]) => v) as Array<ConcreteEffects[keyof ConcreteEffects]>;
 
 export interface BossleEvents {
     attempt: { readonly player: BosslePlayer, attempt: string, valid: boolean }
