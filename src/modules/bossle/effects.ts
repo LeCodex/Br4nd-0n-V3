@@ -38,7 +38,7 @@ export const effectAttributesRepository = buildEffectDataAttributes({
         emoji: "🧐",
         description: "Les joueurs doivent utiliser les indices qu'ils ont reçus",
     },
-    quick: {
+    fast: {
         name: "Rapide",
         emoji: "🫨", // :shaking_head:
         description: "Les joueurs ont 1 essai de moins",

@@ -47,7 +47,6 @@ export default class Bossle extends GameModule() {
 
     @GameCommand({ subcommand: "show", description: "Envoie le message d'info de partie" })
     public async show(game: BossleGame, interaction: ChatInputCommandInteraction) {
-        const player = game.getPlayer(interaction.user);
         await game.sendBoard({ ephemeralReplyTo: interaction });
     }
 
