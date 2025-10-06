@@ -172,7 +172,7 @@ export class Medkit extends ShopItem {
 export class Shield extends ShopItem {
     name = "Bouclier";
     emoji = "🛡️";
-    description = "Ignorez les `⬛` de votre premier mot";
+    description = "Ignorez la perte de PV de votre premier mot";
     cost = 6;
     uses = 4;
 
@@ -184,7 +184,7 @@ export class Shield extends ShopItem {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
             if (context.player === this.owner && context.player.attempts.length === 1 && this.use()) {
-                context.result = context.result.filter((e) => e !== WordleResult.INCORRECT);
+                context.totalDmg = 0;
             }
         });
         return true;
@@ -205,8 +205,9 @@ export class MoneyBag extends ShopItem {
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
-            if (context.player === this.owner && context.result.some((e) => e === WordleResult.WRONG_PLACE) && this.use()) {
-                context.goldPerMisplaced++;
+            const wrongPlaces = context.result.filter((e) => e === WordleResult.WRONG_PLACE).length;
+            if (context.player === this.owner && wrongPlaces && this.use()) {
+                context.totalGold += wrongPlaces;
             }
         });
         return true;
@@ -227,8 +228,9 @@ export class Vial extends ShopItem {
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
-            if (context.player === this.owner && context.result.some((e) => e === WordleResult.CORRECT) && this.use()) {
-                context.xpPerCorrect++;
+            const corrects = context.result.filter((e) => e === WordleResult.CORRECT).length;
+            if (context.player === this.owner && corrects > 0 && this.use()) {
+                context.totalXp += corrects;
             }
         });
         return true;
@@ -304,7 +306,7 @@ export class Scarf extends ShopItem {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
             if (context.player === this.owner && context.result.filter((e) => e === WordleResult.INCORRECT).length >= 4 && this.use()) {
-                context.result = [];
+                context.ignore = true;
             }
         });
         return true;

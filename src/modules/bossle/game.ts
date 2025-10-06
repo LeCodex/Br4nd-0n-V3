@@ -23,7 +23,8 @@ export const ALL_EFFECTS = Object.entries(Effects).filter(([k]) => k !== "defaul
 
 export interface BossleEvents {
     attempt: { readonly player: BosslePlayer, attempt: string, valid: boolean }
-    result: { readonly player: BosslePlayer, attempt: string,  result: Array<WordleResult>, readonly constResult: readonly WordleResult[], dmgPerIncorrect: number, xpPerCorrect: number, goldPerMisplaced: number }
+    editResult: { readonly player: BosslePlayer, attempt: string, result: Array<WordleResult> }
+    result: { readonly player: BosslePlayer, attempt: string, readonly result: readonly WordleResult[], totalDmg: number, totalXp: number, totalGold: number, ignore: boolean }
     finished: { readonly player: BosslePlayer, damage: number }
     gainXP: { amount: number }
     gainGold: { amount: number }
@@ -54,7 +55,6 @@ export default class BossleGame extends Game {
     };
     monsterEffects: Array<BossEffect> = [];
     targetWord = "";
-    targetLength = 5;
 
     listeners: { [K in keyof BossleEvents]?: Set<BossleEventHandler<K>> } = {};
     onceListeners = new Set<BossleEventHandler>();
@@ -190,7 +190,7 @@ export default class BossleGame extends Game {
 
         this.turnHealthChange = 0;
         this.monster.turnHealthChange = 0;
-        const targetLength = this.emit("newWord", { length: 5 }).length
+        const targetLength = this.emit("newWord", { length: random(4, 7) }).length
         this.targetWord = randomlyPick(this.module.targetWords.filter((e) => e.length === targetLength)).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         this.shop = range(5).map(() => this.pickRandomUniqueItem());
 
@@ -272,7 +272,7 @@ export default class BossleGame extends Game {
             return interaction.editReply({ content: "Le mot n'est pas valide" });
         }
 
-        const valid = this.emit("attempt", { player, attempt: word, valid: true }).valid;
+        const { valid } = this.emit("attempt", { player, attempt: word, valid: true });
         if (!valid) {
             return interaction.editReply({ content: "Un effet vous empêche de jouer ce mot" });
         }
@@ -280,37 +280,33 @@ export default class BossleGame extends Game {
         const wasAlive = this.isMonsterAlive;
         player.summary.length = 0;
         player.attempts.push(word);
-        const constResult = this.attemptToResult(word);
 
+        const { result } = this.emit("editResult", { player, attempt: word, result: this.attemptToResult(word) });
         const {
-            result,
-            xpPerCorrect,
-            goldPerMisplaced,
-            dmgPerIncorrect
+            totalXp,
+            totalGold,
+            totalDmg,
+            ignore
         } = this.emit("result", {
             player,
             attempt: word,
-            result: constResult,
-            constResult,
-            xpPerCorrect: 1,
-            goldPerMisplaced: 1,
-            dmgPerIncorrect: 1,
+            result,
+            totalXp: result.filter((e) => e === WordleResult.CORRECT).length,
+            totalGold: result.filter((e) => e === WordleResult.WRONG_PLACE).length,
+            totalDmg: result.filter((e) => e === WordleResult.INCORRECT).length,
+            ignore: false
         });
-        for (const [i, tile] of result.entries()) {
-            if (tile === WordleResult.CORRECT) {
-                this.gainXP(xpPerCorrect);
-                player.stats.xpGained += xpPerCorrect;
-            } else if (tile === WordleResult.WRONG_PLACE) {
-                this.gainGold(goldPerMisplaced);
-                player.stats.goldGained += goldPerMisplaced;
-            } else {
-                if (!this.targetWord.includes(word[i]!)) {
-                    player.incorrectLetters.add(word[i]!);
-                }
-                if (this.isMonsterAlive) {
-                    this.gainHealth(-dmgPerIncorrect);
-                    player.stats.damageReceived += dmgPerIncorrect;
-                }
+        if (!ignore) {
+            player.stats.xpGained += totalXp;
+            player.stats.goldGained += totalGold;
+            if (this.isMonsterAlive) {
+                this.gainHealth(-totalDmg);
+                player.stats.damageReceived += totalDmg;
+            }
+        }
+        for (const letter of word.split("")) {
+            if (!this.targetWord.includes(letter)) {
+                player.incorrectLetters.add(letter);
             }
         }
         await interaction.editReply({ content: player.privateAttemptContent });

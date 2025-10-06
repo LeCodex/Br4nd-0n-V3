@@ -10,7 +10,7 @@ export default class BossleView extends GameView<BossleGame> {
         for (const [i, item] of this.game.shop.entries()) {
             this.setButton({
                 emoji: item?.emoji ?? "🔁",
-                style: item ? ButtonStyle.Primary : ButtonStyle.Success,
+                style: item ? ButtonStyle.Primary : ButtonStyle.Secondary,
                 callback: async (interaction) => {
                     if (item) {
                         await this.callback(item, interaction);

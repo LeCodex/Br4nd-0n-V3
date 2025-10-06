@@ -64,12 +64,19 @@ export class Sick extends BossEffect {
 export class Ferocious extends BossEffect {
     name = "Féroce";
     emoji = "😡";
-    description = "Chaque essai avec 4 `⬛` ou plus fait perdre le double de PV";
+    description = "Chaque `⬛` au delà de la moitié de la longueur du mot fait perdre 1 PV supplémentaire";
 
     setupListeners(): void {
         this.on("result", (context) => {
-            if (context.constResult.filter((e) => e === WordleResult.INCORRECT).length >= 4) {
-                context.dmgPerIncorrect *= 2;
+            const cutoff = this.game.targetWord.length / 2;
+            let found = 0;
+            for (const tile of context.result) {
+                if (tile === WordleResult.INCORRECT) {
+                    found++;
+                    if (found > cutoff) {
+                        context.totalDmg++;
+                    }
+                }
             }
         })
     }
@@ -82,9 +89,9 @@ export class Greedy extends BossEffect {
 
     setupListeners(): void {
         this.on("result", (context) => {
-            context.constResult.forEach((e) => {
+            context.result.forEach((e) => {
                 if (e === WordleResult.WRONG_PLACE) {
-                    this.game.gainHealth(-1);
+                    context.totalDmg++;
                 }
             });
         })
@@ -140,19 +147,6 @@ export class Sophisticated extends BossEffect {
     }
 }
 
-export class Tough extends BossEffect {
-    name = "Coriace";
-    emoji = "🤖";
-    description = "Le mot a 1 lettre supplémentaire";
-    disablable = false;  // Can't change the word mid turn
-
-    setupListeners(): void {
-        this.on("newWord", (context) => {
-            context.length++;
-        })
-    }
-}
-
 export class Fast extends BossEffect {
     name = "Rapide";
     emoji = "🫨"; // :shaking_head:
@@ -177,7 +171,7 @@ export class Fast extends BossEffect {
 export class Patient extends BossEffect {
     name = "Patient";
     emoji = "😴";
-    description = "A la fin du tour, fais 10 dégâts s'il est en vie";
+    description = "A la fin du tour, fait perdre 10 PV s'il est en vie";
 
     setupListeners(): void {
         this.on("turnEnd", (context) => {
@@ -193,7 +187,47 @@ export class Unusual extends BossEffect {
 
     setupListeners(): void {
         this.on("result", (context) => {
-            context.result = context.result.map((e) => e === WordleResult.CORRECT ? WordleResult.INCORRECT : e === WordleResult.INCORRECT ? WordleResult.CORRECT : e)
+            const difference = context.result.filter((e) => e === WordleResult.CORRECT).length - context.result.filter((e) => e === WordleResult.INCORRECT).length;
+            context.totalDmg += difference;
+            context.totalXp -= difference;
+        });
+    }
+}
+
+export class Cruel extends BossEffect {
+    name = "Cruel";
+    emoji = "😈";
+    description = "Double la perte de PV des `⬛` à partir du 4e essai";
+
+    setupListeners(): void {
+        this.on("result", (context) => {
+            if (context.player.attempts.length >= 4) {
+                context.totalDmg *= 2;
+            }
+        });
+    }
+}
+
+export class Venomous extends BossEffect {
+    name = "Venimeux";
+    emoji = "🤢";
+    description = "Fait perdre 1 PV à chaque essai";
+
+    setupListeners(): void {
+        this.on("result", (context) => {
+            context.totalDmg += 1;
+        });
+    }
+}
+
+export class Blind extends BossEffect {
+    name = "Aveugle";
+    emoji = "😎";
+    description = "Seules les lettres de la première moitié du mot ont leurs effets";
+
+    setupListeners(): void {
+        this.on("editResult", (context) => {
+            context.result.splice(Math.ceil(context.result.length / 2), context.result.length);
         });
     }
 }
