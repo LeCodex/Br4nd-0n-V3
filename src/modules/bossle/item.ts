@@ -20,7 +20,7 @@ export const itemAttributesRepository = buildItemAttributes({
     xpPotion: {
         name: "Potion d'expérience",
         emoji: "🎉",
-        description: "Donne 10 points d'expérience",
+        description: "Donne 10% de l'XP pour le niveau suivant",
         cost: 6,
     },
     firePotion: {
@@ -198,8 +198,9 @@ export class HealthPotion extends ShopItem {
 
 export class XpPotion extends ShopItem {
     buy(player: BosslePlayer): boolean {
-        this.game.channel?.send(`### 🎉 Vous avez gagné 10 XP!`);
-        this.game.gainXP(10);
+        const amount = Math.floor(this.game.xpForNextLevel / 10);
+        this.game.channel?.send(`### 🎉 Vous avez gagné ${amount} XP!`);
+        this.game.gainXP(amount);
         return true;
     }
 }
