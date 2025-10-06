@@ -24,6 +24,7 @@ export default class Bossle extends GameModule() {
     public async onDeleted(game: BossleGame) {
         clearTimeout(game.timeout);
         await game.boardView?.end();
+        try { await game.boardView?.message?.unpin(); } catch { }
     }
 
     @GameCommand({

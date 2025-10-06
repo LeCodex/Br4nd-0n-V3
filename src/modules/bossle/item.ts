@@ -49,7 +49,7 @@ export default abstract class ShopItem {
     }
 
     toCondensed() {
-        return `${this.emoji}${' ' + '\\|'.repeat(this.uses)}`;
+        return `${this.emoji} x${this.uses}`;
     }
 
     serialize() {
