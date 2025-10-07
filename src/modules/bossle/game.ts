@@ -298,7 +298,9 @@ export default class BossleGame extends Game {
             ignore: false
         });
         if (!ignore) {
+            this.gainXP(totalXp);
             player.stats.xpGained += totalXp;
+            this.gainGold(totalGold);
             player.stats.goldGained += totalGold;
             if (this.isMonsterAlive) {
                 this.gainHealth(-totalDmg);
