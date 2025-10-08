@@ -260,7 +260,7 @@ export class Shield extends ShopItem {
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
-            if (context.player === this.owner && context.player.attempts.length === 1 && this.use()) {
+            if (context.player === this.owner && this.game.isMonsterAlive && context.player.attempts.length === 1 && this.use()) {
                 context.totalDmg = 0;
             }
         });
@@ -326,7 +326,7 @@ export class Bow extends ShopItem {
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("finished", (context) => {
-            if (context.player === this.owner && this.owner!.attempts.length <= 3 && this.use()) {
+            if (context.player === this.owner && this.game.isMonsterAlive && this.owner!.attempts.length <= 3 && this.use()) {
                 context.damage *= 2;
             }
         });
@@ -338,7 +338,7 @@ export class Scarf extends ShopItem {
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
-            if (context.player === this.owner && context.result.filter((e) => e === WordleResult.INCORRECT).length >= 4 && this.use()) {
+            if (context.player === this.owner && this.game.isMonsterAlive && context.result.filter((e) => e === WordleResult.INCORRECT).length >= 4 && this.use()) {
                 context.ignore = true;
             }
         });
@@ -351,7 +351,7 @@ export class MagicWand extends ShopItem {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
             const corrects = context.result.filter((e) => e === WordleResult.CORRECT).length;
-            if (context.player === this.owner && (corrects === 3 || corrects === 4) && this.use()) {
+            if (context.player === this.owner && this.game.isMonsterAlive && (corrects === 3 || corrects === 4) && this.use()) {
                 player.damageMonster(1);
             }
         });
