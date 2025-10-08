@@ -113,7 +113,7 @@ export const itemAttributesRepository = buildItemAttributes({
     crystalBall: {
         name: "Boule de cristal",
         emoji: "🔮",
-        description: "Révèle une lettre `⬛` après chaque essai",
+        description: "Vous révèle une lettre `⬛` après chaque essai",
         cost: 8,
         uses: 10,
     }

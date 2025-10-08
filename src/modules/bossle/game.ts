@@ -192,7 +192,10 @@ export default class BossleGame extends Game {
         this.monster.turnHealthChange = 0;
         const targetLength = this.emit("newWord", { length: random(4, 7) }).length
         this.targetWord = randomlyPick(this.module.targetWords.filter((e) => e.length === targetLength)).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-        this.shop = range(5).map(() => this.pickRandomUniqueItem());
+        this.shop.length = 0;
+        for (let i = 0; i < 5; i++) {
+            this.shop.push(this.pickRandomUniqueItem());
+        }
         this.refreshes = 0;
 
         this.emit("turnStart", {});
@@ -320,9 +323,10 @@ export default class BossleGame extends Game {
         }
 
         if (!this.isMonsterAlive && wasAlive) {
-            this.channel?.send("### ⚔️ Le monstre est vaincu!");
-            const { regenRatio } = this.emit("defeated", { regenRatio: 1/4 });
+            this.channel?.send("### ⚔️ Le monstre est vaincu!\nLes dégâts et effets sont désactivés jusqu'à la fin du tour");
+            const { regenRatio } = this.emit("defeated", { regenRatio: 1 / 4 });
             this.gainHealth(Math.floor(this.maxHealth * regenRatio + .5));
+            this.monsterEffects.forEach((e) => e.destroy());
         }
 
         await this.sendBoard({ edit: true });
@@ -440,6 +444,7 @@ export default class BossleGame extends Game {
         instance.turnHealthChange = obj.turnHealthChange;
         instance.monster = obj.monster;
         instance.monsterEffects = obj.monsterEffects.map((e) => new Effects[e](instance));
+        if (!instance.isMonsterAlive) instance.monsterEffects.forEach((e) => e.destroy());
         instance.targetWord = obj.targetWord;
         instance.turn = obj.turn;
         instance.shop = obj.shop.map((e) => e && loadItem(instance, e));
