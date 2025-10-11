@@ -255,7 +255,7 @@ export class Venomous extends BossEffect {
 export class OneEyed extends BossEffect {
     setupListeners(): void {
         this.on("editResult", (context) => {
-            context.result.splice(Math.ceil(context.result.length / 2), context.result.length);
+            context.result.splice(Math.ceil(context.attempt.length / 2), context.result.length);
         });
     }
 }

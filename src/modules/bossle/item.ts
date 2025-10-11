@@ -116,6 +116,20 @@ export const itemAttributesRepository = buildItemAttributes({
         description: "Vous révèle une lettre `⬛` après chaque essai",
         cost: 8,
         uses: 10,
+    },
+    helmet: {
+        name: "Casque",
+        emoji: "🪖",
+        description: "Ignorez la première lettre si elle est `⬛`",
+        cost: 8,
+        uses: 5
+    },
+    shoes: {
+        name: "Chaussures",
+        emoji: "👟",
+        description: "Ignorez la dernière lettre si elle est `⬛`",
+        cost: 8,
+        uses: 5
     }
 });
 type ItemKey = keyof typeof itemAttributesRepository;
@@ -132,11 +146,11 @@ export default abstract class ShopItem implements ItemData {
     constructor(public game: BossleGame) {
         const key = this.constructor.name.slice(0, 1).toLowerCase() + this.constructor.name.slice(1) as ItemKey;
         const data = itemAttributesRepository[key];
-        this.name = data.name;
-        this.emoji = data.emoji;
-        this.description = data.description;
-        this.cost = data.cost;
-        this.uses = data.uses ?? 0;
+        this.name = data?.name ?? "Missing name!";
+        this.emoji = data?.emoji ?? "⚠";
+        this.description = data?.description ?? "Missing description!";
+        this.cost = data?.cost ?? 9999;
+        this.uses = data?.uses ?? 0;
     }
 
     abstract buy(player: BosslePlayer): boolean;
@@ -370,6 +384,30 @@ export class CrystalBall extends ShopItem {
                 } while (this.game.targetWord.includes(letter) || this.owner.incorrectLetters.has(letter));
                 this.owner.summary.push(`🔮 Le \`${letter}\` n'est pas dans le mot`);
                 this.owner.incorrectLetters.add(letter);
+            }
+        });
+        return true;
+    }
+}
+
+export class Helmet extends ShopItem {
+    buy(player: BosslePlayer): boolean {
+        if (!this.giveTo(player)) return false;
+        this.on("editResult", (context) => {
+            if (context.player === this.owner && context.result[0] === WordleResult.INCORRECT && this.use()) {
+                context.result.shift();
+            }
+        });
+        return true;
+    }
+}
+
+export class Shoes extends ShopItem {
+    buy(player: BosslePlayer): boolean {
+        if (!this.giveTo(player)) return false;
+        this.on("editResult", (context) => {
+            if (context.player === this.owner && context.result[context.attempt.length - 1] === WordleResult.INCORRECT && this.use()) {
+                context.result.pop();
             }
         });
         return true;
