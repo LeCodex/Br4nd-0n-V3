@@ -267,8 +267,10 @@ export default class BossleGame extends Game {
         const word = input.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         if (word.length !== this.targetWord.length) {
             return interaction.editReply({ content: "Le mot ne fait pas la bonne longueur" });
+        } else if (player.attempts.includes(word)) {
+            return interaction.editReply({ content: "Vous avez déjà essayé ce mot" });
         }
-        const knownIncorrectLetters = word.split("").map((e) => player.incorrectLetters.has(e))
+        const knownIncorrectLetters = word.split("").map((e) => player.incorrectLetters.has(e));
         if (knownIncorrectLetters.some((e) => e)) {
             return interaction.editReply({ content: `Le mot contient des lettres que vous savez incorrectes (${word.split("").filter((_, i) => knownIncorrectLetters[i]).join(", ")})` });
         }
