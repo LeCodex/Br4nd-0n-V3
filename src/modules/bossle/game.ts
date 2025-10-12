@@ -270,10 +270,6 @@ export default class BossleGame extends Game {
         } else if (player.attempts.includes(word)) {
             return interaction.editReply({ content: "Vous avez déjà essayé ce mot" });
         }
-        const knownIncorrectLetters = word.split("").map((e) => player.incorrectLetters.has(e));
-        if (knownIncorrectLetters.some((e) => e)) {
-            return interaction.editReply({ content: `Le mot contient des lettres que vous savez incorrectes (${word.split("").filter((_, i) => knownIncorrectLetters[i]).join(", ")})` });
-        }
         if (!this.module.words.has(word)) {
             return interaction.editReply({ content: "Le mot n'est pas valide" });
         }
@@ -287,7 +283,13 @@ export default class BossleGame extends Game {
         player.summary.length = 0;
         player.attempts.push(word);
 
-        const { result } = this.emit("editResult", { player, attempt: word, result: this.attemptToResult(word) });
+        const orignalResult = this.attemptToResult(word);
+        for (const [i, tile] of orignalResult.entries()) {
+            if (tile === WordleResult.INCORRECT) {
+                player.incorrectLetters.add(word[i]!);
+            }
+        }
+        const { result } = this.emit("editResult", { player, attempt: word, result: orignalResult });
         const {
             totalXp,
             totalGold,
@@ -310,11 +312,6 @@ export default class BossleGame extends Game {
             if (this.isMonsterAlive) {
                 this.gainHealth(-totalDmg);
                 player.stats.damageReceived += totalDmg;
-            }
-        }
-        for (const letter of word.split("")) {
-            if (!this.targetWord.includes(letter)) {
-                player.incorrectLetters.add(letter);
             }
         }
         await interaction.editReply({ content: player.privateAttemptContent });

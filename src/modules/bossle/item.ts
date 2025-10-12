@@ -119,16 +119,16 @@ export const itemAttributesRepository = buildItemAttributes({
     },
     helmet: {
         name: "Casque",
-        emoji: "🪖",
+        emoji: "🪖", // :military_helmet:
         description: "Ignorez la première lettre si elle est `⬛`",
-        cost: 8,
+        cost: 7,
         uses: 5
     },
     shoes: {
         name: "Chaussures",
         emoji: "👟",
         description: "Ignorez la dernière lettre si elle est `⬛`",
-        cost: 8,
+        cost: 7,
         uses: 5
     }
 });
@@ -185,7 +185,7 @@ export default abstract class ShopItem implements ItemData {
     }
 
     toString() {
-        return `${this.cost} :coin: - ${this.emoji} **${this.name}**: ${this.description}${this.uses > 0 ? ` (${this.uses} utilisations)` : ''}`;
+        return `${this.cost} :coin: - ${this.emoji} **${this.name}**: ${this.description}${this.uses > 0 ? ` (x${this.uses})` : ''}`;
     }
 
     toCondensed() {
