@@ -106,7 +106,7 @@ export const itemAttributesRepository = buildItemAttributes({
     magicWand: {
         name: "Baguette magique",
         emoji: "🪄", // :magic_wand:
-        description: "Fait 1 dégât au monstre si vous trouvez un mot avec 3 ou 4 `🟩`",
+        description: "Fait 1 dégât au monstre si vous trouvez un mot avec autant de `🟩` que la taille du mot moins 1 ou 2",
         cost: 8,
         uses: 5,
     },
@@ -365,7 +365,7 @@ export class MagicWand extends ShopItem {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
             const corrects = context.result.filter((e) => e === WordleResult.CORRECT).length;
-            if (context.player === this.owner && this.game.isMonsterAlive && (corrects === 3 || corrects === 4) && this.use()) {
+            if (context.player === this.owner && this.game.isMonsterAlive && (corrects === this.game.targetWord.length - 1 || corrects === this.game.targetWord.length - 2) && this.use()) {
                 player.damageMonster(1);
             }
         });
