@@ -182,6 +182,7 @@ export default class BossleGame extends Game {
         }
 
         for (const player of Object.values(this.players)) {
+            player.shopAllowed = player.done;
             player.attempts.length = 0;
             player.maxAttempts = 6;
             player.incorrectLetters.clear();
@@ -314,11 +315,15 @@ export default class BossleGame extends Game {
                 player.stats.damageReceived += totalDmg;
             }
         }
-        await interaction.editReply({ content: player.privateAttemptContent });
 
         if (player.finished && wasAlive) {
             const damage = this.emit("finished", { player, damage: player.maxAttempts - player.attempts.length + this.level }).damage;
             player.damageMonster(damage);
+        }
+        await interaction.editReply({ content: player.privateAttemptContent });
+
+        if (player.done) {
+            player.shopAllowed = true;
         }
 
         if (!this.isMonsterAlive && wasAlive) {
@@ -369,7 +374,7 @@ export default class BossleGame extends Game {
             fields: [
                 {
                     name: `🐲 Monstre`,
-                    value: `-# **❤️ Vie:** ${this.monster.health}/${this.monster.maxHealth}${this.renderChange(this.monster.turnHealthChange)}\n-# **⏫ Niveau:** ${this.monster.level}\n-# **📖 Mot:** \`${options?.showWord ? this.targetWord : '?'.repeat(this.targetWord.length)}\``,
+                    value: `-# **❤️ Vie:** ${this.monster.health}/${this.monster.maxHealth}${this.renderChange(this.monster.turnHealthChange)}\n-# **⏫ Niveau:** ${this.monster.level}\n-# **📖 Mot:** \`${options?.showWord ? this.targetWord : '?'.repeat(this.targetWord.length)}\` (${this.targetWord.length})`,
                     inline: true
                 },
                 {

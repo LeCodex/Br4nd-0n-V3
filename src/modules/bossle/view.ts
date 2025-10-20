@@ -2,6 +2,7 @@ import { ButtonStyle, Message, MessageComponentInteraction, MessageFlags } from 
 import GameView from "../game/view";
 import BossleGame from "./game";
 import ShopItem from "./item";
+import { ComponentHandler } from "../../interfaces";
 
 export default class BossleView extends GameView<BossleGame> {
     constructor(game: BossleGame, message?: Message) {
@@ -12,6 +13,12 @@ export default class BossleView extends GameView<BossleGame> {
                 emoji: item?.emoji ?? "🔁",
                 style: item ? ButtonStyle.Primary : ButtonStyle.Secondary,
                 callback: async (interaction) => {
+                    const player = this.game.getPlayer(interaction.user);
+                    if (!player.shopAllowed) {
+                        await interaction.reply({ content: "Vous devez avoir terminé vos essais aujourd'hui ou hier pour interagir avec le marché", flags: MessageFlags.Ephemeral });
+                        return;
+                    }
+
                     if (item) {
                         await this.callback(item, interaction);
                     } else {

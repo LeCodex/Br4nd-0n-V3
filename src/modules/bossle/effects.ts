@@ -16,7 +16,7 @@ export const effectAttributesRepository = buildEffectDataAttributes({
     sick: {
         name: "Malade",
         emoji: "🤒",
-        description: "Un mot trouvé ne rapporte pas les 5 XP qu'il devrait",
+        description: "Un mot trouvé ne rapporte pas l'XP qu'il devrait",
     },
     ferocious: {
         name: "Féroce",
@@ -125,8 +125,10 @@ export class Stingy extends BossEffect {
 
 export class Sick extends BossEffect {
     setupListeners(): void {
-        this.on("finished", () => {
-            this.game.gainXP(-5);
+        this.on("result", (context) => {
+            if (context.player.finished) {
+                context.totalXp -= context.result.filter((e) => e === WordleResult.CORRECT).length;
+            }
         });
     }
 }

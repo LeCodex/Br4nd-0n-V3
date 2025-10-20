@@ -18,6 +18,7 @@ export default class BosslePlayer {
     items = new Set<ShopItem>();
     summary: Array<string> = [];
     incorrectLetters = new Set<string>();
+    shopAllowed = true;
 
     constructor(public game: BossleGame, public user: User) { }
 
@@ -27,6 +28,10 @@ export default class BosslePlayer {
 
     get finished() {
         return !!this.lastAttempt && this.game.attemptToResult(this.lastAttempt).every((e) => e === WordleResult.CORRECT);
+    }
+
+    get done() {
+        return this.finished || this.attempts.length >= this.maxAttempts;
     }
 
     get remainingLetters() {
@@ -70,7 +75,8 @@ export default class BosslePlayer {
             maxAttempts: this.maxAttempts,
             items: [...this.items].map((e) => e.serialize()),
             summary: this.summary,
-            incorrectLetters: [...this.incorrectLetters]
+            incorrectLetters: [...this.incorrectLetters],
+            shopAllowed: this.shopAllowed
         }
     }
 
@@ -82,6 +88,7 @@ export default class BosslePlayer {
         obj.items.map((e) => loadItem(game, e)).forEach((e) => e.buy(instance));
         instance.summary = obj.summary;
         instance.incorrectLetters = new Set(obj.incorrectLetters);
+        instance.shopAllowed = obj.shopAllowed ?? instance.done;
         if (obj.attemptsBoard) {
             instance.attemptsBoard = await (await client.channels.fetch(game.channelId) as SendableChannels).messages.fetch(obj.attemptsBoard);
         }
