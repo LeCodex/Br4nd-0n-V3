@@ -122,14 +122,14 @@ export const itemAttributesRepository = buildItemAttributes({
         emoji: "🪖", // :military_helmet:
         description: "Ignorez la première lettre si elle est `⬛`",
         cost: 7,
-        uses: 5
+        uses: 15
     },
     shoes: {
         name: "Chaussures",
         emoji: "👟",
         description: "Ignorez la dernière lettre si elle est `⬛`",
         cost: 7,
-        uses: 5
+        uses: 15
     }
 });
 type ItemKey = keyof typeof itemAttributesRepository;
@@ -156,7 +156,7 @@ export default abstract class ShopItem implements ItemData {
     abstract buy(player: BosslePlayer): boolean;
 
     giveTo(player: BosslePlayer) {
-        if (player.items.size >= 3) {
+        if (player.items.size >= 3 || [...player.items].some((e) => e.constructor === this.constructor)) {
             return false;
         }
         this.owner?.items.delete(this);

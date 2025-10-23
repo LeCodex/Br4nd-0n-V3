@@ -88,7 +88,7 @@ export default class BosslePlayer {
         obj.items.map((e) => loadItem(game, e)).forEach((e) => e.buy(instance));
         instance.summary = obj.summary;
         instance.incorrectLetters = new Set(obj.incorrectLetters);
-        instance.shopAllowed = obj.shopAllowed ?? instance.done;
+        instance.shopAllowed = obj.shopAllowed;
         if (obj.attemptsBoard) {
             instance.attemptsBoard = await (await client.channels.fetch(game.channelId) as SendableChannels).messages.fetch(obj.attemptsBoard);
         }
