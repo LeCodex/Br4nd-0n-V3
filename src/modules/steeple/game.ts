@@ -72,15 +72,19 @@ export default class SteepleGame extends Game {
     }
 
     generateBoard(size: number) {
-        for (let i = 0; i < 4; i++) {
-            Object.keys(Tiles).filter((e) => e !== "default").forEach((element) => this.board.push(new Tiles[element as TileName](this)));
-        }
+        this.board.length = 0;
+        const sections = 4;
+        const sectionLength = size / sections;
+        if (sectionLength !== Math.floor(sectionLength)) throw RangeError("Cannot have fractional section length");
 
-        for (let i = this.board.length; i < size; i++) {
-            this.board.push(new Tiles.Chair(this));
+        for (let i = 0; i < sections; i++) {
+            const section: Array<Tile<any>> = [];
+            Object.keys(Tiles).filter((e) => e !== "default").forEach((element) => section.push(new Tiles[element as TileName](this)));
+            for (let j = section.length; j < sectionLength; j++) {
+                section.push(new Tiles.Chair(this));
+            }
+            this.board.push(...shuffle(section));
         }
-
-        this.board = shuffle(this.board);
     }
 
     private getPlayerFromUser(user: User) {

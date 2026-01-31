@@ -133,26 +133,27 @@ export class Carousel extends Tile {
 
 export class BusStop extends Tile {
     name = "Arrêt de bus";
-    description = "Te téléporte à un autre 🚏 aléatoire";
+    description = "Te téléporte au 🚏 suivant ou précédent";
 
     constructor(game: SteepleGame) {
         super(game, "0", "🚏");
     }
 
     effect(player: SteeplePlayer, index: number, amount: number) {
-        let stops = this.game.board.filter((e, i) => e.constructor.name === this.constructor.name && i != index);
-
-        if (stops.length) {
-            let stop = stops[Math.floor(Math.random() * stops.length)]!;
-            let stopIndex = this.game.board.indexOf(stop);
-            let distance = stopIndex - player.index;
-
-            this.game.summary.push(`${this.emoji} ${player.toString()} a pris le bus sur ${Math.abs(distance)} ${Math.abs(distance) > 1 ? "cases" : "case"} en ${distance > 0 ? "avant" : "arrière"}`);
-
-            player.index = stopIndex;
-        } else {
-            this.game.summary.push(`${this.emoji} ${player.toString()} a attendu longtemps à l'arrêt de bus...`);
+        let direction = Math.floor(Math.random() * 2) * 2 - 1;
+        if (player.score == 0 && this.game.board.findIndex((tile) => tile instanceof BusStop) == index) {
+            direction = 1;
         }
+        let stopIndex = player.index;
+        do {
+            stopIndex = (stopIndex + direction) % this.game.board.length;
+        } while (!(this.game.board[stopIndex] instanceof BusStop))
+        let distance = Math.abs(player.index - stopIndex) * direction;
+
+        this.game.summary.push(`${this.emoji} ${player.toString()} a pris le bus sur ${Math.abs(distance)} ${Math.abs(distance) > 1 ? "cases" : "case"} en ${distance > 0 ? "avant" : "arrière"}`);
+
+        player.index += distance;
+        player.checkForWrapping();
     }
 }
 

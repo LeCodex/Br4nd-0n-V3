@@ -1,7 +1,7 @@
 import GameModule from "modules/game/base";
 import SteepleGame from "./game";
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from "discord.js";
-import { GameCommand } from "modules/game";
+import { AdminGameCommand, GameCommand } from "modules/game";
 
 export default class Steeple extends GameModule() {
     cls = SteepleGame;
@@ -53,5 +53,10 @@ export default class Steeple extends GameModule() {
     @GameCommand({ subcommand: "rank", description: "Affiche le classement", pausable: false })
     async rank(game: SteepleGame, interaction: ChatInputCommandInteraction) {
         await interaction.reply({ embeds: [game.rankEmbed] });
+    }
+
+    @AdminGameCommand({ subcommand: "turn", description: "Force un tour" })
+    async turn(game: SteepleGame, interaction: ChatInputCommandInteraction) {
+        await game.throwDice();
     }
 }
