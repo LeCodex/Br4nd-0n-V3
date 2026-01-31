@@ -24,6 +24,15 @@ export default class Bossle extends GameModule() {
         return new BossleGame(this, interaction.channelId);
     }
 
+    public async onToggled(game: BossleGame): Promise<void> {
+        if (game.paused) {
+            clearTimeout(game.timeout);
+            delete game.timeout;
+        } else {
+            game.setupTimeout();
+        }
+    }
+
     public async onDeleted(game: BossleGame) {
         clearTimeout(game.timeout);
         await game.boardView?.end();
