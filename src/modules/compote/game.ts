@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { Game } from "modules/game";
 import CompoteDePommesPlayer from "./player";
 import { CharOf, NumberRange } from "interfaces";
-import { createRankEmbed, randomlyPick, toMultiSorted, toRanked } from "utils";
+import { createRankEmbed, randomlyPick, toRanked } from "utils";
 import CompoteDePommes from ".";
 
 export default class CompoteDePommesGame extends Game {

@@ -9,7 +9,7 @@ import Montpartasse from ".";
 import { DateTime } from "luxon";
 import View from "view";
 
-const NonDefaultCups = Object.entries(Cups).filter(([k, _]) => k !== "default" ).map(([_, v]) => v) as Array<Omit<typeof Cups, "default">[keyof Omit<typeof Cups, "default">]>;
+const NonDefaultCups = Object.entries(Cups).filter(([k, _]) => k !== "default").map(([_, v]) => v) as Array<Omit<typeof Cups, "default">[keyof Omit<typeof Cups, "default">]>;
 const RollableCups = NonDefaultCups.filter((e) => e.canBeRolled);
 const AllColors = ["blue", "orange", "green", "purple", "special"] as const
 const BasicCups = RollableCups.filter((e) => (AllColors as readonly string[]).slice(0, 4).includes(e.color));
