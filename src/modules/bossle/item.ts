@@ -272,7 +272,7 @@ export class Shield extends ShopItem {
         if (!this.giveTo(player)) return false;
         this.on("result", (context) => {
             if (context.player === this.owner && this.game.isMonsterAlive && context.player.attempts.length === 1 && this.use()) {
-                context.totalDmg = 0;
+                context.totalDmg -= context.result.filter((e) => e === WordleResult.INCORRECT).length;
             }
         });
         return true;
