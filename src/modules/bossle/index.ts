@@ -69,7 +69,7 @@ export default class Bossle extends GameModule() {
     @BotCommand({ subcommandGroup: "wiki", subcommand: "items", description: "Envoie un récapitulatif des objets" })
     public async items(interaction: ChatInputCommandInteraction) {
         await interaction.reply({
-            content: `## Wiki des objets:\n${Object.values(itemAttributesRepository).map((e) => `${e.emoji} **${e.name}** (${e.cost} :coin:): ${e.description}${e.uses ? ` (${e.uses} utilisations)` : ''}`).join('\n')}`,
+            content: `## Wiki des objets:\n${Object.values(itemAttributesRepository).map((e) => `${e.emoji} **${e.name}** (${e.cost} 🟡): ${e.description}${e.uses ? ` (${e.uses} utilisations)` : ''}`).join('\n')}`,
             flags: MessageFlags.Ephemeral
         });
     }

@@ -56,7 +56,7 @@ export default class BossleView extends GameView<BossleGame> {
         if (!item) {
             return interaction.reply({ content: "Il n'y a pas d'objet à acheter ici", flags: MessageFlags.Ephemeral });
         } else if (item.cost > this.game.gold) {
-            return interaction.reply({ content: "Vous n'avez pas assez d':coin: Or", flags: MessageFlags.Ephemeral });
+            return interaction.reply({ content: "Vous n'avez pas assez d'🟡 Or", flags: MessageFlags.Ephemeral });
         }
         const player = this.game.getPlayer(interaction.user);
         const successful = item.buy(player);
@@ -74,7 +74,7 @@ export default class BossleView extends GameView<BossleGame> {
         if (this.game.shop[index]) {
             return interaction.reply({ content: "L'objet est encore présent", flags: MessageFlags.Ephemeral });
         } else if (this.game.refreshCost > this.game.gold) {
-            return interaction.reply({ content: "Vous n'avez pas assez d':coin: Or", flags: MessageFlags.Ephemeral });
+            return interaction.reply({ content: "Vous n'avez pas assez d'🟡 Or", flags: MessageFlags.Ephemeral });
         }
         this.game.gainGold(-this.game.refreshCost);
         this.game.refreshes++;

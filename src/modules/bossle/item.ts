@@ -179,7 +179,7 @@ export default abstract class ShopItem extends ListenerSource implements ItemDat
     }
 
     toString() {
-        return `${this.cost} :coin: - ${this.emoji} **${this.name}**: ${this.description}${this.uses > 0 ? ` (x${this.uses})` : ''}`;
+        return `${this.cost} 🟡 - ${this.emoji} **${this.name}**: ${this.description}${this.uses > 0 ? ` (x${this.uses})` : ''}`;
     }
 
     toCondensed() {

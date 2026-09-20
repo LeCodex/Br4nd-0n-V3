@@ -454,11 +454,11 @@ export default class BossleGame extends Game {
                     name: `🧮 Stats`,
                     value: `-# **❤️ Vie:** ${this.health}/${this.maxHealth}${this.renderChange(this.turnHealthChange)}\n`
                         + `-# **⏫ Niveau:** ${this.level} | **✨ XP:** ${this.xp}/${this.xpForNextLevel}\n`
-                        + `-# **🟩 Mana:** ${this.mana}/${this.maxMana} | **:coin: Or:** ${this.gold}/${this.maxGold}`,
+                        + `-# **🟩 Mana:** ${this.mana}/${this.maxMana} | **🟡 Or:** ${this.gold}/${this.maxGold}`,
                     inline: true
                 },
                 {
-                    name: `💰 Magasin - 🔁 Rafraîchissement: ${this.refreshCost} :coin:`,
+                    name: `💰 Magasin - 🔁 Rafraîchissement: ${this.refreshCost} 🟡`,
                     value: `-# ${this.shop.length ? this.shop.map((e) => e ? e.toString() : "🚫 Epuisé").join("\n-# ") : "🚫 Stock épuisé"}`
                 },
                 {
