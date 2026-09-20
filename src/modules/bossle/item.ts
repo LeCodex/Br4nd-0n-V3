@@ -1,6 +1,8 @@
 import { randomlyPick } from "../../utils";
-import BossleGame, { BossleEventHandler, BossleEvents, ConcreteItems, WordleResult } from "./game";
+import BossleGame, { ConcreteItems, WordleResult } from "./game";
 import BosslePlayer from "./player";
+import { isConsonant } from "./utils";
+import { ListenerSource } from "./listener";
 
 interface ItemData {
     name: string;
@@ -134,28 +136,24 @@ export const itemAttributesRepository = buildItemAttributes({
 });
 type ItemKey = keyof typeof itemAttributesRepository;
 
-export default abstract class ShopItem implements ItemData {
-    name: string;
-    emoji: string;
-    description: string;
-    cost: number
+export default abstract class ShopItem extends ListenerSource implements ItemData {
     uses: number;
-    listeners = new Set<[keyof BossleEvents, BossleEventHandler]>();
     owner?: BosslePlayer;
 
-    constructor(public game: BossleGame) {
-        const key = this.constructor.name.slice(0, 1).toLowerCase() + this.constructor.name.slice(1) as ItemKey;
-        const data = itemAttributesRepository[key];
-        this.name = data?.name ?? "Missing name!";
-        this.emoji = data?.emoji ?? "⚠";
-        this.description = data?.description ?? "Missing description!";
-        this.cost = data?.cost ?? 9999;
-        this.uses = data?.uses ?? 0;
+    get key() { return this.constructor.name.slice(0, 1).toLowerCase() + this.constructor.name.slice(1) as ItemKey; }
+    get name() { return itemAttributesRepository[this.key].name; }
+    get emoji() { return itemAttributesRepository[this.key].emoji; }
+    get description() { return itemAttributesRepository[this.key].description; }
+    get cost() { return itemAttributesRepository[this.key].cost; }
+
+    constructor(game: BossleGame) {
+        super(game);
+        this.uses = itemAttributesRepository[this.key].uses ?? 0;
     }
 
     abstract buy(player: BosslePlayer): boolean;
 
-    giveTo(player: BosslePlayer) {
+    giveTo(player: BosslePlayer): boolean {
         if (player.items.size >= 3 || [...player.items].some((e) => e.constructor === this.constructor)) {
             return false;
         }
@@ -165,23 +163,19 @@ export default abstract class ShopItem implements ItemData {
         return true;
     }
 
-    on<K extends keyof BossleEvents>(key: K, listener: BossleEventHandler<K>) {
-        this.game.on(key, listener);
-        this.listeners.add([key, listener as BossleEventHandler]);
-    }
-
     use(): boolean {
         if (this.uses <= 0) return false;
         this.uses--;
-        if (this.uses <= 0) this.destroy();
+        if (this.uses <= 0) {
+            this.game.emit("itemBreak", { item: this });
+            this.destroy();
+        }
         return true;
     }
 
     destroy() {
         this.owner?.items.delete(this);
-        for (const [key, listener] of this.listeners) {
-            this.game.off(key, listener);
-        }
+        this.clear();
     }
 
     toString() {
@@ -196,7 +190,7 @@ export default abstract class ShopItem implements ItemData {
         return {
             cls: this.constructor.name as keyof ConcreteItems,
             uses: this.uses
-        }
+        };
     }
 }
 
@@ -229,7 +223,10 @@ export class FirePotion extends ShopItem {
 
 export class MagnifyingGlass extends ShopItem {
     buy(player: BosslePlayer): boolean {
-        this.game.channel?.send(`### 🔎 Le mot contient un \`${randomlyPick(this.game.targetWord)}\`!`);
+        const letter = this.game.revealLetter((letter) => this.game.targetWord.includes(letter) && isConsonant(letter));
+        if (letter) {
+            this.game.channel?.send(`### 🔎 La lettre \`${letter}\` est dans le mot!`);
+        }
         return true;
     }
 }
@@ -237,9 +234,9 @@ export class MagnifyingGlass extends ShopItem {
 export class CriticalPotion extends ShopItem {
     buy(player: BosslePlayer): boolean {
         this.game.channel?.send(`### 💥 Les dégâts sont doublés ce tour-ci!`);
-        this.game.untilEndOfTurn("monsterDamage", (context) => {
-            context.amount *= 2;
-        })
+        this.game.untilEndOfTurn("editMonsterDamage", (context) => {
+            context.factor *= 2;
+        });
         return true;
     }
 }
@@ -261,7 +258,7 @@ export class NeutralizingPotion extends ShopItem {
 export class Medkit extends ShopItem {
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
-        this.on("defeated", (context) => {
+        this.on("levelUp", (context) => {
             if (this.use()) {
                 context.regenRatio += 1 / 10;
             }
@@ -327,7 +324,7 @@ export class Unction extends ShopItem {
 export class Sword extends ShopItem {
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
-        this.on("monsterDamage", (context) => {
+        this.on("editMonsterDamage", (context) => {
             if (context.player === this.owner && this.use()) {
                 context.amount++;
             }
@@ -341,7 +338,7 @@ export class Bow extends ShopItem {
         if (!this.giveTo(player)) return false;
         this.on("finished", (context) => {
             if (context.player === this.owner && this.game.isMonsterAlive && this.owner!.attempts.length <= 3 && this.use()) {
-                context.damage *= 2;
+                context.factor *= 2;
             }
         });
         return true;
@@ -393,9 +390,9 @@ export class CrystalBall extends ShopItem {
 export class Helmet extends ShopItem {
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
-        this.on("editResult", (context) => {
+        this.on("editResultPlayers", (context) => {
             if (context.player === this.owner && context.result[0] === WordleResult.INCORRECT && this.use()) {
-                context.result.shift();
+                context.result[0] = WordleResult.NONE;
             }
         });
         return true;
@@ -405,9 +402,9 @@ export class Helmet extends ShopItem {
 export class Shoes extends ShopItem {
     buy(player: BosslePlayer): boolean {
         if (!this.giveTo(player)) return false;
-        this.on("editResult", (context) => {
+        this.on("editResultPlayers", (context) => {
             if (context.player === this.owner && context.result[context.attempt.length - 1] === WordleResult.INCORRECT && this.use()) {
-                context.result.pop();
+                context.result[context.attempt.length - 1] = WordleResult.NONE;
             }
         });
         return true;

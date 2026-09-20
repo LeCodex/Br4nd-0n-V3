@@ -11,6 +11,8 @@ export default class View {
 
     protected actionRows: ActionRowBuilder<NonTextInputComponentBuilder>[] = [];
     private components: ComponentHandler[] = [];
+    
+    parentInteraction?: RepliableInteraction;
 
     constructor(public message?: Message) {
         const componentsMetadata = this.constructor.prototype[ComponentHandlers] as ComponentHandlerMetadata[];
@@ -110,7 +112,8 @@ export default class View {
         if (this.message) {
             throw Error("View was already sent. Did you mean to use edit?");
         }
-
+        
+        this.parentInteraction = interaction;
         const res = await interaction.reply({ ...options, components: this.actionRows, withResponse: true });
         this.message = res.resource?.message ?? undefined;
         if (this.message) {

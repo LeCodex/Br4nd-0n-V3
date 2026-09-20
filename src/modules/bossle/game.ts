@@ -4,14 +4,16 @@ import { Game } from "../game";
 import BosslePlayer from "./player";
 import { randomlyPick } from "../../utils";
 import { DateTime } from "luxon";
-import { random, range } from "lodash";
+import { random } from "lodash";
 import ShopItem, * as Items from "./item";
 import BossEffect, * as Effects from "./effects";
+import * as Classes from "./classes";
 import BossleView from "./view";
 import View from "../../view";
 import { loadItem } from "./utils";
 
 export enum WordleResult {
+    NONE,
     CORRECT,
     WRONG_PLACE,
     INCORRECT
@@ -20,20 +22,35 @@ export type ConcreteItems = Omit<typeof Items, "default" | "itemAttributesReposi
 export const ALL_ITEMS = Object.entries(Items).filter(([k]) => k !== "default" && k !== "itemAttributesRepository").map(([_, v]) => v) as Array<ConcreteItems[keyof ConcreteItems]>;
 export type ConcreteEffects = Omit<typeof Effects, "default" | "effectAttributesRepository">;
 export const ALL_EFFECTS = Object.entries(Effects).filter(([k]) => k !== "default" && k !== "effectAttributesRepository").map(([_, v]) => v) as Array<ConcreteEffects[keyof ConcreteEffects]>;
+export type ConcreteClasses = Omit<typeof Classes, "default" | "playerClassAttributesRepository">;
+export const ALL_CLASSES = Object.entries(Classes).filter(([k]) => k !== "default"&& k !== "playerClassAttributesRepository").map(([_, v]) => v) as Array<ConcreteClasses[keyof ConcreteClasses]>;
 
-export interface BossleEvents {
+export type BossleEvents = {
     attempt: { readonly player: BosslePlayer, attempt: string, valid: boolean }
-    editResult: { readonly player: BosslePlayer, attempt: string, result: Array<WordleResult> }
-    result: { readonly player: BosslePlayer, attempt: string, readonly result: readonly WordleResult[], totalDmg: number, totalXp: number, totalGold: number, ignore: boolean }
-    finished: { readonly player: BosslePlayer, damage: number }
-    gainXP: { amount: number }
-    gainGold: { amount: number }
-    gainHealth: { amount: number }
-    monsterDamage: { readonly player: BosslePlayer, amount: number }
+    editResultMonster: { readonly player: BosslePlayer, attempt: string, result: Array<WordleResult> }
+    editResultPlayers: { readonly player: BosslePlayer, attempt: string, result: Array<WordleResult> }
+    result: { readonly player: BosslePlayer, attempt: string, readonly result: readonly WordleResult[], totalDmg: number, totalXp: number, totalGold: number, totalMana: number, ignore: boolean }
+    finished: { readonly player: BosslePlayer, damage: number, factor: number }
+    editGainXP: { amount: number }
+    gainXP: { readonly amount: number }
+    editGainGold: { amount: number }
+    gainGold: { readonly amount: number }
+    editGainMana: { amount: number }
+    gainMana: { readonly amount: number }
+    editGainHealth: { amount: number }
+    gainHealth: { readonly amount: number }
+    reveal: { letter: string | undefined }
+    editMonsterDamage: { readonly player: BosslePlayer, amount: number, factor: number }
+    monsterDamage: { readonly player: BosslePlayer, readonly amount: number }
+    buy: { readonly player: BosslePlayer, readonly item: ShopItem }
+    itemBreak: { readonly item: ShopItem }
     turnEnd: {}
+    newMonster: {}
     turnStart: {}
     newWord: { length: number }
-    defeated: { regenRatio: number }
+    defeated: { xp: number }
+    levelUp: { regenRatio: number }
+    lastBreath: { prevent: boolean }
 }
 export type BossleEventHandler<K extends keyof BossleEvents = keyof BossleEvents> = (context: BossleEvents[K]) => void;
 
@@ -42,22 +59,26 @@ export default class BossleGame extends Game {
     players: Record<string, BosslePlayer> = {};
 
     gold = 0;
+    mana = 0;
     xp = 0;
     level = 0;
     health = 0;
     turnHealthChange = 0;
+    turnGoldChange = 0;
+    turnManaChange = 0;
+    turnXPChange = 0;
 
     monster = {
         level: 0,
         turnHealthChange: 0,
         health: 0,
-        maxHealth: 0,
+        maxHealth: 0
     };
     monsterEffects: Array<BossEffect> = [];
     targetWord = "";
+    revealedLetters = new Set<string>();
 
     listeners: { [K in keyof BossleEvents]?: Set<BossleEventHandler<K>> } = {};
-    onceListeners = new Set<BossleEventHandler>();
 
     turn = 0;
     shop: Array<ShopItem | undefined> = [];
@@ -98,18 +119,17 @@ export default class BossleGame extends Game {
     }
 
     get isMonsterAlive() { return this.monster.health > 0; }
-    get xpForNextLevel() { return 190 + 10 * this.level; }
-    get maxHealth() { return 110 + 10 * this.level; }
-    get maxGold() { return 20 + 5 * this.level; }
-    get refreshCost() { return this.refreshes + 1; }
+    get xpForNextLevel() { return 90 + 10 * this.level; }
+    get maxHealth() { return Math.min(300, 120 + 10 * this.level); }
+    get maxGold() { return Math.min(150, 20 + 5 * this.level); }
+    get maxMana() { return Math.min(100, 20 + 5 * this.level); }
+    get regenRatio() { return this.level < 3 ? 0.5 : this.level < 6 ? 0.25 : 0 }
+    get refreshCost() { return Math.max(0, this.refreshes + 1); }
 
     emit<K extends keyof BossleEvents>(key: K, context: BossleEvents[K]): BossleEvents[K] {
         if (!this.listeners[key]) return context;
         for (const listener of this.listeners[key]) {
             listener(context);
-            if (this.onceListeners.has(listener as BossleEventHandler)) {
-                this.listeners[key].delete(listener);
-            }
         }
         return context;
     }
@@ -120,8 +140,11 @@ export default class BossleGame extends Game {
     }
 
     once<K extends keyof BossleEvents>(key: K, listener: BossleEventHandler<K>) {
-        this.on(key, listener);
-        this.onceListeners.add(listener as BossleEventHandler);
+        const wrappedListener = (context: BossleEvents[K]) => {
+            listener(context);
+            this.off(key, wrappedListener)
+        };
+        this.on(key, wrappedListener);
     }
 
     untilEndOfTurn<K extends keyof BossleEvents>(key: K, listener: BossleEventHandler<K>) {
@@ -139,12 +162,13 @@ export default class BossleGame extends Game {
         delete this.boardView;
         this.monster = {
             level: 1,
-            health: 20,
-            maxHealth: 20,
+            health: 10,
+            maxHealth: 10,
             turnHealthChange: 0
         };
         this.gold = 0;
-        this.level = 1;
+        this.mana = 0;
+        this.level = 0;
         this.health = this.maxHealth;
         this.turn = 0;
         await this.nextTurn();
@@ -176,9 +200,10 @@ export default class BossleGame extends Game {
                 let cls: ConcreteEffects[keyof ConcreteEffects];
                 do {
                     cls = randomlyPick(ALL_EFFECTS);
-                } while (this.monsterEffects.find((e) => e.constructor === cls))
+                } while (this.monsterEffects.find((e) => e instanceof cls))
                 this.monsterEffects.push(new cls(this));
             }
+            this.emit("newMonster", {});
         }
 
         for (const player of Object.values(this.players)) {
@@ -190,12 +215,15 @@ export default class BossleGame extends Game {
         }
 
         this.turnHealthChange = 0;
+        this.turnGoldChange = 0;
+        this.turnManaChange = 0;
+        this.turnXPChange = 0;
         this.monster.turnHealthChange = 0;
-        const targetLength = this.emit("newWord", { length: random(4, 7) }).length
+        const targetLength = this.emit("newWord", { length: random(5, 7) }).length
         this.targetWord = randomlyPick(this.module.targetWords.filter((e) => e.length === targetLength)).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         this.shop.length = 0;
         for (let i = 0; i < 5; i++) {
-            this.shop.push(this.pickRandomUniqueItem());
+            this.shop.push(this.pickRandomUniqueShopItem());
         }
         this.refreshes = 0;
 
@@ -208,38 +236,76 @@ export default class BossleGame extends Game {
         await this.save();
     }
 
-    pickRandomUniqueItem() {
+    pickRandomUniqueShopItem() {
         let item: ConcreteItems[keyof ConcreteItems];
         do {
             item = randomlyPick(ALL_ITEMS);
-        } while (this.shop.find((e) => e?.constructor === item));
+        } while (this.shop.find((e) => e instanceof item));
         return new item(this);
     }
 
     gainXP(amount: number) {
-        this.xp += this.emit("gainXP", { amount }).amount;
+        amount = this.emit("editGainXP", { amount }).amount;
+        this.emit("gainXP", { amount });
+        this.xp += amount;
+        this.turnXPChange += amount;
         if (this.xp > this.xpForNextLevel) {
             this.xp -= this.xpForNextLevel;
             const oldMaxHealth = this.maxHealth;
+            const regenRatio = this.emit("levelUp", { regenRatio: this.regenRatio }).regenRatio;
             this.level++;
-            this.gainHealth(this.maxHealth - oldMaxHealth);
+            this.gainHealth(this.maxHealth - oldMaxHealth + Math.round(this.maxHealth * regenRatio));
         }
     }
 
     gainGold(amount: number) {
-        amount = this.emit("gainGold", { amount }).amount;
+        amount = this.emit("editGainGold", { amount }).amount;
+        this.emit("gainGold", { amount });
         const trueAmount = Math.max(0, Math.min(amount, this.maxGold - this.gold));
         this.gold += trueAmount;
+        this.turnGoldChange += trueAmount;
+        if (amount - trueAmount > 0) this.gainXP(amount - trueAmount);
+    }
+
+    gainMana(amount: number) {
+        amount = this.emit("editGainMana", { amount }).amount;
+        this.emit("gainMana", { amount });
+        const trueAmount = Math.max(0, Math.min(amount, this.maxMana - this.mana));
+        this.mana += trueAmount;
+        this.turnManaChange += trueAmount;
         if (amount - trueAmount > 0) this.gainXP(amount - trueAmount);
     }
 
     gainHealth(amount: number) {
-        this.health = Math.max(0, Math.min(this.health + this.emit("gainHealth", { amount }).amount, this.maxHealth));
+        amount = this.emit("editGainHealth", { amount }).amount;
+        this.emit("gainHealth", { amount });
+        this.health = Math.max(0, Math.min(this.health + amount, this.maxHealth));
         this.turnHealthChange += amount;
+    }
+
+    revealLetter(predicate: (letter: string) => boolean = () => true): string | undefined {
+        let letter: string | undefined;
+        for (let i = 0; i < 1000; i++) {
+            letter = randomlyPick("abcdefghijklmnopqrstuvwxyz")
+            if (predicate(letter) && !this.revealedLetters.has(letter)) {
+                break;
+            }
+            letter = undefined;
+        }
+        letter = this.emit("reveal", { letter }).letter;
+        if (!letter) {
+            this.channel?.send(`### ❌ La révélation de la lettre a échoué.`);
+            return undefined;
+        }
+        return letter;
     }
 
     async checkForNewGame() {
         if (this.health <= 0) {
+            if (this.emit("lastBreath", { prevent: false }).prevent) {
+                return false;
+            }
+
             this.bestRun = {
                 level: this.level,
                 monsterLevel: this.monster.level
@@ -284,24 +350,27 @@ export default class BossleGame extends Game {
         player.summary.length = 0;
         player.attempts.push(word);
 
-        const orignalResult = this.attemptToResult(word);
-        for (const [i, tile] of orignalResult.entries()) {
+        let result = this.attemptToResult(word);
+        for (const [i, tile] of result.entries()) {
             if (tile === WordleResult.INCORRECT) {
                 player.incorrectLetters.add(word[i]!);
             }
         }
-        const { result } = this.emit("editResult", { player, attempt: word, result: orignalResult });
+        result = this.emit("editResultMonster", { player, attempt: word, result }).result;
+        result = this.emit("editResultPlayers", { player, attempt: word, result }).result;
         const {
             totalXp,
             totalGold,
+            totalMana,
             totalDmg,
             ignore
         } = this.emit("result", {
             player,
             attempt: word,
             result,
-            totalXp: result.filter((e) => e === WordleResult.CORRECT).length,
+            totalXp: 0,
             totalGold: result.filter((e) => e === WordleResult.WRONG_PLACE).length,
+            totalMana: result.filter((e) => e === WordleResult.CORRECT).length,
             totalDmg: result.filter((e) => e === WordleResult.INCORRECT).length,
             ignore: false
         });
@@ -310,6 +379,8 @@ export default class BossleGame extends Game {
             player.stats.xpGained += totalXp;
             this.gainGold(totalGold);
             player.stats.goldGained += totalGold;
+            this.gainMana(totalMana);
+            player.stats.manaGained += totalMana;
             if (this.isMonsterAlive) {
                 this.gainHealth(-totalDmg);
                 player.stats.damageReceived += totalDmg;
@@ -317,8 +388,8 @@ export default class BossleGame extends Game {
         }
 
         if (player.finished && wasAlive) {
-            const damage = this.emit("finished", { player, damage: player.maxAttempts - player.attempts.length + this.level }).damage;
-            player.damageMonster(damage);
+            const { damage, factor } = this.emit("finished", { player, damage: player.maxAttempts - player.attempts.length + 1, factor: 1 });
+            player.damageMonster(damage * factor);
         }
         await interaction.editReply({ content: player.privateAttemptContent });
 
@@ -328,8 +399,8 @@ export default class BossleGame extends Game {
 
         if (!this.isMonsterAlive && wasAlive) {
             this.channel?.send("### ⚔️ Le monstre est vaincu!\nLes dégâts et effets sont désactivés jusqu'à la fin du tour");
-            const { regenRatio } = this.emit("defeated", { regenRatio: 1 / 4 });
-            this.gainHealth(Math.floor(this.maxHealth * regenRatio + .5));
+            const { xp } = this.emit("defeated", { xp: this.xpForNextLevel });
+            this.gainXP(xp);
             this.monsterEffects.forEach((e) => e.destroy());
         }
 
@@ -374,12 +445,16 @@ export default class BossleGame extends Game {
             fields: [
                 {
                     name: `🐲 Monstre`,
-                    value: `-# **❤️ Vie:** ${this.monster.health}/${this.monster.maxHealth}${this.renderChange(this.monster.turnHealthChange)}\n-# **⏫ Niveau:** ${this.monster.level}\n-# **📖 Mot:** \`${options?.showWord ? this.targetWord : '?'.repeat(this.targetWord.length)}\` (${this.targetWord.length})`,
+                    value: `-# **❤️ Vie:** ${this.monster.health}/${this.monster.maxHealth}${this.renderChange(this.monster.turnHealthChange)}\n`
+                        + `-# **⏫ Niveau:** ${this.monster.level}\n`
+                        + `-# **📖 Mot:** \`${options?.showWord ? this.targetWord : '?'.repeat(this.targetWord.length)}\` (${this.targetWord.length})`,
                     inline: true
                 },
                 {
                     name: `🧮 Stats`,
-                    value: `-# **❤️ Vie:** ${this.health}/${this.maxHealth}${this.renderChange(this.turnHealthChange)}\n-# **⏫ Niveau:** ${this.level} | **✨ XP:** ${this.xp}/${this.xpForNextLevel}\n-# **:coin: Or:** ${this.gold}/${this.maxGold}`,
+                    value: `-# **❤️ Vie:** ${this.health}/${this.maxHealth}${this.renderChange(this.turnHealthChange)}\n`
+                        + `-# **⏫ Niveau:** ${this.level} | **✨ XP:** ${this.xp}/${this.xpForNextLevel}\n`
+                        + `-# **🟩 Mana:** ${this.mana}/${this.maxMana} | **:coin: Or:** ${this.gold}/${this.maxGold}`,
                     inline: true
                 },
                 {
@@ -407,10 +482,10 @@ export default class BossleGame extends Game {
             await this.boardView.edit({ embeds: [embed] });
         } else if (this.channel) {
             if (this.boardView) {
+                try { await this.boardView.message?.unpin(); } catch { }
                 if (options?.replace) {
                     await this.boardView.delete();
                 }
-                try { await this.boardView.message?.unpin(); } catch { }
             }
             this.boardView = await new BossleView(this).send(this.channel, { embeds: [embed] });
             try { await this.boardView.message?.pin(); } catch { }

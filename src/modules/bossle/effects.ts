@@ -1,4 +1,5 @@
 import BossleGame, { BossleEvents, BossleEventHandler, WordleResult } from "./game";
+import { ListenerSource } from "./listener";
 
 interface EffectData {
     name: string;
@@ -11,12 +12,12 @@ export const effectAttributesRepository = buildEffectDataAttributes({
     stingy: {
         name: "Radin",
         emoji: "🤐",
-        description: "Divise par deux l'Or gagné (arrondi à l'inférieur)",
+        description: "Divise par deux l'🟡 Or gagné (arrondi à l'inférieur)",
     },
     sick: {
         name: "Malade",
         emoji: "🤒",
-        description: "Un mot trouvé ne rapporte pas l'XP qu'il devrait",
+        description: "Un mot trouvé ne rapporte pas le 🟩 Mana qu'il devrait",
     },
     ferocious: {
         name: "Féroce",
@@ -69,22 +70,17 @@ export const effectAttributesRepository = buildEffectDataAttributes({
         description: "Seules les lettres de la première moitié du mot ont leurs effets",
     }
 });
-type EffectKey = keyof typeof effectAttributesRepository;
+export type EffectKey = keyof typeof effectAttributesRepository;
 
-export default abstract class BossEffect {
-    name: string;
-    emoji: string;
-    description: string;
-    disablable: boolean;
-    listeners = new Set<[keyof BossleEvents, BossleEventHandler]>();
+export default abstract class BossEffect extends ListenerSource {
+    get key() { return this.constructor.name.slice(0, 1).toLowerCase() + this.constructor.name.slice(1) as EffectKey; }
+    get name() { return effectAttributesRepository[this.key].name; }
+    get emoji() { return effectAttributesRepository[this.key].emoji; }
+    get description() { return effectAttributesRepository[this.key].description; }
+    get disablable() { return effectAttributesRepository[this.key].disablable ?? true; }
 
-    constructor(public game: BossleGame) {
-        const key = this.constructor.name.slice(0, 1).toLowerCase() + this.constructor.name.slice(1) as EffectKey;
-        const data = effectAttributesRepository[key];
-        this.name = data.name,
-        this.emoji = data.emoji,
-        this.description = data.description,
-        this.disablable = data.disablable ?? true;
+    constructor(game: BossleGame) {
+        super(game);
         this.setupListeners();
     }
 
@@ -95,14 +91,11 @@ export default abstract class BossEffect {
             if (!this.game.isMonsterAlive) return;
             return listener(context);
         }
-        this.game.on(key, wrappedListener);
-        this.listeners.add([key, wrappedListener as BossleEventHandler]);
+        super.on(key, wrappedListener);
     }
 
     destroy() {
-        for (const [key, listener] of this.listeners) {
-            this.game.off(key, listener);
-        }
+        this.clear();
     }
 
     toString() {
@@ -114,10 +107,13 @@ export class Stingy extends BossEffect {
     preventGold = false;
 
     setupListeners(): void {
-        this.on("gainGold", (context) => {
-            this.preventGold = !this.preventGold;
-            if (this.preventGold) {
-                context.amount = 0;
+        this.on("editGainGold", (context) => {
+            const amount = context.amount;
+            for (let i = 0; i < amount; i++) {
+                this.preventGold = !this.preventGold;
+                if (this.preventGold) {
+                    context.amount--;
+                }
             }
         });
     }
@@ -127,7 +123,7 @@ export class Sick extends BossEffect {
     setupListeners(): void {
         this.on("result", (context) => {
             if (context.player.finished) {
-                context.totalXp -= context.result.filter((e) => e === WordleResult.CORRECT).length;
+                context.totalMana -= context.result.filter((e) => e === WordleResult.CORRECT).length;
             }
         });
     }
@@ -164,7 +160,7 @@ export class Greedy extends BossEffect {
 
 export class Furtive extends BossEffect {
     setupListeners(): void {
-        this.on("monsterDamage", (context) => {
+        this.on("editMonsterDamage", (context) => {
             context.amount--;
         })
     }
@@ -230,8 +226,8 @@ export class Patient extends BossEffect {
 
 export class Unusual extends BossEffect {
     setupListeners(): void {
-        this.on("editResult", (context) => {
-            context.result = context.result.map((e) => e === WordleResult.CORRECT ? WordleResult.INCORRECT : e === WordleResult.INCORRECT ? WordleResult.CORRECT : WordleResult.WRONG_PLACE);
+        this.on("editResultMonster", (context) => {
+            context.result = context.result.map((e) => e === WordleResult.CORRECT ? WordleResult.INCORRECT : e === WordleResult.INCORRECT ? WordleResult.CORRECT : e);
         });
     }
 }
@@ -256,8 +252,8 @@ export class Venomous extends BossEffect {
 
 export class OneEyed extends BossEffect {
     setupListeners(): void {
-        this.on("editResult", (context) => {
-            context.result.splice(Math.ceil(context.attempt.length / 2), context.result.length);
+        this.on("editResultMonster", (context) => {
+            context.result = context.result.map((e, i) => i >= Math.ceil(context.attempt.length / 2) ? WordleResult.NONE : e);
         });
     }
 }
