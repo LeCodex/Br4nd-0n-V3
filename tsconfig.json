@@ -22,7 +22,7 @@
             "node_modules/@types"
         ],
         "sourceMap": false,
-        "baseUrl": "src"
+        "paths": { "*": ["./src/*"] }
     },
     "include": [
         "src",
