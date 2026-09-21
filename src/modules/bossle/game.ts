@@ -314,6 +314,15 @@ export default class BossleGame extends Game {
             await this.newGame();
             return true;
         }
+        if (this.level >= 30) {
+            this.bestRun = {
+                level: this.level,
+                monsterLevel: this.monster.level
+            };
+            this.channel?.send("# 🎉 Vous avez gagné!");
+            await this.newGame();
+            return true;
+        }
         return false;
     }
 
