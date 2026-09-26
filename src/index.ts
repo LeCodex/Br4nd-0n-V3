@@ -1,11 +1,11 @@
 import { ApplicationCommandOptionData, ApplicationCommandOptionType, ApplicationCommandSubGroupData, ApplicationCommandType, ChatInputApplicationCommandData, InteractionContextType, PermissionFlagsBits } from "discord.js";
 import { configDotenv } from "dotenv";
+import View from "view";
 import { modules } from "modules";
 import { BotCommand } from "interfaces";
 import Logger from "logger";
 import ErrorHandler from "errors";
 import AdminPanel from "admin";
-import View from "view";
 import { client } from "client";
 import { BotModule } from "modules/base";
 

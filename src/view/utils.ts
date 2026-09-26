@@ -1,5 +1,5 @@
 import { ButtonInteraction, ButtonStyle, Message } from "discord.js";
-import View, { Button } from ".";
+import View, { Button } from "view";
 
 export class ConfirmView extends View {
     constructor(private readonly callback: (interaction: ButtonInteraction, confirmed: boolean) => Promise<void>, message?: Message) {

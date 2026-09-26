@@ -1,11 +1,11 @@
 import DB from "db";
 import { AdminCommand, BotCommand, BotModule } from "./base"
 import Logger from "logger";
-import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationCommandUserOption, ChatInputCommandInteraction, EmbedBuilder, Emoji, MessageFlags, ModalBuilder, PermissionFlagsBits, TextInputBuilder, TextInputStyle, User } from "discord.js";
+import { ApplicationCommandOptionType, ApplicationCommandUserOption, ChatInputCommandInteraction, EmbedBuilder, Emoji, MessageFlags, User } from "discord.js";
 import { times } from "lodash";
 import { createRankEmbed, getEmoji } from "utils";
 import { client } from "client";
-import { ConfirmView } from "../view/utils";
+import { ConfirmView } from "view/utils";
 
 export default class Sakatasses extends BotModule {
     public name: string = "Sakatasses";
