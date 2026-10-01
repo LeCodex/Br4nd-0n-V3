@@ -156,7 +156,7 @@ export class PowerView extends GameView<BossleGame> {
     constructor(game: BossleGame, player: BosslePlayer, message?: Message) {
         super(game, message);
 
-        const usableAbilities = player.classes.filter((e) => e.activeAbilityLevel >= e.level && e.activeAbilityCost >= game.mana);
+        const usableAbilities = player.classes.filter((e) => e.level >= e.activeAbilityLevel && game.mana >= e.activeAbilityCost);
         for (const cls of usableAbilities) {
             this.setButton({
                 emoji: cls.emoji,
