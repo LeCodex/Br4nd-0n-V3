@@ -265,7 +265,7 @@ export default class BossleGame extends Game {
         const trueAmount = Math.max(0, Math.min(amount, this.maxGold - this.gold));
         this.gold += trueAmount;
         this.turnGoldChange += trueAmount;
-        if (amount - trueAmount > 0) this.gainXP(amount - trueAmount);
+        // if (amount - trueAmount > 0) this.gainXP(amount - trueAmount);
     }
 
     gainMana(amount: number) {
@@ -274,7 +274,7 @@ export default class BossleGame extends Game {
         const trueAmount = Math.max(0, Math.min(amount, this.maxMana - this.mana));
         this.mana += trueAmount;
         this.turnManaChange += trueAmount;
-        if (amount - trueAmount > 0) this.gainXP(amount - trueAmount);
+        // if (amount - trueAmount > 0) this.gainXP(amount - trueAmount);
     }
 
     gainHealth(amount: number) {
