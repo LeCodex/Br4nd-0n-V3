@@ -183,12 +183,17 @@ export default class BossleGame extends Game {
             }
         }
 
+        this.emit("turnEnd", {});
         if (this.targetWord) {
             await this.sendBoard({ showWord: true, edit: true });
         }
 
-        this.emit("turnEnd", {});
         this.turn++;
+        this.turnHealthChange = 0;
+        this.turnGoldChange = 0;
+        this.turnManaChange = 0;
+        this.turnXPChange = 0;
+        this.monster.turnHealthChange = 0;
 
         if (!this.isMonsterAlive) {
             const healthGain = random(1, 20);
@@ -215,11 +220,6 @@ export default class BossleGame extends Game {
             delete player.attemptsBoard;
         }
 
-        this.turnHealthChange = 0;
-        this.turnGoldChange = 0;
-        this.turnManaChange = 0;
-        this.turnXPChange = 0;
-        this.monster.turnHealthChange = 0;
         const targetLength = this.emit("newWord", { length: random(5, 7) }).length
         this.targetWord = randomlyPick(this.module.targetWords.filter((e) => e.length === targetLength)).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         this.shop.length = 0;
@@ -287,7 +287,7 @@ export default class BossleGame extends Game {
     revealLetter(predicate: (letter: string) => boolean = () => true): string | undefined {
         let letter: string | undefined;
         for (let i = 0; i < 1000; i++) {
-            letter = randomlyPick("abcdefghijklmnopqrstuvwxyz")
+            letter = randomlyPick("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
             if (predicate(letter) && !this.revealedLetters.has(letter)) {
                 break;
             }

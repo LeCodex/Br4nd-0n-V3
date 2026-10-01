@@ -41,13 +41,13 @@ export const itemAttributesRepository = buildItemAttributes({
         name: "Potion de criticité",
         emoji: "💥",
         description: "Double les dégâts au monstre ce tour-ci",
-        cost: 10,
+        cost: 20,
     },
     neutralizingPotion: {
         name: "Potion neutralisante",
         emoji: "🧬",
         description: "Annule 1 des effets du monstre",
-        cost: 14,
+        cost: 20,
     },
     medkit: {
         name: "Médikit",
