@@ -88,7 +88,7 @@ export const playerClassAttributesRepository = buildPlayerClassDataAttributes({
     },
     hunter: {
         name: "Chasseur.se",
-        emoji: "🏹",
+        emoji: "🎯",
         descriptions: [
             "Au début de chaque monstre, faites autant de dégâts que votre Niveau.",
             "Vos 🟩 rapportent aussi 1 XP.",

@@ -74,7 +74,7 @@ export default class BosslePlayer {
     }
 
     toString() {
-        return `${this.user}: ${this.lastAttempt ? `\`${this.game.renderAttempt(this.lastAttempt)}\`` : "Pas d'essai"} ${this.availablePoints ? `(${this.availablePoints} ✨) ` : ""}${this.classes.map((i) => i.toCondensed()).join(", ")} ${[...this.items].map((i) => i.toCondensed()).join(", ")}`;
+        return `${this.user}: ${this.lastAttempt ? `\`${this.game.renderAttempt(this.lastAttempt)}\`` : "Pas d'essai"} ${this.availablePoints ? `(${this.availablePoints} 🔷) ` : ""}${this.classes.map((i) => i.toCondensed()).join(", ")} ${[...this.items].map((i) => i.toCondensed()).join(", ")}`;
     }
 
     serialize() {

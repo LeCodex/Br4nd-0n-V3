@@ -34,7 +34,7 @@ export default class BossleView extends GameView<BossleGame> {
             style: ButtonStyle.Success,
             callback: async (interaction) => {
                 const player = this.game.getPlayer(interaction.user);
-                await new UpgradeView(this.game, player).reply(interaction as ButtonInteraction, { content: `Vous avez ${player.availablePoints} ✨ disponibles`, flags: MessageFlags.Ephemeral })
+                await new UpgradeView(this.game, player).reply(interaction as ButtonInteraction, { content: `Vous avez ${player.availablePoints} 🔷 disponibles`, flags: MessageFlags.Ephemeral })
             }
         });
         this.setButton({
@@ -94,7 +94,7 @@ export class UpgradeView extends GameView<BossleGame> {
             if (cls.price === undefined) continue;
             options.push({
                 emoji: cls.emoji,
-                label: `${cls.name} (Niv ${cls.level + 1}, ${cls.price} ✨)`,
+                label: `${cls.name} (Niv ${cls.level + 1}, ${cls.price} 🔷)`,
                 description: cls.descriptions[cls.level + 1],
                 value: cls.constructor.name
             });
@@ -106,7 +106,7 @@ export class UpgradeView extends GameView<BossleGame> {
             newClasses[cls.name] = instance;
             options.push({
                 emoji: instance.emoji,
-                label: `${instance.name} (Lvl 0, ${newClassPrice}✨)`,
+                label: `${instance.name} (Lvl 0, ${newClassPrice} 🔷)`,
                 description: instance.descriptions[0],
                 value: cls.name
             });
@@ -117,31 +117,32 @@ export class UpgradeView extends GameView<BossleGame> {
             callback: async (interaction) => {
                 const value = (interaction as StringSelectMenuInteraction).values[0]!;
                 const existing = player.classes.find((e) => e.constructor.name === value);
+                const suffix = () => `${player.availablePoints > 0 ? `. Il vous reste ${player.availablePoints} 🔷 Points à dépender` : ""}`;
                 if (existing) {
                     if (existing.price === undefined) {
                         await interaction.reply({ content: "La classe n'est pas améliorable", flags: MessageFlags.Ephemeral });
                         return;
                     } else if (existing.price > player.availablePoints) {
-                        await interaction.reply({ content: "Vous n'avez pas assez de ✨ points", flags: MessageFlags.Ephemeral });
+                        await interaction.reply({ content: "Vous n'avez pas assez de 🔷 Points", flags: MessageFlags.Ephemeral });
                         return;
                     }
                     player.pointsSpents += existing.price;
                     existing.levelUp();
                     await this.game.sendBoard({ edit: true });
                     await this.parentInteraction?.deleteReply();
-                    await interaction.reply({ content: `Vous avez amélioré votre classe de ${existing}`, flags: MessageFlags.Ephemeral });
+                    await interaction.reply({ content: `Vous avez amélioré votre classe de ${existing}${suffix()}`, flags: MessageFlags.Ephemeral });
                     await this.game.save();
                 } else if (newClasses[value]) {
                     const instance = newClasses[value];
                     if (newClassPrice > player.availablePoints) {
-                        await interaction.reply({ content: "Vous n'avez pas assez de ✨ points", flags: MessageFlags.Ephemeral });
+                        await interaction.reply({ content: "Vous n'avez pas assez de 🔷 Points", flags: MessageFlags.Ephemeral });
                         return;
                     }
                     player.pointsSpents += newClassPrice;
                     instance.giveTo(player);
                     await this.game.sendBoard({ edit: true });
                     await this.parentInteraction?.deleteReply();
-                    await interaction.reply({ content: `Vous avez gagné la classe de ${instance}`, flags: MessageFlags.Ephemeral });
+                    await interaction.reply({ content: `Vous avez gagné la classe de ${instance}${suffix()}`, flags: MessageFlags.Ephemeral });
                     await this.game.save();
                 } else {
                     await interaction.deferReply();

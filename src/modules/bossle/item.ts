@@ -86,7 +86,7 @@ export const itemAttributesRepository = buildItemAttributes({
     },
     sword: {
         name: "Epée",
-        emoji: "⚔️",
+        emoji: "🗡️",
         description: "Augmente de 1 tous vos dégâts au monstre",
         cost: 6,
         uses: 5,
@@ -113,8 +113,8 @@ export const itemAttributesRepository = buildItemAttributes({
         uses: 5,
     },
     crystalBall: {
-        name: "Boule de cristal",
-        emoji: "🔮",
+        name: "Amulette",
+        emoji: "🧿",
         description: "Vous révèle une lettre `⬛` après chaque essai",
         cost: 8,
         uses: 10,
