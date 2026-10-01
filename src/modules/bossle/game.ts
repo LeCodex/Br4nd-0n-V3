@@ -2,7 +2,7 @@ import { APIEmbed, ChatInputCommandInteraction, MessageFlags, RepliableInteracti
 import Bossle from ".";
 import { Game } from "../game";
 import BosslePlayer from "./player";
-import { randomlyPick } from "../../utils";
+import { randomlyPick } from "src/utils";
 import { DateTime } from "luxon";
 import { random } from "lodash";
 import ShopItem, * as Items from "./item";
@@ -11,6 +11,7 @@ import * as Classes from "./classes";
 import BossleView from "./view";
 import View from "src/view";
 import { loadItem } from "./utils";
+import Logger from "src/logger";
 
 export enum WordleResult {
     NONE,
@@ -184,7 +185,6 @@ export default class BossleGame extends Game {
 
         if (this.targetWord) {
             await this.sendBoard({ showWord: true, edit: true });
-            await this.boardView?.end();
         }
 
         this.emit("turnEnd", {});
@@ -492,13 +492,15 @@ export default class BossleGame extends Game {
             await this.boardView.edit({ embeds: [embed] });
         } else if (this.channel) {
             if (this.boardView) {
-                try { await this.boardView.message?.unpin(); } catch { }
+                try { await this.boardView.message?.unpin(); } catch (e) { Logger.error(e) }
                 if (options?.replace) {
                     await this.boardView.delete();
+                } else {
+                    await this.boardView?.end();
                 }
             }
             this.boardView = await new BossleView(this).send(this.channel, { embeds: [embed] });
-            try { await this.boardView.message?.pin(); } catch { }
+            try { await this.boardView.message?.pin(); } catch (e) { Logger.error(e) }
         }
     }
 
