@@ -29,7 +29,7 @@ export default class BossleView extends GameView<BossleGame> {
         }
 
         this.setButton({
-            emoji: "⏫",
+            emoji: "🔷",
             label: "Amélioration",
             style: ButtonStyle.Success,
             callback: async (interaction) => {
@@ -38,12 +38,12 @@ export default class BossleView extends GameView<BossleGame> {
             }
         });
         this.setButton({
-            emoji: "✨",
+            emoji: "🟩",
             label: "Pouvoir",
             style: ButtonStyle.Success,
             callback: async (interaction) => {
                 const player = this.game.getPlayer(interaction.user);
-                if (!player.classes.some((e) => e.level >= e.activeAbilityLevel && e.activeAbilityCost >= game.mana)) {
+                if (!player.classes.some((e) => e.level >= e.activeAbilityLevel && game.mana >= e.activeAbilityCost)) {
                     await interaction.reply({ content: "Vous n'avez pas de pouvoirs activables", flags: MessageFlags.Ephemeral });
                     return;
                 }
