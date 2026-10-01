@@ -117,7 +117,7 @@ export class UpgradeView extends GameView<BossleGame> {
             callback: async (interaction) => {
                 const value = (interaction as StringSelectMenuInteraction).values[0]!;
                 const existing = player.classes.find((e) => e.constructor.name === value);
-                const suffix = () => `${player.availablePoints > 0 ? `. Il vous reste ${player.availablePoints} 🔷 Points à dépender` : ""}`;
+                const suffix = () => `${player.availablePoints > 0 ? `. Il vous reste ${player.availablePoints} 🔷 Points à dépenser` : ""}`;
                 if (existing) {
                     if (existing.price === undefined) {
                         await interaction.reply({ content: "La classe n'est pas améliorable", flags: MessageFlags.Ephemeral });

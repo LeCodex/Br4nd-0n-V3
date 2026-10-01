@@ -507,10 +507,14 @@ export default class BossleGame extends Game {
             ...super.serialize(),
             players: Object.fromEntries(Object.entries(this.players).map(([k, v]) => [k, v.serialize()])),
             gold: this.gold,
+            mana: this.mana,
             xp: this.xp,
             level: this.level,
             health: this.health,
             turnHealthChange: this.turnHealthChange,
+            turnGoldChange: this.turnGoldChange,
+            turnManaChange: this.turnManaChange,
+            turnXPChange: this.turnXPChange,
             monster: this.monster,
             monsterEffects: this.monsterEffects.map((e) => e.constructor.name as keyof ConcreteEffects),
             targetWord: this.targetWord,
@@ -527,10 +531,14 @@ export default class BossleGame extends Game {
         const instance = new this(module, channelId);
         instance.players = Object.fromEntries(await Promise.all(Object.entries(obj.players).map(async ([k, v]) => [k, await BosslePlayer.load(instance, v)])));
         instance.gold = obj.gold;
+        instance.mana = obj.mana;
         instance.xp = obj.xp;
         instance.level = obj.level;
         instance.health = obj.health;
         instance.turnHealthChange = obj.turnHealthChange;
+        instance.turnGoldChange = obj.turnGoldChange;
+        instance.turnManaChange = obj.turnManaChange;
+        instance.turnXPChange = obj.turnXPChange;
         instance.monster = obj.monster;
         instance.monsterEffects = obj.monsterEffects.map((e) => new Effects[e](instance));
         if (!instance.isMonsterAlive) instance.monsterEffects.forEach((e) => e.destroy());
