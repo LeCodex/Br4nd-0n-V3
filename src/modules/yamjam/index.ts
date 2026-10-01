@@ -1,8 +1,8 @@
-import GameModule from "modules/game/base";
+import GameModule from "../game/base";
 import YamJamGame from "./game";
 import { ChatInputCommandInteraction, Emoji, MessageFlags } from "discord.js";
-import { getEmoji } from "utils";
-import { GameCommand } from "modules/game";
+import { getEmoji }from "src/utils";
+import { GameCommand } from "../game";
 
 export default class YamJam extends GameModule() {
     readonly cls = YamJamGame;

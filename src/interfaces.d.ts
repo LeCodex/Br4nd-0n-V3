@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionData, ApplicationCommandSubCommandData, ApplicationCommandSubGroupData, ButtonBuilder, ChannelSelectMenuBuilder, ChannelSelectMenuComponentData, ChatInputApplicationCommandData, ChatInputCommandInteraction, InteractionButtonComponentData, MentionableSelectMenuBuilder, MentionableSelectMenuComponentData, MessageComponentInteraction, RepliableInteraction, RoleSelectMenuBuilder, RoleSelectMenuComponentData, StringSelectMenuBuilder, StringSelectMenuComponentData, UserSelectMenuBuilder, UserSelectMenuComponentData } from "discord.js";
 import { BotModule } from "modules/base";
-import GameModule from "modules/game/base";
+import GameModule from "../game/base";
 
 export interface ChatInputAplicationSubcommandData<AllowSubcommandGroup extends boolean = true> extends Omit<ChatInputApplicationCommandData, "name" | "options" | "type"> {
     subcommand?: string;

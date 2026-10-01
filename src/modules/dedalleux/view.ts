@@ -1,10 +1,10 @@
 import { ButtonInteraction, ButtonStyle, Message, MessageComponentInteraction, MessageFlags } from "discord.js";
-import { Button } from "view";
+import { Button } from "src/view";
 import DedalleuxGame from "./game";
 import { DateTime } from "luxon";
 import DedalleuxPlayer from "./player";
-import GameView from "modules/game/view";
-import { ComponentHandler } from "interfaces";
+import GameView from "../game/view";
+import { ComponentHandler } from "src/interfaces";
 
 export default class DedalleuxView extends GameView<DedalleuxGame> {
     constructor(game: DedalleuxGame, message?: Message) {

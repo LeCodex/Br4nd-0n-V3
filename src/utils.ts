@@ -1,6 +1,6 @@
 import { APIEmbed, Emoji, InteractionEditReplyOptions, InteractionReplyOptions, MessagePayload, RepliableInteraction, Snowflake, User } from "discord.js";
 import { CharOf, Vector2 } from "./interfaces";
-import { client } from "client";
+import { client }from "src/client";
 
 export async function getEmoji(name: Snowflake, fallback: string) {
     try {

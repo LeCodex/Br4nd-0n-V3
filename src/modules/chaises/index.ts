@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction } from "discord.js";
-import { Game, AdminGameCommand, GameCommand } from "modules/game";
-import GameModule from "modules/game/base";
+import { Game, AdminGameCommand, GameCommand } from "../game";
+import GameModule from "../game/base";
 import ChaisesGame from "./game";
 
 export default class Chaises extends GameModule() {

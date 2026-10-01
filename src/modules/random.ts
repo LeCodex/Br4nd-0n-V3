@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { BotCommand, BotModule } from "./base";
-import { randomlyPick } from "utils";
-import { CharOf } from "interfaces";
+import { randomlyPick }from "src/utils";
+import { CharOf } from "src/interfaces";
 
 export default class Random extends BotModule {
     name: string = "Random";

@@ -1,7 +1,7 @@
-import GameModule from "modules/game/base";
+import GameModule from "../game/base";
 import SteepleGame from "./game";
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from "discord.js";
-import { AdminGameCommand, GameCommand } from "modules/game";
+import { AdminGameCommand, GameCommand } from "../game";
 
 export default class Steeple extends GameModule() {
     cls = SteepleGame;

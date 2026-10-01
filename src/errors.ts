@@ -1,7 +1,7 @@
 import { Client, EmbedBuilder, Interaction, Message, TextChannel } from "discord.js";
 import DB from "./db";
 import Logger from "./logger";
-import { client } from "client";
+import { client }from "src/client";
 import { replyOrFollowUp } from "./utils";
 
 export default class ErrorHandler {

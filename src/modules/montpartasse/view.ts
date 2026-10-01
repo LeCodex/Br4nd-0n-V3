@@ -1,4 +1,4 @@
-import GameView from "modules/game/view";
+import GameView from "../game/view";
 import MontpartasseGame from "./game";
 import { Message, StringSelectMenuInteraction } from "discord.js";
 

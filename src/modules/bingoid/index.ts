@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, Emoji } from "discord.js";
-import GameModule from "modules/game/base";
+import GameModule from "../game/base";
 import BingoidGame from "./game";
-import { GameCommand } from "modules/game";
-import { getEmoji } from "utils";
+import { GameCommand } from "../game";
+import { getEmoji }from "src/utils";
 
 export default class Bingoid extends GameModule() {
     name = "Bingoid";

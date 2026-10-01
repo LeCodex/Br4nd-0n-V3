@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, MessageFlags } from "discord.js";
-import { AdminGameCommand, GameCommand } from "modules/game"
+import { AdminGameCommand, GameCommand } from "../game"
 import GameModule from "../game/base";
 import CompoteDePommesGame from "./game";
 

@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, MessageFlags, User } from "discord.js";
 import TartilettresGame from "./game";
-import { client } from "client";
+import { client } from "src/client";
 
 export default class TartilettresPlayer {
     score: number = 0;

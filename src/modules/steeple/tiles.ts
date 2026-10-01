@@ -1,4 +1,4 @@
-import { getEmoji } from "utils";
+import { getEmoji }from "src/utils";
 import SteepleGame from "./game";
 import { Emoji } from "discord.js";
 import SteeplePlayer from "./player";

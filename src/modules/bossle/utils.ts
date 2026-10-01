@@ -1,7 +1,6 @@
 import type PlayerClass from "./classes";
 import * as Classes from "./classes";
 import type BossleGame from "./game";
-import type { BossleEventHandler, BossleEvents } from "./game";
 import type ShopItem from "./item";
 import * as Items from "./item";
 import type BosslePlayer from "./player";

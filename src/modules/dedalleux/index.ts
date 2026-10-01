@@ -1,8 +1,8 @@
-import GameModule from "modules/game/base";
+import GameModule from "../game/base";
 import DedalleuxGame from "./game";
 import { ChatInputCommandInteraction, Emoji, MessageFlags } from "discord.js";
 import { Game, GameCommand } from "../game";
-import { getEmoji } from "utils";
+import { getEmoji }from "src/utils";
 
 export default class Dedalleux extends GameModule() {
     protected cls = DedalleuxGame;

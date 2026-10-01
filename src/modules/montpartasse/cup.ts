@@ -1,4 +1,4 @@
-import { randomlyPick } from "utils";
+import { randomlyPick }from "src/utils";
 import MontpartasseGame from "./game";
 import MontpartassePlayer from "./player";
 import { shuffle } from "lodash";

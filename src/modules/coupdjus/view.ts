@@ -1,8 +1,8 @@
 import { Message, ButtonStyle, MessageComponentInteraction, ButtonInteraction } from "discord.js";
 import CoupdjusGame from "./game";
-import GameView from "modules/game/view";
-import { NUMBER_EMOJIS } from "utils";
-import { Button } from "view";
+import GameView from "../game/view";
+import { NUMBER_EMOJIS }from "src/utils";
+import { Button } from "src/view";
 import CoupdjusPlayer from "./player";
 
 export default class CoupdjusView extends GameView<CoupdjusGame> {

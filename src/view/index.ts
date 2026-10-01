@@ -1,8 +1,8 @@
-import { client } from "client";
+import { client } from "src/client";
 import { randomBytes } from "crypto";
 import { ActionRowBuilder, AnyComponentBuilder, ButtonBuilder, ChannelSelectMenuBuilder, ChannelSelectMenuComponentData, ComponentData, ComponentType, InteractionButtonComponentData, InteractionReplyOptions, MentionableSelectMenuBuilder, MentionableSelectMenuComponentData, Message, MessageComponentInteraction, MessageCreateOptions, MessageEditOptions, RepliableInteraction, RoleSelectMenuBuilder, RoleSelectMenuComponentData, SendableChannels, Snowflake, StringSelectMenuBuilder, StringSelectMenuComponentData, UserSelectMenuBuilder, UserSelectMenuComponentData } from "discord.js";
-import { ComponentHandler, ComponentHandlerMetadata, ComponentHandlerParameter, ComponentHandlerMetadataParameter, Constructor, NonLinkButtonMessageActionRowComponentData, NonTextInputComponentBuilder } from "interfaces";
-import Logger from "logger";
+import { ComponentHandler, ComponentHandlerMetadata, ComponentHandlerParameter, ComponentHandlerMetadataParameter, Constructor, NonLinkButtonMessageActionRowComponentData, NonTextInputComponentBuilder } from "src/interfaces";
+import Logger from "src/logger";
 
 const ComponentHandlers = Symbol("ComponentHandlers");
 

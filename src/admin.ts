@@ -1,7 +1,7 @@
 import { ButtonInteraction, ButtonStyle, MessageFlags, TextChannel } from "discord.js";
 import DB from "./db";
 import View, { Button } from "./view";
-import { client } from "client";
+import { client } from "src/client";
 
 class AdminView extends View {
     @Button({ style: ButtonStyle.Primary, label: "Restart", emoji: "🔄" })

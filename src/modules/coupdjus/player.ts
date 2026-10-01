@@ -1,8 +1,8 @@
 import { EmbedBuilder, MessageFlags, RepliableInteraction, User } from "discord.js";
 import CoupdjusGame from "./game";
 import Fruit from "./fruits";
-import { randomlyPick } from "utils";
-import { client } from "client";
+import { randomlyPick }from "src/utils";
+import { client }from "src/client";
 
 export default class CoupdjusPlayer {
     score = 0;

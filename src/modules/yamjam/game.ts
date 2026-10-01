@@ -1,10 +1,10 @@
-import { Game } from "modules/game";
+import { Game } from "../game";
 import { Figure, figures } from "./figures";
 import YamJamPlayer from "./player";
 import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import YamJamView from "./view";
-import { getRankEmoji } from "utils";
-import View from "view";
+import { getRankEmoji } from "src/utils";
+import View from "src/view";
 import YamJam from ".";
 
 export default class YamJamGame extends Game {

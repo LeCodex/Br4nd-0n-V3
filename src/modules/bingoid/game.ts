@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, MessageFlags, RepliableInteraction } from "discord.js";
-import { Game } from "modules/game";
+import { Game } from "../game";
 import * as Balls from "./ball";
 import BingoidPlayer from "./player";
-import { call, randomlyPick, replyOrEdit } from "utils";
+import { call, randomlyPick, replyOrEdit }from "src/utils";
 import { range, uniq } from "lodash";
 import Bingoid from ".";
 import { BingoidCard, Tile } from "./card";

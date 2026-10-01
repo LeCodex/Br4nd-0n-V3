@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, Emoji, MessageFlags } from "discord.js";
-import { Game, GameCommand } from "modules/game";
+import { Game, GameCommand } from "../game";
 import MontpartasseGame from "./game";
-import GameModule from "modules/game/base";
-import { getEmoji } from "utils";
+import GameModule from "../game/base";
+import { getEmoji }from "src/utils";
 
 export default class Montpartasse extends GameModule() {
     cls = MontpartasseGame;

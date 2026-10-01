@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, MessageFlags, SendableChannels } from "discord.js";
 import { AdminCommand, BotCommand } from "../base";
-import DB from "db";
-import { ChatInputAplicationSubcommandData, GameSubcommandData, type GameModule } from "interfaces";
-import { client } from "client";
+import DB from "src/db";
+import { ChatInputAplicationSubcommandData, GameSubcommandData, type GameModule } from "src/interfaces";
+import { client }from "src/client";
 
 export abstract class Game {
     paused: boolean = false;

@@ -1,9 +1,9 @@
-import { Game } from "modules/game";
+import { Game } from "../game";
 import Fruit from "./fruits";
 import CoupdjusPlayer from "./player";
 import { ChatInputCommandInteraction, EmbedBuilder, MessageComponentInteraction, MessageFlags } from "discord.js";
 import { DateTime } from "luxon";
-import { getRankEmoji, NUMBER_EMOJIS } from "utils";
+import { getRankEmoji, NUMBER_EMOJIS }from "src/utils";
 import CoupdjusView from "./view";
 import Coupdjus from ".";
 

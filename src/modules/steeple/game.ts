@@ -1,12 +1,12 @@
 import { DateTime, DurationLikeObject } from "luxon";
-import { Game } from "modules/game";
+import { Game } from "../game";
 import Tile, * as Tiles from "./tiles";
 import SteeplePlayer from "./player";
 import { APIEmbed, ChatInputCommandInteraction, EmbedBuilder, Message, MessageFlags, ReactionCollector, SendableChannels, User } from "discord.js";
 import { shuffle } from "lodash";
 import Steeple from ".";
-import { client } from "client";
-import { BANNED_EMOJIS, createRankEmbed } from "utils";
+import { client }from "src/client";
+import { BANNED_EMOJIS, createRankEmbed }from "src/utils";
 
 type TileName = Exclude<keyof typeof Tiles, "default">;
 

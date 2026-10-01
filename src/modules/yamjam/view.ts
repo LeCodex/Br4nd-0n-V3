@@ -1,9 +1,9 @@
 import { Message, ButtonStyle, MessageComponentInteraction, ButtonInteraction, MessageFlags } from "discord.js";
-import { Button } from "view";
+import { Button } from "src/view";
 import YamJamGame from "./game";
 import YamJamPlayer from "./player";
-import GameView from "modules/game/view";
-import { ComponentHandler } from "interfaces";
+import GameView from "../game/view";
+import { ComponentHandler } from "src/interfaces";
 
 export default class YamJamView extends GameView<YamJamGame> {
     constructor(game: YamJamGame, message?: Message) {

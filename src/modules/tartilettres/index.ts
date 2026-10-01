@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from "discord.js";
-import { replyMultiple } from "utils";
-import { GameCommand } from "modules/game";
-import GameModule from "modules/game/base";
+import { replyMultiple } from "src/utils";
+import { GameCommand } from "../game";
+import GameModule from "../game/base";
 import TartilettresGame from "./game";
 
 export default class Tartilettres extends GameModule() {

@@ -1,4 +1,4 @@
-import { randomlyPick } from "utils";
+import { randomlyPick }from "src/utils";
 import BingoidGame, { RollContext } from "./game";
 import { Emoji } from "discord.js";
 import { shuffle } from "lodash";

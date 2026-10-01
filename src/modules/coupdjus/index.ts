@@ -1,7 +1,7 @@
-import GameModule from "modules/game/base";
+import GameModule from "../game/base";
 import CoupdjusGame from "./game";
 import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
-import { Game, GameCommand } from "modules/game";
+import { Game, GameCommand } from "../game";
 
 export default class Coupdjus extends GameModule() {
     cls = CoupdjusGame;

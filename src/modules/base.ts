@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, Message, MessageFlags, OmitPartialGroupDMChannel, Snowflake } from "discord.js";
 import * as fs from "fs";
-import { BotCommand, BotSubcommandMetadata, ChatInputAplicationSubcommandData } from "interfaces";
-import Logger from "logger";
+import { BotCommand, BotSubcommandMetadata, ChatInputAplicationSubcommandData } from "src/interfaces";
+import Logger from "src/logger";
 
 export const BotCommands = Symbol("BotCommands");
 export const AdminCommands = Symbol("AdminCommands");

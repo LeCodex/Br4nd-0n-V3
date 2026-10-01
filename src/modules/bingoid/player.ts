@@ -1,6 +1,6 @@
 import { User } from "discord.js";
 import BingoidGame from "./game";
-import { client } from "client";
+import { client }from "src/client";
 
 export default class BingoidPlayer {
     score = 0;

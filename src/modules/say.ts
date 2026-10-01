@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, SendableChannels } from "discord.js";
 import { BotCommand, BotModule } from "./base";
-import { client } from "client";
+import { client }from "src/client";
 
 export default class Say extends BotModule {
     public name: string = "Say";

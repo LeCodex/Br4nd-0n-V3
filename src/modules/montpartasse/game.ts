@@ -1,13 +1,13 @@
 import { APIEmbed, ChatInputCommandInteraction, MessageFlags, StringSelectMenuInteraction, User } from "discord.js";
-import { Game } from "modules/game";
+import { Game } from "src/modules/game";
 import MontpartassePlayer from "./player";
 import Cup, * as Cups from "./cup";
 import { random, range } from "lodash";
-import { getRankEmoji, randomlyPick, toRanked } from "utils";
+import { getRankEmoji, randomlyPick, toRanked } from "src/utils";
 import MontpartasseView from "./view";
 import Montpartasse from ".";
 import { DateTime } from "luxon";
-import View from "view";
+import View from "src/view";
 
 const NonDefaultCups = Object.entries(Cups).filter(([k, _]) => k !== "default").map(([_, v]) => v) as Array<Omit<typeof Cups, "default">[keyof Omit<typeof Cups, "default">]>;
 const RollableCups = NonDefaultCups.filter((e) => e.canBeRolled);

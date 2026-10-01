@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { BotCommand, BotModule } from "./base";
-import { client } from "client";
+import { client } from "src/client";
 
 export default class Ping extends BotModule {
     name: string = "Ping";

@@ -1,9 +1,9 @@
 import { ChatInputCommandInteraction, MessageFlags, TextChannel } from "discord.js";
-import DB from "db";
-import Logger from "logger";
+import DB from "src/db";
+import Logger from "src/logger";
 import { BotModule, AdminCommand } from "../base";
 import { Game } from ".";
-import ErrorHandler from "errors";
+import ErrorHandler from "src/errors";
 
 export default function GameModule() {
     abstract class GameModule extends BotModule {

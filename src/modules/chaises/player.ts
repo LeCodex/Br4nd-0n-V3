@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, MessageFlags, User } from "discord.js";
 import ChaisesGame from "./game";
-import { client } from "client";
-import { randomlyPick, COLORED_SQUARES, replyOrFollowUp } from "utils";
+import { client }from "src/client";
+import { randomlyPick, COLORED_SQUARES, replyOrFollowUp }from "src/utils";
 
 export default class ChaisesPlayer {
     score = 0;

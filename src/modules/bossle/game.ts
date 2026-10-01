@@ -9,7 +9,7 @@ import ShopItem, * as Items from "./item";
 import BossEffect, * as Effects from "./effects";
 import * as Classes from "./classes";
 import BossleView from "./view";
-import View from "../../view";
+import View from "src/view";
 import { loadItem } from "./utils";
 
 export enum WordleResult {
@@ -171,6 +171,7 @@ export default class BossleGame extends Game {
         this.level = 0;
         this.health = this.maxHealth;
         this.turn = 0;
+        this.targetWord = "";
         await this.nextTurn();
     }
 

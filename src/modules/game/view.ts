@@ -1,7 +1,7 @@
 import { Message, MessageComponentInteraction } from "discord.js";
 import { Game } from ".";
-import View from "view";
-import { ComponentHandler } from "interfaces";
+import View from "src/view";
+import { ComponentHandler } from "src/interfaces";
 
 export default class GameView<T extends Game> extends View {
     constructor(public game: T, message?: Message) {

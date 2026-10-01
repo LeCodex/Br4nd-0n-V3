@@ -1,4 +1,4 @@
-import { Game } from "modules/game";
+import { Game } from "../game";
 import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import TartilettresPlayer from "./player";
 import Tartilettres from ".";

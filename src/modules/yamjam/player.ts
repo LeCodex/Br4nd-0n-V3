@@ -1,6 +1,6 @@
 import { EmbedBuilder, MessageFlags, RepliableInteraction, User } from "discord.js";
 import YamJamGame from "./game";
-import { client } from "client";
+import { client }from "src/client";
 import YamJam from ".";
 
 export default class YamJamPlayer {

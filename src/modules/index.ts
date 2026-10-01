@@ -1,8 +1,8 @@
-import { BotModule } from "modules/base";
-import Ping from "modules/ping";
-import Random from "modules/random";
-import CompoteDePommes from "modules/compote";
-import Tartilettres from "modules/tartilettres";
+import { BotModule } from "./base";
+import Ping from "./ping";
+import Random from "./random";
+import CompoteDePommes from "./compote";
+import Tartilettres from "./tartilettres";
 import Dedalleux from "./dedalleux";
 import Sakatasses from "./sak";
 import YamJam from "./yamjam";

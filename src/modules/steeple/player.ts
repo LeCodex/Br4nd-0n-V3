@@ -1,8 +1,8 @@
 import { User } from "discord.js";
 import SteepleGame from "./game";
 import Effect, * as Effects from "./effects";
-import { COLORED_SQUARES, randomlyPick } from "utils";
-import { client } from "client";
+import { COLORED_SQUARES, randomlyPick }from "src/utils";
+import { client }from "src/client";
 
 type EffectName = Exclude<keyof typeof Effects, "default">;
 

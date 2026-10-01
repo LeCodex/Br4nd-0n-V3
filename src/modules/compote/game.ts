@@ -1,9 +1,9 @@
 import { APIEmbed, ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { DateTime } from "luxon";
-import { Game } from "modules/game";
+import { Game } from "../game";
 import CompoteDePommesPlayer from "./player";
-import { CharOf, NumberRange } from "interfaces";
-import { createRankEmbed, randomlyPick, toRanked } from "utils";
+import { CharOf, NumberRange } from "src/interfaces";
+import { createRankEmbed, randomlyPick, toRanked }from "src/utils";
 import CompoteDePommes from ".";
 
 export default class CompoteDePommesGame extends Game {

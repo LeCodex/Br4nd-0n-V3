@@ -2,7 +2,7 @@ import { User } from "discord.js";
 import Cup from "./cup";
 import MontpartasseGame from "./game";
 import { range } from "lodash";
-import { client } from "client";
+import { client }from "src/client";
 
 export default class MontpartassePlayer {
     score = 0;

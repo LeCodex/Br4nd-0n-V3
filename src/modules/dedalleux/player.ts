@@ -1,7 +1,7 @@
 import { EmbedBuilder, MessageFlags, RepliableInteraction, User } from "discord.js";
 import DedalleuxGame from "./game";
 import Dedalleux from ".";
-import { client } from "client";
+import { client }from "src/client";
 
 export default class DedalleuxPlayer {
     score: number = 0;

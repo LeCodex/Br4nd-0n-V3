@@ -1,11 +1,11 @@
-import DB from "db";
+import DB from "src/db";
 import { AdminCommand, BotCommand, BotModule } from "./base"
-import Logger from "logger";
+import Logger from "src/logger";
 import { ApplicationCommandOptionType, ApplicationCommandUserOption, ChatInputCommandInteraction, EmbedBuilder, Emoji, MessageFlags, User } from "discord.js";
 import { times } from "lodash";
-import { createRankEmbed, getEmoji } from "utils";
-import { client } from "client";
-import { ConfirmView } from "view/utils";
+import { createRankEmbed, getEmoji }from "src/utils";
+import { client }from "src/client";
+import { ConfirmView } from "src/view/utils";
 
 export default class Sakatasses extends BotModule {
     public name: string = "Sakatasses";
