@@ -55,7 +55,7 @@ export const playerClassAttributesRepository = buildPlayerClassDataAttributes({
         emoji: "✝️",
         descriptions: [
             "Vos dégâts font regagner autant de PV.",
-            "6 🟩 : Regagnez 5 % de vos PV max.",
+            "6 🟩 : Regagnez 2 % de vos PV max.",
             "Tant que vous avez plus de la moitié de vos PV max, +2 dégâts de mot.",
             "La première fois que vous mourrez, vous revenez à 50 % de vos PV max à la place."
         ],
@@ -362,7 +362,7 @@ export class Priest extends PlayerClass {
     }
 
     activeAbility(): boolean {
-        const amount = Math.round(this.game.maxHealth / 20);
+        const amount = Math.round(this.game.maxHealth / 50);
         this.game.gainHealth(amount);
         this.game.channel?.send(`### ${this.emoji} Vous regagnez ${amount}!`);
         return true;
