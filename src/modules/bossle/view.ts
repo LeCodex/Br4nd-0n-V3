@@ -171,7 +171,7 @@ export class PowerView extends GameView<BossleGame> {
                     if (successful) {
                         await this.parentInteraction?.deleteReply();
                         game.gainMana(-cls.activeAbilityCost);
-                        await interaction.deferReply();
+                        await interaction.reply({ content: "Pouvoir utilisé", flags: MessageFlags.Ephemeral });
                     } else {
                         await interaction.reply({ content: "Vous ne pouvez pas utiliser cette capacité pour le moment", flags: MessageFlags.Ephemeral })
                     }

@@ -491,7 +491,7 @@ export class Hunter extends PlayerClass {
         }
         this.game.monsterEffects.splice(this.game.monsterEffects.indexOf(effect), 1);
         effect.destroy();
-        this.game.channel?.send(`### ${this.emoji} L'effet ${effect} a été neutralisé!`);
+        this.game.channel?.send(`### ${this.emoji} L'effet ${effect.emoji} ${effect.name} a été neutralisé!`);
         return true;
     }
 }

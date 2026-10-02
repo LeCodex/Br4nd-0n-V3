@@ -40,7 +40,7 @@ export default class BosslePlayer {
     }
 
     get remainingLetters() {
-        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").filter((e) => !this.incorrectLetters.has(e));
+        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").filter((e) => !this.incorrectLetters.has(e) && !(this.game.revealedLetters.has(e) && !this.game.targetWord.includes(e)));
     }
 
     get privateAttemptContent() {
