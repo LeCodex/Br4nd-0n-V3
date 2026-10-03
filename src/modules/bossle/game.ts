@@ -27,10 +27,10 @@ export type ConcreteClasses = Omit<typeof Classes, "default" | "playerClassAttri
 export const ALL_CLASSES = Object.entries(Classes).filter(([k]) => k !== "default"&& k !== "playerClassAttributesRepository").map(([_, v]) => v) as Array<ConcreteClasses[keyof ConcreteClasses]>;
 
 export type BossleEvents = {
-    attempt: { readonly player: BosslePlayer, attempt: string, valid: boolean }
-    editResultMonster: { readonly player: BosslePlayer, attempt: string, result: Array<WordleResult> }
-    editResultPlayers: { readonly player: BosslePlayer, attempt: string, result: Array<WordleResult> }
-    result: { readonly player: BosslePlayer, attempt: string, readonly result: readonly WordleResult[], totalDmg: number, totalXp: number, totalGold: number, totalMana: number, ignore: boolean }
+    attempt: { readonly player: BosslePlayer, readonly attempt: string, valid: boolean }
+    editResultMonster: { readonly player: BosslePlayer, readonly attempt: string, result: Array<WordleResult> }
+    editResultPlayers: { readonly player: BosslePlayer, readonly attempt: string, result: Array<WordleResult> }
+    result: { readonly player: BosslePlayer, readonly attempt: string, readonly result: readonly WordleResult[], totalDmg: number, totalXp: number, totalGold: number, totalMana: number, ignore: boolean }
     finished: { readonly player: BosslePlayer, damage: number, factor: number }
     editGainXP: { amount: number }
     gainXP: { readonly amount: number }

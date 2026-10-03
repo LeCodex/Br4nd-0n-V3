@@ -364,7 +364,7 @@ export class Priest extends PlayerClass {
     activeAbility(): boolean {
         const amount = Math.round(this.game.maxHealth / 50);
         this.game.gainHealth(amount);
-        this.game.channel?.send(`### ${this.emoji} Vous regagnez ${amount}!`);
+        this.game.channel?.send(`### ${this.emoji} Vous regagnez ${amount} PV!`);
         return true;
     }
 }
