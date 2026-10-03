@@ -55,13 +55,14 @@ export default class BosslePlayer {
         return this.attempts.some((e) => e.includes(letter));
     }
 
-    damageMonster(amount: number) {
+    damageMonster(amount: number): number {
         const { amount: flatAmount, factor } = this.game.emit("editMonsterDamage", { player: this, amount, factor: 1 });
         amount = flatAmount * factor;
         this.game.emit("monsterDamage", { player: this, amount });
         this.game.monster.health = Math.max(0, this.game.monster.health - amount);
         this.game.monster.turnHealthChange -= amount;
         this.stats.damageDealt += amount;
+        return amount;
     }
 
     async sendAttemptsBoard() {

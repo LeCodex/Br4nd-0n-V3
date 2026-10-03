@@ -245,7 +245,7 @@ export default class BossleGame extends Game {
         return new item(this);
     }
 
-    gainXP(amount: number) {
+    gainXP(amount: number): number {
         amount = this.emit("editGainXP", { amount }).amount;
         this.emit("gainXP", { amount });
         this.xp += amount;
@@ -257,32 +257,36 @@ export default class BossleGame extends Game {
             this.level++;
             this.gainHealth(this.maxHealth - oldMaxHealth + Math.round(this.maxHealth * regenRatio));
         }
+        return amount;
     }
 
-    gainGold(amount: number) {
+    gainGold(amount: number): number {
         amount = this.emit("editGainGold", { amount }).amount;
         this.emit("gainGold", { amount });
         const trueAmount = Math.max(-this.gold, Math.min(amount, this.maxGold - this.gold));
         this.gold += trueAmount;
         this.turnGoldChange += trueAmount;
         // if (amount - trueAmount > 0) this.gainXP(amount - trueAmount);
+        return trueAmount;
     }
 
-    gainMana(amount: number) {
+    gainMana(amount: number): number {
         amount = this.emit("editGainMana", { amount }).amount;
         this.emit("gainMana", { amount });
         const trueAmount = Math.max(-this.mana, Math.min(amount, this.maxMana - this.mana));
         this.mana += trueAmount;
         this.turnManaChange += trueAmount;
         // if (amount - trueAmount > 0) this.gainXP(amount - trueAmount);
+        return trueAmount;
     }
 
-    gainHealth(amount: number) {
+    gainHealth(amount: number): number {
         amount = this.emit("editGainHealth", { amount }).amount;
         this.emit("gainHealth", { amount });
         const trueAmount = Math.max(-this.health, Math.min(amount, this.maxHealth - this.health));
         this.health += trueAmount;
         this.turnHealthChange += trueAmount;
+        return trueAmount;
     }
 
     revealLetter(predicate: (letter: string) => boolean = () => true): string | undefined {

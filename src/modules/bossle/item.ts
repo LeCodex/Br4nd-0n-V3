@@ -197,26 +197,24 @@ export default abstract class ShopItem extends ListenerSource implements ItemDat
 // =================== ONE-SHOT ITEMS ===================
 export class HealthPotion extends ShopItem {
     buy(player: BosslePlayer): boolean {
-        const amount = Math.floor(this.game.maxHealth / 10);
+        const amount = this.game.gainHealth(Math.floor(this.game.maxHealth / 10));
         this.game.channel?.send(`### 💖 Vous avez regagné ${amount} PV!`);
-        this.game.gainHealth(amount);
         return true;
     }
 }
 
 export class XpPotion extends ShopItem {
     buy(player: BosslePlayer): boolean {
-        const amount = Math.floor(this.game.xpForNextLevel / 10);
+        const amount = this.game.gainXP(Math.floor(this.game.xpForNextLevel / 10));
         this.game.channel?.send(`### 🎉 Vous avez gagné ${amount} XP!`);
-        this.game.gainXP(amount);
         return true;
     }
 }
 
 export class FirePotion extends ShopItem {
     buy(player: BosslePlayer): boolean {
-        this.game.channel?.send(`### 🔥 Le monstre a pris 3 dégâts!`);
-        player.damageMonster(3);
+        const amount = player.damageMonster(3);
+        this.game.channel?.send(`### 🔥 Le monstre a pris ${amount} dégâts!`);
         return true;
     }
 }
