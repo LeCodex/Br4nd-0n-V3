@@ -250,10 +250,10 @@ export class Venomous extends BossEffect {
     }
 }
 
-export class OneEyed extends BossEffect {
-    setupListeners(): void {
-        this.on("editResultMonster", (context) => {
-            context.result = context.result.map((e, i) => i >= Math.ceil(context.attempt.length / 2) ? WordleResult.NONE : e);
-        });
-    }
-}
+// export class OneEyed extends BossEffect {
+//     setupListeners(): void {
+//         this.on("editResultMonster", (context) => {
+//             context.result = context.result.map((e, i) => i >= Math.ceil(context.attempt.length / 2) ? WordleResult.NONE : e);
+//         });
+//     }
+// }

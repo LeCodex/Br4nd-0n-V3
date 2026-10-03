@@ -22,5 +22,5 @@ export function loadClass(game: BossleGame, player: BosslePlayer, obj: ReturnTyp
 }
 
 export function isConsonant(letter: string) {
-    return "bcdfghjklmnpqrstvwxz".includes(letter);
+    return "BCDFGHJKLMNPQRSTVWXZ".includes(letter);
 }
