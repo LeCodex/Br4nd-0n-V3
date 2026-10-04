@@ -301,7 +301,7 @@ export class PlayDohBall extends Ball {
         // Toutes les personnes qui ont un nombre de points inférieur ou égal à ton score marquent un point
         (context) => {
             const scoring = Object.values(this.game.players).filter((e) => e.score <= context.player.score);
-            this.game.summary.push(`${this.emoji} Tous les joueurs avec moins de points que ${context.player} gagnent **1 point**!`);
+            this.game.summary.push(`${this.emoji} Tous les joueurs avec autant ou moins de points que ${context.player} gagnent **1 point**!`);
             scoring.forEach((e) => e.scorePoints(1));
         },
         // Si la personne au-dessus de toi au classement a au moins 5 points de plus, tu lui en voles un
@@ -323,6 +323,11 @@ export class PlayDohBall extends Ball {
         (context) => {
             this.game.summary.push(`${this.emoji} Les numéros de la grille ont été **tirés de nouveau**!`);
             this.game.card.rerollNumbers();
+        },
+        // Annule l'attente
+        (context) => {
+            context.player.nextRollTimestamp = 0
+            this.game.summary.push(`${this.emoji} L'attente avant le prochain tirage pour ${context.player} a été **annulée**!`);
         }
     ];
 
