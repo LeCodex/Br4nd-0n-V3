@@ -4,7 +4,7 @@ import { Game } from "../game";
 import BosslePlayer from "./player";
 import { randomlyPick } from "src/utils";
 import { DateTime } from "luxon";
-import { random } from "lodash";
+import { random, shuffle } from "lodash";
 import ShopItem, * as Items from "./item";
 import BossEffect, * as Effects from "./effects";
 import * as Classes from "./classes";
@@ -289,20 +289,15 @@ export default class BossleGame extends Game {
         return trueAmount;
     }
 
+    // TODO: Rework this to use shuffle instead
     revealLetter(predicate: (letter: string) => boolean = () => true): string | undefined {
-        let letter: string | undefined;
-        for (let i = 0; i < 1000; i++) {
-            letter = randomlyPick("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-            if (predicate(letter) && !this.revealedLetters.has(letter)) {
-                break;
-            }
-            letter = undefined;
-        }
-        letter = this.emit("reveal", { letter }).letter;
+        const valid = shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").filter((el) => !this.revealedLetters.has(el)).filter(predicate))
+        const letter = this.emit("reveal", { letter: valid[0] }).letter;
         if (!letter) {
             this.channel?.send(`### ❌ La révélation de la lettre a échoué.`);
             return undefined;
         }
+        this.revealedLetters.add(letter);
         return letter;
     }
 
