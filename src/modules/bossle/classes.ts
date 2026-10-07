@@ -446,8 +446,8 @@ export class Mage extends PlayerClass {
     }
 
     activeAbility(): boolean {
-        const amount = 2 + this.extraData.bonusDmg;
-        this.player?.damageMonster(amount);
+        if (!this.player) return false;
+        const amount = this.player.damageMonster(2 + this.extraData.bonusDmg);
         this.extraData.bonusDmg++;
         this.game.channel?.send(`### ${this.emoji} Le monstre a pris ${amount} dégâts!`);
         return true;

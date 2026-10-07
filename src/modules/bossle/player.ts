@@ -56,12 +56,21 @@ export default class BosslePlayer {
     }
 
     damageMonster(amount: number): number {
+        const wasAlive = this.game.isMonsterAlive;
         const { amount: flatAmount, factor } = this.game.emit("editMonsterDamage", { player: this, amount, factor: 1 });
         amount = flatAmount * factor;
         this.game.emit("monsterDamage", { player: this, amount });
+
         this.game.monster.health = Math.max(0, this.game.monster.health - amount);
         this.game.monster.turnHealthChange -= amount;
         this.stats.damageDealt += amount;
+        if (!this.game.isMonsterAlive && wasAlive) {
+            this.game.channel?.send("### ⚔️ Le monstre est vaincu!\nLes dégâts et effets sont désactivés jusqu'à la fin du tour");
+            const { xp } = this.game.emit("defeated", { xp: this.game.xpForNextLevel });
+            this.game.gainXP(xp);
+            this.game.monsterEffects.forEach((e) => e.destroy());
+        }
+
         return amount;
     }
 

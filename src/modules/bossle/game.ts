@@ -356,7 +356,6 @@ export default class BossleGame extends Game {
             return interaction.editReply({ content: "Un effet vous empêche de jouer ce mot" });
         }
 
-        const wasAlive = this.isMonsterAlive;
         player.summary.length = 0;
         player.attempts.push(word);
 
@@ -397,21 +396,14 @@ export default class BossleGame extends Game {
             }
         }
 
-        if (player.finished && wasAlive) {
+        if (player.finished) {
             const { damage, factor } = this.emit("finished", { player, damage: player.maxAttempts - player.attempts.length + 1, factor: 1 });
-            player.damageMonster(damage * factor);
+            if (this.isMonsterAlive) player.damageMonster(damage * factor);
         }
         await interaction.editReply({ content: player.privateAttemptContent });
 
         if (player.done) {
             player.shopAllowed = true;
-        }
-
-        if (!this.isMonsterAlive && wasAlive) {
-            this.channel?.send("### ⚔️ Le monstre est vaincu!\nLes dégâts et effets sont désactivés jusqu'à la fin du tour");
-            const { xp } = this.emit("defeated", { xp: this.xpForNextLevel });
-            this.gainXP(xp);
-            this.monsterEffects.forEach((e) => e.destroy());
         }
 
         await this.sendBoard({ edit: true });
