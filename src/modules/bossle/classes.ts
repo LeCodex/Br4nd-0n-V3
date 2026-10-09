@@ -405,7 +405,7 @@ export class Warrior extends PlayerClass {
     activeAbility(): boolean {
         if (this.extraData.usedAbility) return false;
         this.extraData.usedAbility = true;
-        this.player?.damageMonster(this.game.monster.turnHealthChange);
+        this.player?.damageMonster(-this.game.monster.turnHealthChange);
         this.game.channel?.send(`### ${this.emoji} Les dégâts au monstre sont doublés ce tour-ci!`);
         return true;
     }
