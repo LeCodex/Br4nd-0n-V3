@@ -194,6 +194,7 @@ export default class BossleGame extends Game {
         this.turnManaChange = 0;
         this.turnXPChange = 0;
         this.monster.turnHealthChange = 0;
+        this.revealedLetters.clear();
 
         if (!this.isMonsterAlive) {
             const healthGain = random(1, 20);
@@ -250,7 +251,7 @@ export default class BossleGame extends Game {
         this.emit("gainXP", { amount });
         this.xp += amount;
         this.turnXPChange += amount;
-        if (this.xp > this.xpForNextLevel) {
+        while (this.xp >= this.xpForNextLevel) {
             this.xp -= this.xpForNextLevel;
             const oldMaxHealth = this.maxHealth;
             const regenRatio = this.emit("levelUp", { regenRatio: this.regenRatio }).regenRatio;
@@ -517,7 +518,8 @@ export default class BossleGame extends Game {
             refreshes: this.refreshes,
             bestRun: this.bestRun,
             boardView: this.boardView?.serialize(),
-            nextTimestamp: this.nextTimestamp
+            nextTimestamp: this.nextTimestamp,
+            revealedLetters: [...this.revealedLetters]
         }
     }
 
@@ -543,6 +545,7 @@ export default class BossleGame extends Game {
         instance.bestRun = obj.bestRun;
         if (obj.boardView) instance.boardView = new BossleView(instance, await View.load(obj.boardView));
         instance.nextTimestamp = obj.nextTimestamp;
+        instance.revealedLetters = new Set(obj.revealedLetters);
         await instance.sendBoard({ edit: true });
         instance.setupTimeout();
         return instance;

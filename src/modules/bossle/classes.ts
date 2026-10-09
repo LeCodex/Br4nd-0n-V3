@@ -90,7 +90,7 @@ export const playerClassAttributesRepository = buildPlayerClassDataAttributes({
         name: "Chasseur.se",
         emoji: "🎯",
         descriptions: [
-            "Au début de chaque monstre, faites autant de dégâts que votre Niveau.",
+            "Au début de chaque monstre, faites autant de dégâts que votre Niveau de Chasseur.",
             "Vos 🟩 rapportent aussi 1 XP.",
             "14 🟩 : Désactive un effet du monstre. Max 1 fois par monstre.",
             "Chaque monstre tué rapporte 50 % d'XP en plus."
@@ -102,7 +102,7 @@ export const playerClassAttributesRepository = buildPlayerClassDataAttributes({
         name: "Barbare",
         emoji: "💢",
         descriptions: [
-            "Chaque mot avec au moins 1 ⬛ rapporte 1 🟩.",
+            "Vos ⬛ rapportent aussi 1 🟩.",
             "6 🟩 : Ce tour, faites 1 dégât tous les 4 ⬛ que vous faites.",
             "Si vous avez fait 10 ⬛ ou plus, x2 dégâts de mot.",
             "Vos dégâts de mot augmentent avec les essais au lieu de diminuer."
@@ -459,7 +459,7 @@ export class Hunter extends PlayerClass {
 
     level0(): void {
         this.on("newMonster", () => {
-            this.player!.damageMonster(this.game.level);
+            this.player!.damageMonster(this.level + 1);
         });
     }
 
@@ -502,7 +502,7 @@ export class Barbarian extends PlayerClass {
     level0(): void {
         this.on("result", (context) => {
             if (context.player !== this.player) return;
-            if (context.result.some((e) => e === WordleResult.INCORRECT)) context.totalMana++;
+            context.totalMana += context.result.filter((e) => e === WordleResult.INCORRECT).length;
         });
     }
 
